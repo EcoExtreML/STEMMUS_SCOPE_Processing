@@ -40,11 +40,25 @@ mamba env create
 <details>
   <summary>Install MATLAB Runtime </summary>
 
-To run the STEMMUS_SCOPE, you need MATLAB Runtime version `2021a`. Use this
-[download link](https://nl.mathworks.com/products/compiler/matlab-runtime.html)
-and follow [this
-instruction](https://nl.mathworks.com/help/compiler/install-the-matlab-runtime.html)
-to install it.  
+To run the STEMMUS_SCOPE, you need MATLAB Runtime version `2021a`.
+
+In a terminal:
+
+```sh
+# Download MATLAB Runtime for Linux
+wget https://ssd.mathworks.com/supportfiles/downloads/R2021a/Release/6/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2021a_Update_6_glnxa64.zip
+
+# Unzip the file 
+unzip MATLAB_Runtime_R2021a_Update_6_glnxa64.zip
+
+# Install it
+cd MATLAB_Runtime_R2021a_Update_6_glnxa64
+sudo -H ./install -mode silent -agreeToLicense yes
+```
+
+For more information on how to download and install it, see the links below:
+- [download](https://nl.mathworks.com/products/compiler/matlab-runtime.html)
+- [intallation](https://nl.mathworks.com/help/compiler/install-the-matlab-runtime.html)
 
 **On Snellius:**
 
