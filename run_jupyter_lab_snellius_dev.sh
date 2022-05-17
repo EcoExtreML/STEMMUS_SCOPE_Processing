@@ -2,7 +2,7 @@
 #
 # Serve a jupyter lab environment from a compute node on Snellius
 # see https://servicedesk.surfsara.nl/wiki/pages/viewpage.action?pageId=30660252
-# usage: sbatch run_jupyter_on_compute_node.sh
+# usage: sbatch run_jupyter_lab_snellius_dev.sh
  
 # SLURM settings
 #SBATCH -J jupyter_lab
@@ -14,6 +14,9 @@
 #SBATCH --output=./slurm/slurm_%j.out
 #SBATCH --error=./slurm/slurm_%j.out
  
+ # Some security: stop script on error and undefined variables
+set -euo pipefail
+
 # Use an appropriate conda environment
 . ~/mamba/bin/activate stemmus
 
@@ -24,5 +27,17 @@
 module load 2021
 module load MATLAB/2021a-upd3
 
-# Create executable file
-mcc -m ./src/STEMMUS_SCOPE_exe.m -a ./src -d ./exe -o STEMMUS_SCOPE -R nodisplay -R singleCompThread
+# Choose random port and print instructions to connect
+PORT=`shuf -i 5000-5999 -n 1`
+LOGIN_HOST_EXT=int3-pub.snellius.surf.nl
+LOGIN_HOST_INT=int3
+ 
+echo "Selected port is: " $PORT
+echo
+echo "To connect to the notebook type the following command from your local terminal:"
+echo "ssh -L ${PORT}:localhost:${PORT} ${USER}@${LOGIN_HOST_EXT}"
+ 
+ssh -o StrictHostKeyChecking=no -f -N -p 22 -R $PORT:localhost:$PORT $LOGIN_HOST_INT
+ 
+# Start the jupyter lab session
+jupyter lab --no-browser --port $PORT
