@@ -11,8 +11,8 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
 #SBATCH -p thin
-#SBATCH --output=./slurm/slurm_%j.out
-#SBATCH --error=./slurm/slurm_%j.out
+#SBATCH --output=./slurm_%j.out
+#SBATCH --error=./slurm_%j.out
  
 # Use an appropriate conda environment
 . ~/mamba/bin/activate stemmus

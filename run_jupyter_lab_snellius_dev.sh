@@ -11,10 +11,10 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
 #SBATCH -p thin
-#SBATCH --output=./slurm/slurm_%j.out
-#SBATCH --error=./slurm/slurm_%j.out
+#SBATCH --output=./slurm_%j.out
+#SBATCH --error=./slurm_%j.out
  
- # Some security: stop script on error and undefined variables
+# Some security: stop script on error and undefined variables
 set -euo pipefail
 
 # Use an appropriate conda environment
