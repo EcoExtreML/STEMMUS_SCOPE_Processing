@@ -1,1 +1,0 @@
-"""Documentation about this package"""
