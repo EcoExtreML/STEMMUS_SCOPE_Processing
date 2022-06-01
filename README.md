@@ -120,6 +120,17 @@ The execution of the model includes following steps:
 - Run the model
 - Create output directories, prepare output files
 
+## Configure the package for development and testing
+The testing framework used here is [PyTest](https://pytest.org). Before running the test, the package need to be installed and configured as via the command:
+
+```py
+pip install -e .
+```
+or
+```py
+python setup.py develop
+```
+
 ## Contributing
 
 If you want to contribute to the development of PyStemmusScope,
