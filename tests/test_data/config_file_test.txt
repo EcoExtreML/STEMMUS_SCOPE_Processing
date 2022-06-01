@@ -1,0 +1,7 @@
+SoilPropertyPath=tests/test_data/directories/model_parameters/soil_property/
+InputPath=tests/test_data/directories/input
+OutputPath=tests/test_data/directories/output/
+ForcingPath=tests/test_data/directories/forcing/plumber2_data/
+ForcingFileName=NL-dummy_1979-2021_FLUXNET2010_Met.nc
+VegetationPropertyPath=tests/test_data/directories/model_parameters/vegetation_property/
+DurationSize=17520
