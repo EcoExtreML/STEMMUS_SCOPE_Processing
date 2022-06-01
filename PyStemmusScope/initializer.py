@@ -1,5 +1,6 @@
-from asyncio.log import logger
 from pathlib import Path
+import time
+import shutil
 import logging
 
 
@@ -27,10 +28,62 @@ class InputDir:
 
         return config
 
-    def _copy_data():
+    def prepare_work_dir(self, forcing_filenames_list: list = [],
+        full_run: bool = False
+    ):
+        """Prepare work directory"""
+        self.forcing_filenames_list = forcing_filenames_list
+        
+        if full_run:
+            self.forcing_filenames_list = [file.name for file in Path(self.config["ForcingPath"]).iterdir()]
+
+        # dict to store path to config file and working directory for each station
+        self.work_dir_dict, self.config_path_dict = self._create_work_dir()
+
+        return self.work_dir_dict, self.config_path_dict
+
+    def _create_work_dir(self):
+        """Create input directory and copy forcing files."""
+        # empty dict to store path to config file and working directory for each station
+        config_path_dict = {}
+        work_dir_dict = {}
+        for ncfile in self.forcing_filenames_list:
+            # get start time with the format Y-M-D-HM
+            timestamp = time.strftime('%Y%m%d_%H%M')
+            station_name = ncfile.split('_')[0]
+            # create input directory
+            work_dir = Path(self.config["InputPath"], station_name + '_' + timestamp)
+            Path(work_dir).mkdir(parents=True, exist_ok=True)
+            print(f"Prepare work directory {work_dir} for the station: {station_name}")
+            # copy model parameters to work directory
+            self._copy_data(work_dir)
+            # update config file for ForcingFileName and InputPath
+            config_file_path = self._update_config_file(ncfile, work_dir, station_name, timestamp)
+            # save config path and work directory to the dictionaries
+            work_dir_dict[ncfile] = work_dir
+            config_path_dict[ncfile] = config_file_path
+
+        return work_dir_dict, config_path_dict
+
+    def _copy_data(self, work_dir):
         """Copy required data to the work directory."""
+        # copy model parameters
+        shutil.copytree(self.config["VegetationPropertyPath"], work_dir, dirs_exist_ok=True)
         # check all files/folders
+
         #logger
         # required data i.e. directional, fluspect_parameters, leafangles, radiationdata, soil_spectra, and input_data.xlsx
 
-    
+    def _update_config_file(self, ncfile, work_dir, station_name, timestamp):
+        """Update config file for each station."""
+        config_file_path = Path(work_dir, f"{station_name}_{timestamp}_config.txt")
+        with open(config_file_path, 'w') as f:
+            for i in self.config.keys():
+                if i == "ForcingFileName":
+                    f.write(i + "=" + ncfile + "\n")
+                elif i == "InputPath":
+                    f.write(i + "=" + str(work_dir) + "/" + "\n")
+                else:
+                    f.write(i + "=" + self.config[i] + "\n")        
+
+        return config_file_path
