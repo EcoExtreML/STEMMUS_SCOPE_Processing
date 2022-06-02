@@ -64,6 +64,17 @@ interactively.
 
 [CRIB](https://crib.utwente.nl/) is the ITC Geospatial Computing Platform.
 
+1. Log in CRIB with your username and password and select a proper compute unit.
+2. Check `config_file_crib.txt` and change the paths if needed, specifically
+   "InputPath" and "OutputPath".
+3. click on the `Remote Desktop` in the
+Launcher. Click on the `Applications`. You will find the 'MATLAB' software under
+the `Research`. 
+4. After clicking on 'MATLAB', it asks for your account information that is
+connected to a MATLAB license.
+5. Open the file `run_model_in_matlab_dev.m` and set the paths inside the script.
+6. Then, run the main script `run_model_in_matlab_dev.m`.
+
 # Recipe of model execution
 
 The execution of the model includes following steps:
