@@ -1,7 +1,25 @@
-# processing
+# STEMMUS SCOPE Processing
 
-This repositary includes python modules for running the STEMMUS-SCOPE model in a
-notebook. 
+<!-- (Customize these badges with your own links, and check https://shields.io/ or https://badgen.net/ to see which other badges are available.) -->
+
+
+[![github repo badge](https://img.shields.io/badge/github-repo-000.svg?logo=github&labelColor=gray&color=blue)](https://github.com/EcoExtreML/stemmus_scope_processing)
+[![build](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/build.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/build.yml)
+[![fair-software badge](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu)
+[![sonarcloud](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/sonarcloud.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/sonarcloud.yml)
+[![github license badge](https://img.shields.io/github/license/EcoExtreML/stemmus_scope_processing)](https://github.com/EcoExtreML/stemmus_scope_processing)
+
+<!-- [![RSD](https://img.shields.io/badge/rsd-pystemmusscope-00a3e3.svg)](https://www.research-software.nl/software/pystemmusscope) 
+[![workflow pypi badge](https://img.shields.io/pypi/v/pystemmusscope.svg?colorB=blue)](https://pypi.python.org/project/pystemmusscope/) 
+[![DOI](https://zenodo.org/badge/DOI/<replace-with-created-DOI>.svg)](https://doi.org/<replace-with-created-DOI>)
+[![workflow cii badge](https://bestpractices.coreinfrastructure.org/projects/<replace-with-created-project-identifier>/badge)](https://bestpractices.coreinfrastructure.org/projects/<replace-with-created-project-identifier>)
+[![workflow scc badge](https://sonarcloud.io/api/project_badges/measure?project=EcoExtreML_stemmus_scope_processing&metric=coverage)](https://sonarcloud.io/dashboard?id=EcoExtreML_stemmus_scope_processing)
+[![Documentation Status](https://readthedocs.org/projects/stemmus_scope_processing/badge/?version=latest)](https://stemmus_scope_processing.readthedocs.io/en/latest/?badge=latest)
+[![cffconvert](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/cffconvert.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/cffconvert.yml) 
+[![markdown-link-check](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/markdown-link-check.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/markdown-link-check.yml) -->
+
+
+This repositary includes python modules for running the STEMMUS-SCOPE model in a notebook. 
 
 The workflow is executed using python and MATLAB Runtime on a Unix-like system.
 The python packages are listed in the
@@ -99,3 +117,12 @@ The execution of the model includes following steps:
 - Create input directories, prepare input files 
 - Run the model
 - Create output directories, prepare output files
+
+## Contributing
+
+If you want to contribute to the development of PyStemmusScope,
+have a look at the [contribution guidelines](docs/CONTRIBUTING.md).
+
+## Credits
+
+This package was created with [Cookiecutter](https://github.com/audreyr/cookiecutter) and the [NLeSC/python-template](https://github.com/NLeSC/python-template).
