@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 # dummy test product
-tests/directories/input/
+tests/test_data/directories/input/
 
 # C extensions
 *.so
