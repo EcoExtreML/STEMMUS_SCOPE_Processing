@@ -24,12 +24,12 @@ class TestInputDir:
         # Instantiate working directories handler from PyStemmusScope
         initializer = InputDir(path_to_config_file, path_to_model)
         # specify the forcing filenames
-        forcing_filenames_list = ["NL-fake_1979-2021_FLUXNET2010_Met.nc"]
+        forcing_filenames_list = ["NL-dummy_1979-2021_FLUXNET2010_Met.nc"]
         # prepare work directory
         work_dir_dict, config_path_dict = initializer.prepare_work_dir(forcing_filenames_list)
 
-        assert work_dir_dict["NL-fake_1979-2021_FLUXNET2010_Met.nc"].is_dir()
-        assert config_path_dict["NL-fake_1979-2021_FLUXNET2010_Met.nc"].exists()
+        assert work_dir_dict["NL-dummy_1979-2021_FLUXNET2010_Met.nc"].is_dir()
+        assert config_path_dict["NL-dummy_1979-2021_FLUXNET2010_Met.nc"].exists()
 
 
           
