@@ -1,41 +1,86 @@
-# Contributing guidelines
+# processing
 
-We welcome any kind of contribution to our software, from simple comment or question to a full fledged [pull request](https://help.github.com/articles/about-pull-requests/). Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+This repositary includes python modules for running the STEMMUS-SCOPE model in a
+notebook. 
 
-A contribution can be one of the following cases:
+The workflow is executed using python and MATLAB on a Unix-like system.
+The python packages are listed in the
+[`environment.yml`](https://github.com/EcoExtreML/processing/blob/main/environment.yml)
+file. Follow the instructions below to create conda environment and install
+MATLAB Runtime.
 
-1. you have a question;
-1. you think you may have found a bug (including unexpected behavior);
-1. you want to make some kind of change to the code base (e.g. to fix a bug, to add a new feature, to update documentation);
-1. you want to make a new release of the code base.
+<details>
+  <summary>Create conda environment </summary>
 
-The sections below outline the steps in each case.
+Run the commands below in a terminal:
 
-## You have a question
+```sh
+# Download and install Conda
+wget https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-pypy3-Linux-x86_64.sh
+bash Mambaforge-pypy3-Linux-x86_64.sh 
+-b -p ~/mamba
 
-1. use the search functionality [here](https://github.com/EcoExtreML/stemmus_scope_processing/issues) to see if someone already filed the same issue;
-2. if your issue search did not yield any relevant results, make a new issue;
-3. apply the "Question" label; apply other labels when relevant.
+# Update base environment
+. ~/mamba/bin/activate
+mamba update --name base mamba
 
-## You think you may have found a bug
+# Clone this repository
+git clone https://github.com/EcoExtreML/processing.git
 
-1. use the search functionality [here](https://github.com/EcoExtreML/stemmus_scope_processing/issues) to see if someone already filed the same issue;
-1. if your issue search did not yield any relevant results, make a new issue, making sure to provide enough information to the rest of the community to understand the cause and context of the problem. Depending on the issue, you may want to include:
-    - the [SHA hashcode](https://help.github.com/articles/autolinked-references-and-urls/#commit-shas) of the commit that is causing your problem;
-    - some identifying information (name and version number) for dependencies you're using;
-    - information about the operating system;
-1. apply relevant labels to the newly created issue.
+# Create a conda environment called 'stemmus' with all required dependencies
+cd processing
+mamba env create
 
-## You want to make some kind of change to the code base
+# The environment can be activated with
+. ~/mamba/bin/activate stemmus
 
-1. (**important**) announce your plan to the rest of the community *before you start working*. This announcement should be in the form of a (new) issue;
-1. (**important**) wait until some kind of consensus is reached about your idea being a good idea;
-1. if needed, fork the repository to your own Github profile and create your own feature branch off of the latest master commit. While working on your feature branch, make sure to stay up to date with the master branch by pulling in changes, possibly from the 'upstream' repository (follow the instructions [here](https://help.github.com/articles/configuring-a-remote-for-a-fork/) and [here](https://help.github.com/articles/syncing-a-fork/));
-1. make sure the existing tests still work by running ``pytest``;
-1. add your own tests (if necessary);
-1. update or expand the documentation;
-1. update the `CHANGELOG.md` file with change;
-1. push your feature branch to (your fork of) the PyStemmusScope repository on GitHub;
-1. create the pull request, e.g. following the instructions [here](https://help.github.com/articles/creating-a-pull-request/).
+```
+</details>
 
-In case you feel like you've made a valuable contribution, but you don't know how to write or run tests for it, or how to generate the documentation: don't let this discourage you from making the pull request; we can help you! Just go ahead and submit the pull request, but keep in mind that you might be asked to append additional commits to your pull request.
+<details>
+  <summary>Use MATLAB </summary>
+
+To run the STEMMUS_SCOPE, you need MATLAB version `>=2019`.
+
+**On Snellius:**
+
+[Snellius](https://servicedesk.surfsara.nl/wiki/display/WIKI/Snellius) is the
+Dutch National supercomputer hosted at SURF. MATLAB Runtime is installed on
+Snellius, see the script
+[`run_jupyter_lab_snellius_dev.sh`](https://github.com/EcoExtreML/processing/blob/main/run_jupyter_lab_snellius_dev.sh)
+on how to load the module.
+</details>
+
+# Run jupyter notebook
+
+**On Snellius:**
+
+Use the script
+[`run_jupyter_lab_snellius_dev.sh`](https://github.com/EcoExtreML/processing/blob/main/run_jupyter_lab_snellius_dev.sh)
+to create a jupyter lab server on Snellius for running the notebook
+interactively.
+
+**On CRIB:**
+
+[CRIB](https://crib.utwente.nl/) is the ITC Geospatial Computing Platform.
+
+1. Log in CRIB with your username and password and select a proper compute unit.
+2. Check `config_file_crib.txt` and change the paths if needed, specifically
+   "InputPath" and "OutputPath".
+3. click on the `Remote Desktop` in the
+Launcher. Click on the `Applications`. You will find the 'MATLAB' software under
+the `Research`. 
+4. After clicking on 'MATLAB', it asks for your account information that is
+connected to a MATLAB license.
+5. Open the file `run_model_in_matlab_dev.m` and set the paths inside the script.
+6. Then, run the main script `run_model_in_matlab_dev.m`.
+
+# Recipe of model execution
+
+The execution of the model includes following steps:
+
+- Update/set config files
+- Create input directories, prepare input files 
+- Run the model
+- Create output directories, prepare output files
+- Create exe file
