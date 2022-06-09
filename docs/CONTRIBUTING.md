@@ -1,13 +1,12 @@
-# processing
+# STEMMUS_SCOPE processing
 
-This repositary includes python modules for running the STEMMUS-SCOPE model in a
-notebook. 
+This document illustrates how to run the model STEMMUS_SCOPE as a developer. 
+The workflow is executed using python and MATLAB on a Unix-like system where a MATLAB license is available.
+To run the STEMMUS_SCOPE, you need MATLAB version `>=2019`.
 
-The workflow is executed using python and MATLAB on a Unix-like system.
 The python packages are listed in the
 [`environment.yml`](https://github.com/EcoExtreML/processing/blob/main/environment.yml)
-file. Follow the instructions below to create conda environment and install
-MATLAB Runtime.
+file. Follow the instructions below to create conda environment.
 
 <details>
   <summary>Create conda environment </summary>
@@ -37,28 +36,21 @@ mamba env create
 ```
 </details>
 
-<details>
-  <summary>Use MATLAB </summary>
 
-To run the STEMMUS_SCOPE, you need MATLAB version `>=2019`.
+# Run model in a Jupyter notebook
 
 **On Snellius:**
 
 [Snellius](https://servicedesk.surfsara.nl/wiki/display/WIKI/Snellius) is the
-Dutch National supercomputer hosted at SURF. MATLAB Runtime is installed on
-Snellius, see the script
-[`run_jupyter_lab_snellius_dev.sh`](https://github.com/EcoExtreML/processing/blob/main/run_jupyter_lab_snellius_dev.sh)
-on how to load the module.
-</details>
+Dutch National supercomputer hosted at SURF.
 
-# Run jupyter notebook
-
-**On Snellius:**
-
+The notebook [run_model_in_notebook_dev.ipynb](./notebooks/run_model_in_notebook_dev.ipynb) shows how to run the model.
 Use the script
 [`run_jupyter_lab_snellius_dev.sh`](https://github.com/EcoExtreML/processing/blob/main/run_jupyter_lab_snellius_dev.sh)
-to create a jupyter lab server on Snellius for running the notebook
+to create a Jupyter lab server on Snellius for running the notebook
 interactively.
+
+# Run model in a MATLAB script
 
 **On CRIB:**
 
