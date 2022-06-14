@@ -1,3 +1,8 @@
+"""PyStemmusScope directories utilities.
+
+Module designed to manage input directories and data for running the model
+and storing outputs.
+"""
 from pathlib import Path
 import os
 import time

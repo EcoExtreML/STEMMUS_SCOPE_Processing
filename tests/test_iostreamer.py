@@ -1,7 +1,7 @@
 """Tests for the s2s.initializer module.
 """
 from pathlib import Path
-from PyStemmusScope.initializer import InputDir
+from PyStemmusScope.iostreamer import InputDir
 
 from . import data_folder
 
