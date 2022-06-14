@@ -82,7 +82,7 @@ For more information on how to download and install it, see the links below:
 [Snellius](https://servicedesk.surfsara.nl/wiki/display/WIKI/Snellius) is the
 Dutch National supercomputer hosted at SURF. MATLAB Runtime is installed on
 Snellius, see the script
-[`run_jupyter_lab_on_compute_node.sh`](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/run_jupyter_lab_on_compute_node.sh)
+[`run_jupyter_lab_snellius.sh`](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/run_jupyter_lab_snellius.sh)
 on how to load the module.
 </details>
 

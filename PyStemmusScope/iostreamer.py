@@ -6,7 +6,8 @@ and storing outputs.
 from pathlib import Path
 import os
 import time
-import shutil
+import distutils.dir_util
+import distutils.file_util
 
 
 class InputDir:
@@ -116,10 +117,10 @@ class InputDir:
             "Radiationdata", "SoilSpectra"]
         for folder in folder_list_vegetation:
             os.makedirs(work_dir / folder, exist_ok=True)
-            shutil.copytree(self.config[folder], work_dir / folder, dirs_exist_ok=True)
+            distutils.dir_util.copy_tree(str(self.config[folder]), str(work_dir / folder))
         
         # copy input_data.xlsx
-        shutil.copy(self.config["InputData"], work_dir)
+        distutils.file_util.copy_file(str(self.config["InputData"]), str(work_dir))
 
     def _update_config_file(self, ncfile, work_dir, station_name, timestamp):
         """Update config file for each station.
