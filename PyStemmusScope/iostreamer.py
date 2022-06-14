@@ -3,11 +3,11 @@
 Module designed to manage input directories and data for running the model
 and storing outputs.
 """
-from pathlib import Path
-import os
-import time
 import distutils.dir_util
 import distutils.file_util
+import os
+import time
+from pathlib import Path
 
 
 class InputDir:
