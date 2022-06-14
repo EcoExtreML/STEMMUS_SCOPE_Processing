@@ -39,6 +39,3 @@ class TestInputDir:
 
         assert work_dir_dict["NL-dummy_1979-2021_FLUXNET2010_Met.nc"].is_dir()
         assert config_path_dict["NL-dummy_1979-2021_FLUXNET2010_Met.nc"].exists()
-
-
-          

@@ -99,7 +99,7 @@ JupyterLab will open automatically in your browser.
 **On Snellius:**
 
 Use the script
-[`run_jupyter_lab_snellius.sh`](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/run_jupyter_lab_on_compute_node.sh)
+[`run_jupyter_lab_snellius.sh`](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/run_jupyter_lab_snellius.sh)
 to create a jupyter lab server on Snellius for running the notebook
 interactively.
 
@@ -132,7 +132,7 @@ python setup.py develop
 ## Contributing
 
 If you want to contribute to the development of PyStemmusScope,
-have a look at the [contribution guidelines](docs/CONTRIBUTING.md).
+have a look at the [contribution guidelines](CONTRIBUTING.md).
 
 ## Credits
 

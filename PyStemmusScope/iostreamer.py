@@ -43,14 +43,14 @@ class InputDir:
             Dictionary containing paths to work directory and all sub-directories.
         """
         config = {}
-        with open(path_to_config_file, "r") as f:
+        with open(path_to_config_file, "r", encoding="utf8") as f:
             for line in f:
                 (key, val) = line.split("=")
                 config[key] = val.rstrip('\n')
 
         return config
 
-    def prepare_work_dir(self, forcing_filenames_list: list = [],
+    def prepare_work_dir(self, forcing_filenames_list: list,
         full_run: bool = False
     ):
         """Prepare work directory for each station.
@@ -137,13 +137,13 @@ class InputDir:
             Path to updated config file.
         """
         config_file_path = Path(work_dir, f"{station_name}_{timestamp}_config.txt")
-        with open(config_file_path, 'w') as f:
-            for i in self.config.keys():
-                if i == "ForcingFileName":
-                    f.write(i + "=" + ncfile + "\n")
+        with open(config_file_path, 'w', encoding="utf8") as f:
+            for i in self.config.items():
+                if i[0] == "ForcingFileName":
+                    f.write(i[0] + "=" + ncfile + "\n")
                 elif i == "InputPath":
-                    f.write(i + "=" + str(work_dir) + "/" + "\n")
+                    f.write(i[0] + "=" + str(work_dir) + "/" + "\n")
                 else:
-                    f.write(i + "=" + self.config[i] + "\n")        
+                    f.write(i[0] + "=" + i[1] + "\n")        
 
         return config_file_path
