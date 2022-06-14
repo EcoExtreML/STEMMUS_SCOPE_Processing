@@ -35,18 +35,17 @@ Run the commands below in a terminal:
 ```sh
 # Download and install Conda
 wget https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-pypy3-Linux-x86_64.sh
-bash Mambaforge-pypy3-Linux-x86_64.sh 
--b -p ~/mamba
+bash Mambaforge-pypy3-Linux-x86_64.sh -b -p ~/mamba
 
 # Update base environment
 . ~/mamba/bin/activate
 mamba update --name base mamba
 
 # Clone this repository
-git clone https://github.com/EcoExtreML/processing.git
+git clone https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing.git
 
 # Create a conda environment called 'stemmus' with all required dependencies
-cd processing
+cd STEMMUS_SCOPE_Processing
 mamba env create
 
 # The environment can be activated with
@@ -83,7 +82,7 @@ For more information on how to download and install it, see the links below:
 [Snellius](https://servicedesk.surfsara.nl/wiki/display/WIKI/Snellius) is the
 Dutch National supercomputer hosted at SURF. MATLAB Runtime is installed on
 Snellius, see the script
-[`run_jupyter_lab_on_compute_node.sh`](https://github.com/EcoExtreML/processing/blob/main/run_jupyter_lab_on_compute_node.sh)
+[`run_jupyter_lab_on_compute_node.sh`](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/run_jupyter_lab_on_compute_node.sh)
 on how to load the module.
 </details>
 
@@ -100,11 +99,11 @@ JupyterLab will open automatically in your browser.
 **On Snellius:**
 
 Use the script
-[`run_jupyter_lab_on_compute_node.sh`](https://github.com/EcoExtreML/processing/blob/main/run_jupyter_lab_on_compute_node.sh)
+[`run_jupyter_lab_snellius.sh`](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/run_jupyter_lab_on_compute_node.sh)
 to create a jupyter lab server on Snellius for running the notebook
 interactively.
 
-# Run jupyter notebook on CRIB
+**On CRIB:**
 
 [CRIB](https://crib.utwente.nl/) is the ITC Geospatial Computing Platform.
 Currently, running the notebook on CRIB is not supported because MATLAB Runtime
@@ -114,7 +113,6 @@ can not be installed there.
 
 The execution of the model includes following steps:
 
-- Create exe file
 - Update/set config files
 - Create input directories, prepare input files 
 - Run the model
