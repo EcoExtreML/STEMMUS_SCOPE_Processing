@@ -1,7 +1,7 @@
 from pathlib import Path
+import os
 import time
 import shutil
-import logging
 
 
 class InputDir:
@@ -17,6 +17,7 @@ class InputDir:
         """
     
         self.config = self._read_config(path_to_config_file)
+        self.path_to_model = path_to_model
 
     def _read_config(self, path_to_config_file):
         """Read config from given config file."""
@@ -67,12 +68,14 @@ class InputDir:
 
     def _copy_data(self, work_dir):
         """Copy required data to the work directory."""
-        # copy model parameters
-        shutil.copytree(self.config["VegetationPropertyPath"], work_dir, dirs_exist_ok=True)
-        # check all files/folders
-
-        #logger
-        # required data i.e. directional, fluspect_parameters, leafangles, radiationdata, soil_spectra, and input_data.xlsx
+        folder_list_vegetation = ["Directional", "FluspectParameters", "Leafangles",
+            "Radiationdata", "SoilSpectra"]
+        for folder in folder_list_vegetation:
+            os.makedirs(work_dir / folder, exist_ok=True)
+            shutil.copytree(self.config[folder], work_dir / folder, dirs_exist_ok=True)
+        
+        # copy input_data.xlsx
+        shutil.copy(self.config["InputData"], work_dir)
 
     def _update_config_file(self, ncfile, work_dir, station_name, timestamp):
         """Update config file for each station."""
