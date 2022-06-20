@@ -101,14 +101,16 @@ def _update_config_file(nc_file, input_dir, output_dir, config, station_name, ti
     """
     config_file_path = Path(input_dir, f"{station_name}_{timestamp}_config.txt")
     with open(config_file_path, 'w', encoding="utf8") as f:
-        for key, _ in config.items():
+        for key, value in config.items():
             if key == "ForcingFileName":
-                f.write(key + "=" + nc_file + "\n")
+                update_entry = f"{key}={nc_file}\n"
             elif key == "InputPath":
-                f.write(key + "=" + input_dir + "/" + "\n")
+                update_entry = f"{key}={str(input_dir)}/\n"
             elif key == "OutputPath":
-                f.write(key + "=" + output_dir + "/" + "\n")
+                update_entry = f"{key}={str(output_dir)}/\n"
             else:
-                f.write(key + "=" + key + "\n")        
+                update_entry = f"{key}={value}\n"
+
+            f.write(update_entry)
 
     return str(config_file_path)
