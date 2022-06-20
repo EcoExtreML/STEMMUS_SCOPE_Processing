@@ -5,9 +5,9 @@ and storing outputs.
 """
 import distutils.dir_util
 import distutils.file_util
+import logging
 import os
 import time
-import logging
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
