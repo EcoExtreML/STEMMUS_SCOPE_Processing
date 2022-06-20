@@ -3,10 +3,9 @@
 Module designed to manage input directories and data for running the model
 and storing outputs.
 """
-import distutils.dir_util
-import distutils.file_util
 import logging
 import os
+import shutil
 import time
 from pathlib import Path
 
@@ -78,10 +77,10 @@ def _copy_data(input_dir, config):
         "Radiationdata", "SoilSpectra"]
     for folder in folder_list_vegetation:
         os.makedirs(input_dir / folder, exist_ok=True)
-        distutils.dir_util.copy_tree(str(config[folder]), str(input_dir / folder))
+        shutil.copytree(str(config[folder]), str(input_dir / folder), dirs_exist_ok=True)
     
     # copy input_data.xlsx
-    distutils.file_util.copy_file(str(config["InputData"]), str(input_dir))
+    shutil.copy(str(config["InputData"]), str(input_dir))
 
 def _update_config_file(nc_file, input_dir, output_dir, config, station_name, timestamp): #pylint: disable=too-many-arguments
     """Update config file for each station.
