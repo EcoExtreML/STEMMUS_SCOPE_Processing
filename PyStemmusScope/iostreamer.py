@@ -10,6 +10,7 @@ import os
 import time
 from pathlib import Path
 
+
 logger = logging.getLogger(__name__)
 
 def read_config(path_to_config_file):
