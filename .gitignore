@@ -5,6 +5,7 @@ __pycache__/
 
 # dummy test product
 tests/test_data/directories/input/
+tests/test_data/directories/output/
 
 # C extensions
 *.so

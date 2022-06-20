@@ -82,7 +82,7 @@ def _copy_data(input_dir, config):
     # copy input_data.xlsx
     distutils.file_util.copy_file(str(config["InputData"]), str(input_dir))
 
-def _update_config_file(nc_file, input_dir, output_dir, config, station_name, timestamp):
+def _update_config_file(nc_file, input_dir, output_dir, config, station_name, timestamp): #pylint: disable=too-many-arguments
     """Update config file for each station.
 
     Create config file for each forcing/station under the work directory.
