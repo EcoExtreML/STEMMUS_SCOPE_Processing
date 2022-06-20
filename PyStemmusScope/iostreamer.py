@@ -37,7 +37,7 @@ def create_io_dir(forcing_filename, config):
     Work flow executor to create work directory and all sub-directories.
 
     Returns:
-        Dictionary containing path to work directory and config file for every station/forcing.
+        Path (string) to input, output directory and config file for every station/forcing.
     """
     # get start time with the format Y-M-D-HM
     timestamp = time.strftime('%Y%m%d_%H%M')
@@ -70,7 +70,8 @@ def _copy_data(input_dir, config):
     Create sub-directories inside the work directory and copy data.
 
     Args:
-        input_dir: Path to the work directory.
+        input_dir: Path to the input directory.
+        config: Dictionary containing all the paths.
     """
     folder_list_vegetation = ["Directional", "FluspectParameters", "Leafangles",
         "Radiationdata", "SoilSpectra"]
@@ -90,6 +91,7 @@ def _update_config_file(nc_file, input_dir, output_dir, config, station_name, ti
         ncfile: Name of forcing file.
         input_dir: Path to the input directory.
         output_dir: Path to the output directory.
+        config: Dictionary containing all the paths.
         station_name: Station name inferred from forcing file.
         timestamp: Timestamp when creating the config file.
     
@@ -98,14 +100,14 @@ def _update_config_file(nc_file, input_dir, output_dir, config, station_name, ti
     """
     config_file_path = Path(input_dir, f"{station_name}_{timestamp}_config.txt")
     with open(config_file_path, 'w', encoding="utf8") as f:
-        for i in config.items():
-            if i[0] == "ForcingFileName":
-                f.write(i[0] + "=" + nc_file + "\n")
-            elif i == "InputPath":
-                f.write(i[0] + "=" + input_dir + "/" + "\n")
-            elif i == "OutputPath":
-                f.write(i[0] + "=" + output_dir + "/" + "\n")
+        for key, _ in config.items():
+            if key == "ForcingFileName":
+                f.write(key + "=" + nc_file + "\n")
+            elif key == "InputPath":
+                f.write(key + "=" + input_dir + "/" + "\n")
+            elif key == "OutputPath":
+                f.write(key + "=" + output_dir + "/" + "\n")
             else:
-                f.write(i[0] + "=" + i[1] + "\n")        
+                f.write(key + "=" + key + "\n")        
 
     return str(config_file_path)
