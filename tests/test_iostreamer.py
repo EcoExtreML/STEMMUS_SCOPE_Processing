@@ -1,41 +1,30 @@
 """Tests for the s2s.initializer module.
 """
 from pathlib import Path
-from PyStemmusScope.iostreamer import InputDir
+import PyStemmusScope
 
 from . import data_folder
 
 class TestInputDir:
-    def test_init(self):
-        # path to executable
-        path_to_model = Path("path_to_STEMMUS_SCOPE_repository")
-        # path to config file
+    def test_read_config(self):
         path_to_config_file = data_folder / "config_file_test.txt"
-        # Instantiate working directories handler from PyStemmusScope
-        iostreamer = InputDir(path_to_config_file, path_to_model)
+        config = PyStemmusScope.read_config(path_to_config_file)
 
-        assert isinstance(iostreamer, InputDir)
+        expected_config = {
+            'WorkDir': 'tests/test_data/directories/',
+            'SoilPropertyPath': 'tests/test_data/directories/model_parameters/soil_property/',
+            'ForcingPath': 'tests/test_data/directories/forcing/plumber2_data/',
+            'ForcingFileName': 'NL-dummy_1979-2021_FLUXNET2010_Met.nc',
+            'Directional': 'tests/test_data/directories/model_parameters/vegetation_property/directional/',
+            'FluspectParameters': 'tests/test_data/directories/model_parameters/vegetation_property/fluspect_parameters/',
+            'Leafangles': 'tests/test_data/directories/model_parameters/vegetation_property/leafangles/',
+            'Radiationdata': 'tests/test_data/directories/model_parameters/vegetation_property/radiationdata/',
+            'SoilSpectra': 'tests/test_data/directories/model_parameters/vegetation_property/soil_spectrum/',
+            'InputData': 'tests/test_data/directories/model_parameters/vegetation_property/dummy_data.xlsx',
+            'InitialConditionPath': 'tests/test_data/directories/model_parameters/soil_initialcondition/',
+            'NumberOfTimeSteps': '17520',
+            'InputPath': 'tests/test_data/directories/input/',
+            'OutputPath': 'tests/test_data/directories/output/'
+        }
 
-    def test_str(self):
-        # path to executable
-        path_to_model = Path("path_to_STEMMUS_SCOPE_repository")
-        # path to config file
-        path_to_config_file = data_folder / "config_file_test.txt"
-        # Instantiate working directories handler from PyStemmusScope
-        iostreamer = InputDir(path_to_config_file, path_to_model)
-        assert str(iostreamer) == "Input directories handler."
-
-    def test_prepare_work_dir(self):
-        # path to executable
-        path_to_model = Path("path_to_STEMMUS_SCOPE_repository")
-        # path to config file
-        path_to_config_file = data_folder / "config_file_test.txt"
-        # Instantiate working directories handler from PyStemmusScope
-        iostreamer = InputDir(path_to_config_file, path_to_model)
-        # specify the forcing filenames
-        forcing_filenames_list = ["NL-dummy_1979-2021_FLUXNET2010_Met.nc"]
-        # prepare work directory
-        work_dir_dict, config_path_dict = iostreamer.prepare_work_dir(forcing_filenames_list)
-
-        assert work_dir_dict["NL-dummy_1979-2021_FLUXNET2010_Met.nc"].is_dir()
-        assert config_path_dict["NL-dummy_1979-2021_FLUXNET2010_Met.nc"].exists()
+        assert config == expected_config
