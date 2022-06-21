@@ -82,7 +82,7 @@ For more information on how to download and install it, see the links below:
 [Snellius](https://servicedesk.surfsara.nl/wiki/display/WIKI/Snellius) is the
 Dutch National supercomputer hosted at SURF. MATLAB Runtime is installed on
 Snellius, see the script
-[`run_jupyter_lab_on_compute_node.sh`](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/run_jupyter_lab_on_compute_node.sh)
+[`run_jupyter_lab_snellius.sh`](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/run_jupyter_lab_snellius.sh)
 on how to load the module.
 </details>
 
@@ -99,7 +99,7 @@ JupyterLab will open automatically in your browser.
 **On Snellius:**
 
 Use the script
-[`run_jupyter_lab_snellius.sh`](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/run_jupyter_lab_on_compute_node.sh)
+[`run_jupyter_lab_snellius.sh`](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/run_jupyter_lab_snellius.sh)
 to create a jupyter lab server on Snellius for running the notebook
 interactively.
 
@@ -118,10 +118,21 @@ The execution of the model includes following steps:
 - Run the model
 - Create output directories, prepare output files
 
+## Configure the package for development and testing
+The testing framework used here is [PyTest](https://pytest.org). Before running the test, the package need to be installed and configured as via the command:
+
+```py
+pip install -e .
+```
+or
+```py
+python setup.py develop
+```
+
 ## Contributing
 
 If you want to contribute to the development of PyStemmusScope,
-have a look at the [contribution guidelines](docs/CONTRIBUTING.md).
+have a look at the [contribution guidelines](CONTRIBUTING.md).
 
 ## Credits
 
