@@ -40,7 +40,7 @@ def create_io_dir(forcing_filename, config):
         Path (string) to input, output directory and config file for every station/forcing.
     """
     # get start time with the format Y-M-D-HM
-    timestamp = time.strftime('%Y%m%d_%H%M')
+    timestamp = time.strftime('%Y-%m-%d-%H%M')
     station_name = forcing_filename.split('_')[0]
     # create input directory
     input_dir = Path(f"{config['WorkDir']}/input/{station_name}_{timestamp}")
