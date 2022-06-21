@@ -14,5 +14,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-[Unreleased]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/compare/v1.0.0...HEAD
-[0.0.1]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/releases/tag/v0.0.1
+<!-- [Unreleased]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/compare/v1.0.0...HEAD
+[0.0.1]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/releases/tag/v0.0.1 -->

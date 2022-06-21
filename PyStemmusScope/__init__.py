@@ -1,5 +1,7 @@
 """Documentation about PyStemmusScope"""
 import logging
+from .iostreamer import create_io_dir
+from .iostreamer import read_config
 
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())

@@ -7,7 +7,7 @@ import time
 
 def read_config(config_file_path):
     config = {}
-    with open(config_file_path, "r") as f:
+    with open(config_file_path, "r", encoding="utf8") as f:
         for line in f:
             (key, val) = line.split("=")
             config[key] = val.rstrip('\n')
@@ -28,7 +28,7 @@ def input_dir(ncfile, config):
     shutil.copytree(config["VegetationPropertyPath"], work_dir, dirs_exist_ok=True)
     # update config file for ForcingFileName and InputPath
     config_file_path = Path(work_dir, f"{station_name}_{timestamp}_config.txt")
-    with open(config_file_path, 'w') as f:
+    with open(config_file_path, 'w', encoding="utf8") as f:
         for i in config.keys():
             if i == "ForcingFileName":
                 f.write(i + "=" + ncfile + "\n")
