@@ -1,5 +1,23 @@
+import os
 import numpy as np
 import xarray as xr
+
+
+def _calculate_ea(t_air_celcius, rh):
+    """Internal function that calculates the actual vapour pressure (kPa) from the
+    air temperature (degree Celcius) and relative humidity (%)
+
+    Args:
+        t_air_celcius: numpy array containing the air temperature in degrees C.
+
+        rh: numpy array of same shape as t_air_celcius, containing the relative humidity
+            as a percentage (e.g. ranging from 0 - 100).
+
+    Returns:
+        numpy array with the calculated actual vapor pressure
+    """
+    es = 6.107 * 10**(t_air_celcius*7.5 / (237.3+t_air_celcius))
+    return es * rh/100
 
 
 def read_forcing_data(forcing_file):
@@ -11,11 +29,11 @@ def read_forcing_data(forcing_file):
     data = {}
     # Expected time format is days (as floating point) since Jan 1st 00:00.
     data['doy_float'] = (
-        ds_forcing.time.dt.dayofyear - 1 +
-        ds_forcing.time.dt.hour/24 +
-        ds_forcing.time.dt.minute/60/24
+        ds_forcing['time'].dt.dayofyear - 1 +
+        ds_forcing['time'].dt.hour/24 +
+        ds_forcing['time'].dt.minute/60/24
     )
-    data['year'] = ds_forcing.time.dt.year.astype(float)
+    data['year'] = ds_forcing['time'].dt.year.astype(float)
 
     data['t_air_celcius'] = ds_forcing['Tair'] - 273.15
     # convert air pressure from Pa to hPa
@@ -36,17 +54,14 @@ def read_forcing_data(forcing_file):
     data['lai'] = ds_forcing['LAI']
     data['lai'][data['lai']<0.01] = 0.01
 
-    es = 6.107 * 10**(data['t_air_celcius']*7.5 / (237.2+data['t_air_celcius']))
-    # es = np.power(6.107 * 10,
-    #     data['t_air_celcius']*7.5 / (237.2+data['t_air_celcius']))
-    data['ea'] = es * data['rh']/100
-    # es= 6.107*10.^(Taira.*7.5./(237.3+Taira));
-    # ea=es.*RHa./100;
-
+    data['ea'] = _calculate_ea(data['t_air_celcius'], data['rh'])
 
     return data
 
-def write_dat_files(data, input_dir, fmt):
+
+def write_dat_files(data, input_dir, fmt='  %14.7e'):
+    """
+    """
     write_info = {
         'doy_float': 't_.dat',
         't_air_celcius': 'Ta_.dat',
@@ -62,11 +77,13 @@ def write_dat_files(data, input_dir, fmt):
         fpath = os.path.join(input_dir, fname)
         np.savetxt(fpath, data[var], fmt)
 
-def write_lai_file(data, fname, fmt):
+
+def write_lai_file(data, fname, fmt='  %14.7e'):
     lai_file_data = np.vstack([data['doy_float'], data['lai']]).T
     np.savetxt(fname, lai_file_data, fmt)
 
-def write_meteo_file(data, fname, fmt):
+
+def write_meteo_file(data, fname, fmt='  %14.7e'):
     meteo_data_vars = ['doy_float', 't_air_celcius', 'rh',
         'wind_speed', 'psurf_hpa', 'precip_conv', 'sw_down',
         'lw_down', 'vpd', 'lai']

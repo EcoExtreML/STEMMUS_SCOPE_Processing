@@ -7,9 +7,9 @@ from PyStemmusScope import read_forcing
 
 
 def test_mdata(tmp_path):
-    forcing_file = '/test_data/*.nc'
+    forcing_file = './tests/test_data/FI-Hyy_1996-2014_FLUXNET2015_Met.nc'
     fn_out = os.path.join(tmp_path, 'Mdata.txt')
-    fn_expected = '/test_data/Mdata.txt'
+    fn_expected = './tests/test_data/Mdata.txt'
 
     dat = read_forcing.read_forcing_data(forcing_file)
 
@@ -18,13 +18,13 @@ def test_mdata(tmp_path):
     df_expected = pd.read_fwf(fn_expected)
     df_written = pd.read_fwf(fn_out)
 
-    np.testing.allclose(df_expected.values, df_written.values)
+    np.testing.assert_allclose(df_expected.values, df_written.values, rtol=1e-5)
 
 
 def test_lai_file(tmp_path):
-    forcing_file = '/test_data/*.nc'
-    fn_out = os.path.join(tmp_path, 'LAI.dat')
-    fn_expected = '/test_data/LAI.dat'
+    forcing_file = './tests/test_data/FI-Hyy_1996-2014_FLUXNET2015_Met.nc'
+    fn_out = os.path.join(tmp_path, 'LAI_.dat')
+    fn_expected = './tests/test_data/LAI_.dat'
 
     dat = read_forcing.read_forcing_data(forcing_file)
 
@@ -33,13 +33,13 @@ def test_lai_file(tmp_path):
     df_expected = pd.read_fwf(fn_expected)
     df_written = pd.read_fwf(fn_out)
 
-    np.testing.allclose(df_expected.values, df_written.values)
+    np.testing.assert_allclose(df_expected.values, df_written.values, rtol=1e-5)
 
 
 def test_dat_files(tmp_path):
-    forcing_file = '/test_data/*.nc'
+    forcing_file = './tests/test_data/FI-Hyy_1996-2014_FLUXNET2015_Met.nc'
 
-    expected_path = '/test_data/'
+    expected_path = './tests/test_data/'
     files = ['t_.dat', 'Ta_.dat', 'Rin_.dat',
             'Rli_.dat', 'p_.dat', 'u_.dat',
             'CO2_.dat', 'ea_.dat', 'year_.dat']
@@ -51,4 +51,4 @@ def test_dat_files(tmp_path):
     for fname in files:
         df_expected = pd.read_fwf(os.path.join(expected_path, fname))
         df_written = pd.read_fwf(os.path.join(tmp_path, fname))
-        np.testing.allclose(df_expected.values, df_written.values)
+        np.testing.assert_allclose(df_expected.values, df_written.values, rtol=1e-4)
