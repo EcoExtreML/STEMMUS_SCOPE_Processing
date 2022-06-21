@@ -21,6 +21,15 @@ def _calculate_ea(t_air_celcius, rh):
 
 
 def read_forcing_data(forcing_file):
+    """Reads the forcing data from the provided netCDF file, and applies the required
+    unit conversions before returning the read data.
+
+    Args:
+        forcing_file (str or path): _description_
+
+    Returns:
+        _type_: _description_
+    """
     ds_forcing = xr.open_dataset(forcing_file)
 
     # remove the x and y coordinates from the data variables to make the numpy arrays 1D
@@ -60,7 +69,12 @@ def read_forcing_data(forcing_file):
 
 
 def write_dat_files(data, input_dir, fmt='  %14.7e'):
-    """
+    """Fuction to write the single-data .dat files for the STEMMUS_SCOPE matlab model.
+
+    Args:
+        data (dict): _description_
+        input_dir (path): _description_
+        fmt (str, optional): Formatting to use in . Defaults to '  %14.7e'.
     """
     write_info = {
         'doy_float': 't_.dat',
