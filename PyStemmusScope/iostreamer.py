@@ -73,7 +73,7 @@ def _copy_data(input_dir, config):
         input_dir: Path to the input directory.
         config: Dictionary containing all the paths.
     """
-    folder_list_vegetation = ["directional", "fluspectpParameters", "leafangles",
+    folder_list_vegetation = ["directional", "fluspect_parameters", "leafangles",
         "radiationdata", "soil_spectrum"]
     for folder in folder_list_vegetation:
         os.makedirs(input_dir / folder, exist_ok=True)
