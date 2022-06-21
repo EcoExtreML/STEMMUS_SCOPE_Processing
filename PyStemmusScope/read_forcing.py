@@ -1,3 +1,7 @@
+import numpy as np
+import xarray as xr
+
+
 def read_forcing_data(forcing_file):
     ds_forcing = xr.open_dataset(forcing_file)
 
