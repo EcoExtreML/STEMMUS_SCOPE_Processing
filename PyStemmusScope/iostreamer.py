@@ -73,20 +73,20 @@ def _copy_data(input_dir, config):
         input_dir: Path to the input directory.
         config: Dictionary containing all the paths.
     """
-    folder_list_vegetation = ["Directional", "FluspectParameters", "Leafangles",
-        "Radiationdata", "SoilSpectra"]
+    folder_list_vegetation = ["directional", "fluspectpParameters", "leafangles",
+        "radiationdata", "soil_spectrum"]
     for folder in folder_list_vegetation:
         os.makedirs(input_dir / folder, exist_ok=True)
         shutil.copytree(str(config[folder]), str(input_dir / folder), dirs_exist_ok=True)
-    
+
     # copy input_data.xlsx
-    shutil.copy(str(config["InputData"]), str(input_dir))
+    shutil.copy(str(config["input_data"]), str(input_dir))
 
 def _update_config_file(nc_file, input_dir, output_dir, config, station_name, timestamp): #pylint: disable=too-many-arguments
     """Update config file for each station.
 
     Create config file for each forcing/station under the work directory.
-    
+
     Args:
         ncfile: Name of forcing file.
         input_dir: Path to the input directory.
@@ -94,7 +94,7 @@ def _update_config_file(nc_file, input_dir, output_dir, config, station_name, ti
         config: Dictionary containing all the paths.
         station_name: Station name inferred from forcing file.
         timestamp: Timestamp when creating the config file.
-    
+
     Returns:
         Path to updated config file.
     """
