@@ -130,10 +130,10 @@ def prepare_global_variables(forcing_file, config, input_dir):
     sitename = forcing_file.split('/')[-1][:6]
     time_delta = (ds.time.dt.second[1] - ds.time.dt.second[1]).values
 
-    if config['DurationSize'] > ds.time.size:
+    if int(config['NumberOfTimeSteps']) > ds.time.size:
         total_duration = ds.time.size
     else:
-        total_duration = config['DurationSize']
+        total_duration = int(config['NumberOfTimeSteps'])
 
     matfiledata = {
         'latitude': ds['latitude'].values,
