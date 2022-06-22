@@ -1,3 +1,4 @@
+import hdf5storage
 import os
 import numpy as np
 import xarray as xr
@@ -16,7 +17,8 @@ def _calculate_ea(t_air_celcius, rh):
     Returns:
         numpy array with the calculated actual vapor pressure
     """
-    es = 6.107 * 10**(t_air_celcius*7.5 / (237.3+t_air_celcius))
+    # es = 6.107 * 10**(t_air_celcius*7.5 / (237.3+t_air_celcius))
+    es = 0.61 * np.exp(19.9*t_air_celcius/(273+t_air_celcius))
     return es * rh/100
 
 
@@ -120,6 +122,33 @@ def write_meteo_file(data, fname):
         'lw_down', 'vpd', 'lai']
     meteo_file_data = np.vstack([data[var] for var in meteo_data_vars]).T
     _write_matlab_ascii(fname, meteo_file_data, ncols=len(meteo_data_vars))
+
+
+def prepare_global_variables(forcing_file, config, input_dir):
+    ds = xr.open_dataset(forcing_file)
+    ds = ds.squeeze(['x', 'y'])
+    sitename = forcing_file.split('/')[-1][:6]
+    time_delta = (ds.time.dt.second[1] - ds.time.dt.second[1]).values
+
+    if config['DurationSize'] > ds.time.size:
+        total_duration = ds.time.size
+    else:
+        total_duration = config['DurationSize']
+
+    matfiledata = {
+        'latitude': ds['latitude'].values,
+        'longitude': ds['longitude'].values,
+        'elevation': ds['elevation'].values,
+        'IGBP_veg_long': ds['IGBP_veg_long'].values,
+        'reference_height': ds['reference_height'].values,
+        'canopy_height': ds['canopy_height'].values,
+        'Dur_tot': total_duration,
+        'DELT': time_delta,
+        'sitename': sitename
+    }
+
+    hdf5storage.write(
+        matfiledata, input_dir, 'forcing_globals.mat', matlab_compatible=True)
 
 
 def prepare_forcing(input_dir, forcing_file):

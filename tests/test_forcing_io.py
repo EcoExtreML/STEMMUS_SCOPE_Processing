@@ -45,6 +45,7 @@ def lai_file(tmpdir_factory, forcing_data):
     forcing_io.write_lai_file(forcing_data, fn_out)
     return str(fn_out)
 
+
 @pytest.fixture(scope='session', autouse=True)
 def dat_files(tmpdir_factory, forcing_data):
     fnames = ['t_.dat', 'Ta_.dat', 'Rin_.dat',
@@ -53,6 +54,7 @@ def dat_files(tmpdir_factory, forcing_data):
     write_dir = tmpdir_factory.mktemp('data')
     forcing_io.write_dat_files(forcing_data, write_dir)
     return fnames, write_dir
+
 
 def test_mdata(mdata_file):
     fn_expected = './tests/test_data_forcing/Mdata.txt'
