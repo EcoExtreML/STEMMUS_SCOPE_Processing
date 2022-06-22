@@ -3,9 +3,6 @@ import numpy as np
 import xarray as xr
 
 
-# Matlab string format for ascii files. Note: first line has an additional space.
-matlab_fmt = ' %14.7e'
-
 def _calculate_ea(t_air_celcius, rh):
     """Internal function that calculates the actual vapour pressure (kPa) from the
     air temperature (degree Celcius) and relative humidity (%)
@@ -21,6 +18,22 @@ def _calculate_ea(t_air_celcius, rh):
     """
     es = 6.107 * 10**(t_air_celcius*7.5 / (237.3+t_air_celcius))
     return es * rh/100
+
+
+def _write_matlab_ascii(fname, data, ncols):
+    """Internal function to handle writing data in the Matlab ascii format. Equivalent
+    to `save([-], '-ascii')` in Matlab.
+
+    Args:
+        fname (path or str): Path to the file that should be written
+        data (np.array): Array with data to write to file
+        ncols (int, optional): The number of data columns, required to correctly format
+            the ascii file when writing multiple variables.
+    """
+    matlab_fmt = ' %14.7e'
+    multi_fmt = [matlab_fmt]*ncols
+    multi_fmt[0] = ' ' + multi_fmt[0]
+    np.savetxt(fname, data, multi_fmt)
 
 
 def read_forcing_data(forcing_file):
@@ -93,13 +106,12 @@ def write_dat_files(data, input_dir):
     }
     for var, fname in write_info.items():
         fpath = os.path.join(input_dir, fname)
-        np.savetxt(fpath, data[var], ' ' + matlab_fmt)
+        _write_matlab_ascii(fpath, data[var], ncols=1)
 
 
 def write_lai_file(data, fname):
     lai_file_data = np.vstack([data['doy_float'], data['lai']]).T
-    multi_fmt = [' ' + matlab_fmt, matlab_fmt]
-    np.savetxt(fname, lai_file_data, multi_fmt)
+    _write_matlab_ascii(fname, lai_file_data, ncols=2)
 
 
 def write_meteo_file(data, fname):
@@ -107,9 +119,7 @@ def write_meteo_file(data, fname):
         'wind_speed', 'psurf_hpa', 'precip_conv', 'sw_down',
         'lw_down', 'vpd', 'lai']
     meteo_file_data = np.vstack([data[var] for var in meteo_data_vars]).T
-    multi_fmt = [matlab_fmt]*len(meteo_data_vars)
-    multi_fmt[0] = ' ' + multi_fmt[0]
-    np.savetxt(fname, meteo_file_data, multi_fmt)
+    _write_matlab_ascii(fname, meteo_file_data, ncols=len(meteo_data_vars))
 
 
 def prepare_forcing(input_dir, forcing_file):
