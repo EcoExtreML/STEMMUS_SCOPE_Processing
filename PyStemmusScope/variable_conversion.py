@@ -17,7 +17,7 @@ def calculate_ea(t_air_celcius, rh):
     # Teten O. Über einige meteorologische Begriffe. Z. Geophys., 1930; 6. 297-309.
     # Murray FW. On the computation of saturation vapor pressure,
     #   J. Appl. Meteorol., 1967; 6, 203-204
-    es = 6.1078 * 10**(t_air_celcius*7.5 / (237.3+t_air_celcius))
+    es = 0.61078 * 10**(t_air_celcius*7.5 / (237.3+t_air_celcius))
     return es * rh/100
 
 

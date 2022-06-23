@@ -56,7 +56,7 @@ def read_forcing_data(forcing_file):
     data['rh'] = ds_forcing['RH']
     data['vpd'] = ds_forcing['VPD']
     data['lai'] = vc.mask_data(ds_forcing['LAI'], min_value=0.01)
-    data['ea'] = vc.calculate_ea(data['t_air_celcius'], data['rh'])
+    data['ea'] = vc.kpa_to_hpa(vc.calculate_ea(data['t_air_celcius'], data['rh']))
 
     # Load in non-timedependent variables
     data['sitename'] = forcing_file.name[:6]
