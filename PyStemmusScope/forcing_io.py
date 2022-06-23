@@ -2,6 +2,7 @@ import hdf5storage
 import os
 import numpy as np
 import xarray as xr
+from pathlib import Path
 
 
 def _calculate_ea(t_air_celcius, rh):
@@ -124,11 +125,13 @@ def write_meteo_file(data, fname):
     _write_matlab_ascii(fname, meteo_file_data, ncols=len(meteo_data_vars))
 
 
-def prepare_global_variables(forcing_file, config, input_dir):
+def prepare_global_variables(input_dir, forcing_file, config):
     ds = xr.open_dataset(forcing_file)
     ds = ds.squeeze(['x', 'y'])
     sitename = forcing_file.split('/')[-1][:6]
-    time_delta = (ds.time.dt.second[1] - ds.time.dt.second[1]).values
+    # Forcing data timestep size in seconds
+    time_delta = (ds.time.values[1] - ds.time.values[0]) / np.timedelta64(1, 's')
+    time_delta = time_delta.astype(float)
 
     if int(config['NumberOfTimeSteps']) > ds.time.size:
         total_duration = ds.time.size
@@ -147,8 +150,7 @@ def prepare_global_variables(forcing_file, config, input_dir):
         'sitename': sitename
     }
 
-    hdf5storage.write(
-        matfiledata, input_dir, 'forcing_globals.mat', matlab_compatible=True)
+    hdf5storage.savemat(Path(input_dir) / 'forcing_globals.mat', matfiledata, appendmat=False)
 
 
 def prepare_forcing(input_dir, forcing_file):
