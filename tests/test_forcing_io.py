@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
@@ -28,7 +28,8 @@ def eval_str(fdata):
 
 @pytest.fixture(scope='session', autouse=True)
 def forcing_data():
-    forcing_file = './tests/test_data_forcing/FI-Hyy_1996-2014_FLUXNET2015_Met.nc'
+    forcing_file = (Path(__file__).parent / "test_data_forcing" /
+                    "FI-Hyy_1996-2014_FLUXNET2015_Met.nc")
     return forcing_io.read_forcing_data(forcing_file)
 
 
@@ -100,24 +101,26 @@ def test_dat_files(dat_files):
     fnames, write_dir = dat_files
 
     for fname in fnames:
-        df_expected = pd.read_fwf(os.path.join(expected_path, fname))
-        df_written = pd.read_fwf(os.path.join(write_dir, fname))
-        np.testing.assert_allclose(df_expected.values, df_written.values, rtol=1e-5)
+        df_expected = pd.read_fwf(Path(expected_path) / fname)
+        df_written = pd.read_fwf(Path(write_dir) / fname)
+        # Relatively high tolerance due to small changes in constants
+        np.testing.assert_allclose(df_expected.values, df_written.values, rtol=1e-3)
 
 
 def test_dat_file_format(dat_files):
     fnames, write_dir = dat_files
     for fname in fnames:
-        with open(os.path.join(write_dir, fname), encoding='utf-8') as f:
+        with open(Path(write_dir) / fname, encoding='utf-8') as f:
             eval_str(f.read())
 
 
 def test_full_routine(tmp_path, dat_files):
-    forcing_file = './tests/test_data_forcing/FI-Hyy_1996-2014_FLUXNET2015_Met.nc'
-    forcing_io.prepare_forcing(tmp_path, forcing_file)
+    forcing_file = (Path(__file__).parent / "test_data_forcing" /
+                    "FI-Hyy_1996-2014_FLUXNET2015_Met.nc")
+    config = {'NumberOfTimeSteps': 5}
+
+    forcing_io.prepare_forcing(tmp_path, forcing_file, config)
     fnames, _ = dat_files
-    expected_files = fnames + ['LAI_.dat', 'Mdata.txt']
+    expected_files = fnames + ['LAI_.dat', 'Mdata.txt', 'forcing_globals.mat']
     for file in expected_files:
-        assert os.path.exists(
-            os.path.join(tmp_path, file)
-        )
+        assert (Path(tmp_path) / file).exists()
