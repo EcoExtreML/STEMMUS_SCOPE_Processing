@@ -33,9 +33,7 @@ def kpa_to_hpa(pressure):
     Raises:
         ValueError if the input pressure is not in [kPa]
     """
-    if pressure.units == 'kPa':
-        return pressure * 10
-    raise ValueError('Input pressure is not in [kPa]')
+    return pressure * 10
 
 
 def pa_to_hpa(pressure):

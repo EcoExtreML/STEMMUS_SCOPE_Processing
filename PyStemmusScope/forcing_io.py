@@ -149,7 +149,7 @@ def prepare_global_variables(data, input_path, config):
                     'reference_height', 'canopy_height', 'DELT', 'sitename']
     matfiledata = {key: data[key] for key in matfile_vars}
 
-    matfiledata['Dur_tot'] = total_duration
+    matfiledata['Dur_tot'] = float(total_duration) # Matlab expects a 'double'
 
     hdf5storage.savemat(input_path / 'forcing_globals.mat', matfiledata, appendmat=False)
 
