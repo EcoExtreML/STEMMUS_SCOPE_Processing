@@ -6,8 +6,9 @@ from . import variable_conversion as vc
 
 
 def _open_multifile_datasets(paths, lat, lon):
-    """Internal function to open multifile netCDF files, and select the lat & lon before
-    merging them by coordinates.
+    """Internal function to open multifile netCDF files, and selects the lat & lon
+    before merging them by coordinates. xarray's open_mfdataset does not support this
+    type of functionality.
 
     Args:
         paths (iterable): Iterable containing the paths to the netCDF files
@@ -155,7 +156,7 @@ def _collect_soil_data(soil_data_path, lat, lon):
     return matfiledata
 
 
-def prepare_soil_data(soil_data_dir, lat, lon):
+def prepare_soil_data(soil_data_dir, matfile_path, lat, lon):
     """Function that prepares the soil input data for the STEMMUS_SCOPE model. It parses
     the data for the input location, and writes a file that can be easily read in by
     Matlab.
@@ -171,5 +172,5 @@ def prepare_soil_data(soil_data_dir, lat, lon):
     matfiledata = _collect_soil_data(soil_data_path, lat, lon)
 
     hdf5storage.savemat(
-        'soil_parameters.m', mdict=matfiledata, appendmat=False,
+        matfile_path, mdict=matfiledata, appendmat=False,
     )
