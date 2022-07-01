@@ -2,7 +2,7 @@ from pathlib import Path
 import hdf5storage
 import numpy as np
 import xarray as xr
-from PyStemmusScope import variable_conversion as vc
+from . import variable_conversion as vc
 
 
 def _write_matlab_ascii(fname, data, ncols):
@@ -38,6 +38,7 @@ def read_forcing_data(forcing_file):
     ds_forcing = ds_forcing.squeeze(['x', 'y'])
 
     data = {}
+    
     # Expected time format is days (as floating point) since Jan 1st 00:00.
     data['doy_float'] = (
         ds_forcing['time'].dt.dayofyear - 1 +
@@ -59,7 +60,7 @@ def read_forcing_data(forcing_file):
     data['ea'] = vc.kpa_to_hpa(vc.calculate_ea(data['t_air_celcius'], data['rh']))
 
     # Load in non-timedependent variables
-    data['sitename'] = forcing_file.name[:6]
+    data['sitename'] = forcing_file.name.split('_')[0]
     # Forcing data timestep size in seconds
     time_delta = (ds_forcing.time.values[1] -
                   ds_forcing.time.values[0]) / np.timedelta64(1, 's')
@@ -166,6 +167,7 @@ def prepare_forcing(input_dir, forcing_file, config):
         config (dict): The PyStemmusScope configuration dictionary.
     """
     input_path = Path(input_dir)
+    
     # Read the required data from the forcing file into a dictionary
     data = read_forcing_data(forcing_file)
 

@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from PyStemmusScope import forcing_io
-
+from . import forcing_data_folder
 
 numbers = '0123456789'
 
@@ -28,7 +28,7 @@ def eval_str(fdata):
 
 @pytest.fixture(scope='session', autouse=True)
 def forcing_data():
-    forcing_file = (Path(__file__).parent / "test_data_forcing" /
+    forcing_file = (forcing_data_folder /
                     "FI-Hyy_1996-2014_FLUXNET2015_Met.nc")
     return forcing_io.read_forcing_data(forcing_file)
 
@@ -58,7 +58,7 @@ def dat_files(tmpdir_factory, forcing_data):
 
 
 def test_mdata(mdata_file):
-    fn_expected = './tests/test_data_forcing/Mdata.txt'
+    fn_expected = forcing_data_folder / 'Mdata.txt'
 
     df_expected = pd.read_fwf(fn_expected)
     df_written = pd.read_fwf(mdata_file)
@@ -68,7 +68,7 @@ def test_mdata(mdata_file):
 
 # Verifying that the actual data file passes the evaluation
 def test_true_mdata_format():
-    with open('./tests/test_data_forcing/Mdata.txt', encoding='utf-8') as f:
+    with open(forcing_data_folder / 'Mdata.txt', encoding='utf-8') as f:
         content_exp = f.read()
     assert eval_str(content_exp)
 
@@ -81,7 +81,7 @@ def test_mdata_format(mdata_file):
 
 
 def test_lai_file(lai_file):
-    fn_expected = './tests/test_data_forcing/LAI_.dat'
+    fn_expected = forcing_data_folder / 'LAI_.dat'
 
     df_expected = pd.read_fwf(fn_expected)
     df_written = pd.read_fwf(lai_file)
@@ -96,7 +96,7 @@ def test_lai_file_format(lai_file):
 
 
 def test_dat_files(dat_files):
-    expected_path = './tests/test_data_forcing/'
+    expected_path = forcing_data_folder
 
     fnames, write_dir = dat_files
 
@@ -115,7 +115,7 @@ def test_dat_file_format(dat_files):
 
 
 def test_full_routine(tmp_path, dat_files):
-    forcing_file = (Path(__file__).parent / "test_data_forcing" /
+    forcing_file = (forcing_data_folder /
                     "FI-Hyy_1996-2014_FLUXNET2015_Met.nc")
     config = {'NumberOfTimeSteps': 5}
 
