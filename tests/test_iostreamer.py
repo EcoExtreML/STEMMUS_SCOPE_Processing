@@ -1,10 +1,10 @@
 """Tests for the s2s.initializer module.
 """
 from pathlib import Path
-import PyStemmusScope
 import pytest
-
+import PyStemmusScope
 from . import data_folder
+
 
 class TestIOStreamer:
     # define required input/expected values as fixtures
