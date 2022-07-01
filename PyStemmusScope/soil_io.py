@@ -5,6 +5,28 @@ import xarray as xr
 from . import variable_conversion as vc
 
 
+def _open_multifile_datasets(paths, lat, lon):
+    """Internal function to open multifile netCDF files, and select the lat & lon before
+    merging them by coordinates.
+
+    Args:
+        paths (iterable): Iterable containing the paths to the netCDF files
+        lat (float): Latitude of the site of interest (in degrees North)
+        lon (float): Longitude of the site of interest (in degrees East)
+
+    Returns:
+        xarray.Dataset: Dataset containing the merged data for a single location in
+            space.
+    """
+    datasets = []
+    for file in paths:
+        ds = xr.open_dataset(file)
+        datasets.append(ds.sel(lat=lat, lon=lon, method='nearest'))
+    ds = xr.combine_by_coords(datasets)
+
+    return ds
+
+
 def _read_lambda_coef(lambda_directory, lat, lon):
     """Internal function that reads the lambda coefficient files and returns the data
     of interest in a dictionary.
@@ -18,9 +40,8 @@ def _read_lambda_coef(lambda_directory, lat, lon):
         dict: Dictionary containing the lambda coefficient data.
     """
     lambda_files = sorted(lambda_directory.glob("lambda_l*.nc"))
-    ds = xr.open_mfdataset(lambda_files)
 
-    ds = ds.sel(lat=lat, lon=lon, method='nearest')
+    ds = _open_multifile_datasets(lambda_files, lat, lon)
 
     # which depth indices the STEMMUS_SCOPE model expects
     indices = [0, 2, 4, 5, 6, 7]
@@ -48,12 +69,7 @@ def _read_soil_composition(soil_data_path, lat, lon):
 
     soil_comp_paths = [soil_data_path / fname for fname in soil_comp_fnames]
 
-    datasets = []
-    for file in soil_comp_paths:
-        ds = xr.open_dataset(file)
-        datasets.append(ds.sel(lat=lat, lon=lon, method='nearest'))
-
-    ds = xr.combine_by_coords(datasets)
+    ds = _open_multifile_datasets(soil_comp_paths, lat, lon)
 
     depths_indices = [0, 2, 4, 5, 6, 7]
     ds = ds.isel(depth=depths_indices)
@@ -154,4 +170,6 @@ def prepare_soil_data(soil_data_dir, lat, lon):
 
     matfiledata = _collect_soil_data(soil_data_path, lat, lon)
 
-    hdf5storage.savemat('soil_parameters.m', mdict=matfiledata, appendmat=False)
+    hdf5storage.savemat(
+        'soil_parameters.m', mdict=matfiledata, appendmat=False,
+    )
