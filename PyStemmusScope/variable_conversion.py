@@ -115,3 +115,33 @@ def mask_data(data, min_value=None, max_value=None):
             given value.
     """
     return np.clip(data, min_value, max_value)
+
+
+def per_day_to_per_second(data):
+    return data / (24 * 3600)
+
+
+def field_moisture_content(theta_r, theta_s, alpha, coef_n):
+    # Genuchten, V. , & Th., M. . (1980). A closed-form equation for predicting the
+    #   hydraulic conductivity of unsaturated soils. Soil Science Society of America
+    #   Journal, 44(5), 892-898.
+
+    phi_fc = 341.9 # soil water potential at field capacity (cm)
+
+    # field_moisture_content = (
+    #     1 / (((phi_fc * alpha)**(coef_n) + 1) ** (1 - 1/coef_n))
+    #     ) * (theta_s - theta_r) + theta_r
+
+    field_moisture_content = theta_r + (theta_s - theta_r)/(
+        1 + (alpha * phi_fc)**coef_n
+        )**(1 -1/coef_n)
+
+    return field_moisture_content
+
+
+def percent_to_fraction(data):
+    return data/100
+
+
+def hundredth_percent_to_fraction(data):
+    return data/10000
