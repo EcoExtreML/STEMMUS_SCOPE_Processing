@@ -1,9 +1,10 @@
 """Documentation about PyStemmusScope"""
 import logging
+from . import forcing_io
+from . import iostreamer
 from .iostreamer import create_io_dir
 from .iostreamer import read_config
-from . import iostreamer
-from . import forcing_io
+
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
