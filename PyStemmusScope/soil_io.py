@@ -129,7 +129,8 @@ def _read_hydraulic_parameters(soil_data_path, lat, lon):
         'porosity': theta_s,
         'Ks0': Ks[0],
         'SaturatedK': vc.per_day_to_per_second(Ks),
-        'fieldMC': vc.field_moisture_content(theta_r, theta_s, alpha, coef_n)
+        'fieldMC': vc.field_moisture_content(theta_r, theta_s, alpha, coef_n),
+        'theta_s0': theta_s[0]
     }
 
     return hydraulic_matfiledata

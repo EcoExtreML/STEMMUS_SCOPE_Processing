@@ -1,5 +1,5 @@
-import numpy as np
 from pathlib import Path
+import numpy as np
 import pytest
 from PyStemmusScope import soil_io
 from . import soil_data_folder
@@ -37,6 +37,7 @@ def expected_values():
         'FOS': np.array([0.5500, 0.5700, 0.5500, 0.5100, 0.5500, 0.5700]),
         'MSOC': np.array([0.0079, 0.0090, 0.0056, 0.0020, 0.0017, 0.0017]),
         'fmax': 0.4028,
+        'theta_s0': 0.4705,
         'SaturatedK': 1.0e-03 * np.array([0.8795, 0.7264, 0.2297, 0.1503, 0.1284, 0.1263]),
         'SaturatedMC': np.array([0.4705, 0.4572, 0.3999, 0.3769, 0.3659, 0.3546]),
         'ResidualMC': np.array([0.0637, 0.0617, 0.0562, 0.0536, 0.0516, 0.0485]),

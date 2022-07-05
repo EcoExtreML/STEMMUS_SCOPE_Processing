@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def calculate_ea(t_air_celcius, rh):
     """Function that calculates the actual vapour pressure (kPa) from the
     air temperature (degree Celcius) and relative humidity (%)
