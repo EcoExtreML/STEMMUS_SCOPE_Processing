@@ -5,7 +5,7 @@ import xarray as xr
 from . import variable_conversion as vc
 
 
-def _open_multifile_datasets(paths, lat, lon):
+def _open_multifile_datasets(paths, lat, lon, lat_key='lat', lon_key='lon'):
     """Internal function to open multifile netCDF files, and selects the lat & lon
     before merging them by coordinates. xarray's open_mfdataset does not support this
     type of functionality.
@@ -22,7 +22,8 @@ def _open_multifile_datasets(paths, lat, lon):
     datasets = []
     for file in paths:
         ds = xr.open_dataset(file)
-        datasets.append(ds.sel(lat=lat, lon=lon, method='nearest'))
+        ds.attrs = '' # Drop attributed to avoid combine conflicts
+        datasets.append(ds.sel({lat_key: lat, lon_key: lon}, method='nearest'))
     ds = xr.combine_by_coords(datasets)
 
     return ds
@@ -100,8 +101,12 @@ def _read_hydraulic_parameters(soil_data_path, lat, lon):
     Returns:
         dict: Dictionary containing the hydraulic parameters.
     """
+    ptf_files = sorted((soil_data_path / 'Schaap').glob('PTF_*.nc'))
+    ds = _open_multifile_datasets(
+        ptf_files, lat, lon, lat_key='latitude', lon_key='longitude'
+    )
+
     depths = [0, 5, 30, 60, 100, 200]
-    indices = [1, 2, 4, 5, 6, 7]
 
     alpha = np.zeros(len(depths))
     Ks = np.zeros(len(depths))
@@ -110,14 +115,11 @@ def _read_hydraulic_parameters(soil_data_path, lat, lon):
     coef_n = np.zeros(len(depths))
 
     for i, depth in enumerate(depths):
-        ds = xr.open_dataset(soil_data_path /
-                             f'Hydraul_Param_SoilGrids_Schaap_sl{indices[i]}.nc')
-        ds = ds.sel(latitude=lat, longitude=lon, method='nearest')
-        alpha[i] = ds[f"alpha_fit_{depth}cm"]
-        Ks[i] = ds[f"mean_Ks_{depth}cm"]
-        theta_s[i] = ds[f"mean_theta_s_{depth}cm"]
-        theta_r[i] = ds[f"mean_theta_r_{depth}cm"]
-        coef_n[i] = ds[f"n_fit_{depth}cm"]
+        alpha[i] = ds[f"alpha_{depth}cm"]
+        Ks[i] = ds[f"Ks_{depth}cm"]
+        theta_s[i] = ds[f"thetas_{depth}cm"]
+        theta_r[i] = ds[f"thetar_{depth}cm"]
+        coef_n[i] = ds[f"n_{depth}cm"]
 
     hydraulic_matfiledata = {
         'SaturatedMC': theta_s,
@@ -125,11 +127,35 @@ def _read_hydraulic_parameters(soil_data_path, lat, lon):
         'Coefficient_n': coef_n,
         'Coefficient_Alpha': alpha,
         'porosity': theta_s,
+        'Ks0': Ks[0],
         'SaturatedK': vc.per_day_to_per_second(Ks),
         'fieldMC': vc.field_moisture_content(theta_r, theta_s, alpha, coef_n)
     }
 
     return hydraulic_matfiledata
+
+
+def _read_surface_data(soil_data_path, lat, lon):
+    """Internal function that reads the fmax variable from the surface dataset and
+    returns it in a dictionary.
+
+    Args:
+        soil_data_path (Path): Path to the directory which contains the surface data.
+        lat (float): Latitude of the site of interest (in degrees North)
+        lon (float): Longitude of the site of interest (in degrees East)
+
+    Returns:
+        dict: Dictionary containing the `fmax` value (maximum fractional saturated area)
+    """
+    ds = xr.open_dataset(soil_data_path / 'surfdata.nc')
+    ds = ds.sel(
+        lsmlat=vc.lat_to_lsmlat(lat), lsmlon=vc.lon_to_lsmlon(lon))
+
+    fmax = ds['FMAX'].values
+
+    surface_matfiledata = {'fmax': fmax}
+
+    return surface_matfiledata
 
 
 def _collect_soil_data(soil_data_path, lat, lon):
@@ -152,6 +178,7 @@ def _collect_soil_data(soil_data_path, lat, lon):
     matfiledata.update(_read_lambda_coef(lambda_directory, lat, lon))
     matfiledata.update(_read_hydraulic_parameters(soil_data_path, lat, lon))
     matfiledata.update(_read_soil_composition(soil_data_path, lat, lon))
+    matfiledata.update(_read_surface_data(soil_data_path, lat, lon))
 
     return matfiledata
 

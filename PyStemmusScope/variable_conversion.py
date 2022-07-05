@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def calculate_ea(t_air_celcius, rh):
     """Function that calculates the actual vapour pressure (kPa) from the
     air temperature (degree Celcius) and relative humidity (%)
@@ -122,15 +121,24 @@ def per_day_to_per_second(data):
 
 
 def field_moisture_content(theta_r, theta_s, alpha, coef_n):
-    # Genuchten, V. , & Th., M. . (1980). A closed-form equation for predicting the
-    #   hydraulic conductivity of unsaturated soils. Soil Science Society of America
-    #   Journal, 44(5), 892-898.
+    """Calculates the field moisture content at the field capacity, based on the Van
+    Genuchten equation.
 
+    See:
+        Genuchten, V. , & Th., M. . (1980). A closed-form equation for predicting the
+        hydraulic conductivity of unsaturated soils. Soil Science Society of America
+        Journal, 44(5), 892-898.
+
+    Args:
+        theta_r (float or np.array): Residual water content of the soil
+        theta_s (float or np.array): Saturated water content of the soil
+        alpha (float or np.array): Parameter related to the inverse of the air entry suction
+        coef_n (float or np.array): Pore-size distribution coefficient
+
+    Returns:
+        float or np.array: Field moisture content
+    """
     phi_fc = 341.9 # soil water potential at field capacity (cm)
-
-    # field_moisture_content = (
-    #     1 / (((phi_fc * alpha)**(coef_n) + 1) ** (1 - 1/coef_n))
-    #     ) * (theta_s - theta_r) + theta_r
 
     field_moisture_content = theta_r + (theta_s - theta_r)/(
         1 + (alpha * phi_fc)**coef_n
@@ -140,8 +148,59 @@ def field_moisture_content(theta_r, theta_s, alpha, coef_n):
 
 
 def percent_to_fraction(data):
+    """Converts data in a percentage (1 - 100) to a fractional value (0.0 - 1.0)
+
+    Args:
+        data (float or int): value in percentage format
+
+    Returns:
+        float: value as a fraction
+    """
     return data/100
 
 
 def hundredth_percent_to_fraction(data):
+    """Converts data in a hundredth of a percent to a fractional value (0.0 - 1.0)
+
+    Args:
+        data (float or int): value in a hundredth percentage format
+
+    Returns:
+        float: value as a fraction
+    """
     return data/10000
+
+
+def lat_to_lsmlat(lat):
+    """Converts latitude in degrees North to NCAR's LSM coordinate system: Grid with
+    values ranging from 0 -- 360, representing a 0.5 degree resolution, where 0 is the
+    South Pole.
+
+    Args:
+        lat (float): Latitude in degrees North
+
+    Returns:
+        int: (nearest) latitude grid coordinate
+    """
+    lat += 90
+    lat *= 2
+    return round(lat)
+
+
+def lon_to_lsmlon(lon):
+    """Converts longitude in degrees East to NCAR's LSM coordinate system: Grid with
+    values ranging from 0 -- 720, representing a 0.5 degree resolution, where 0 is the
+    prime meridian.
+
+    Args:
+        lon (float): longitude in degrees East
+
+    Returns:
+        int: (nearest) longitude grid coordinate
+    """
+    lon *= 2
+
+    if lon < 0:
+        lon += 720
+
+    return round(lon)
