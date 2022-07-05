@@ -118,6 +118,14 @@ def mask_data(data, min_value=None, max_value=None):
 
 
 def per_day_to_per_second(data):
+    """Converts data in [*/day] to a [*/second] format
+
+    Args:
+        data (float or np.array): Data with units [*/day]
+
+    Returns:
+        float or np.array: Data with units [*/second]
+    """
     return data / (24 * 3600)
 
 
