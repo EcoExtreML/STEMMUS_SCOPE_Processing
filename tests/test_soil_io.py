@@ -52,8 +52,9 @@ def expected_values():
 def test_full_routine(tmp_path, coordinates):
     lat, lon = coordinates
 
-    matfile_path = Path(tmp_path) / 'soil_parameters.m'
-    soil_io.prepare_soil_data(soil_data_folder, matfile_path, lat, lon)
+    write_path = Path(tmp_path)
+    matfile_path = write_path / 'soil_parameters.mat'
+    soil_io.prepare_soil_data(soil_data_folder, write_path, lat, lon)
 
     assert matfile_path.exists()
 

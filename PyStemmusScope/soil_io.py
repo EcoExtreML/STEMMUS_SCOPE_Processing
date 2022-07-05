@@ -199,5 +199,5 @@ def prepare_soil_data(soil_data_dir, matfile_path, lat, lon):
     matfiledata = _collect_soil_data(soil_data_path, lat, lon)
 
     hdf5storage.savemat(
-        matfile_path, mdict=matfiledata, appendmat=False,
+        matfile_path / 'soil_parameters.mat', mdict=matfiledata, appendmat=False,
     )
