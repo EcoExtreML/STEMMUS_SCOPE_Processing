@@ -50,12 +50,15 @@ def expected_values():
     return expected_value_dict
 
 
-def test_full_routine(tmp_path, coordinates):
-    lat, lon = coordinates
+def test_full_routine(tmp_path):
+    dummy_config = {
+        'ForcingPath' : str(soil_data_folder),
+        'ForcingFileName': 'dummy_forcing_file.nc'
+    }
 
     write_path = Path(tmp_path)
     matfile_path = write_path / 'soil_parameters.mat'
-    soil_io.prepare_soil_data(soil_data_folder, write_path, lat, lon)
+    soil_io.prepare_soil_data(soil_data_folder, write_path, dummy_config)
 
     assert matfile_path.exists()
 

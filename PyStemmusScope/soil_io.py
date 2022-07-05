@@ -184,18 +184,43 @@ def _collect_soil_data(soil_data_path, lat, lon):
     return matfiledata
 
 
-def prepare_soil_data(soil_data_dir, matfile_path, lat, lon):
+def _retrieve_latlon(plumber2_file):
+    """Retrieves the latitude and longitude coordinates from the PLUMBER2 dataset file,
+    to allow for the
+
+    Args:
+        plumber2_file (Path): Full path to the netCDF file containing the site latitude
+            and longitude
+
+    Returns:
+        tuple(float, float): Tuple containing the latitude and longitude values.
+            Latitude in degrees N, longitude in degrees E.
+    """
+    ds = xr.open_dataset(plumber2_file)
+    ds = ds.squeeze()
+    lat = float(ds.latitude.values)
+    lon = float(ds.longitude.values)
+    return lat, lon
+
+
+def prepare_soil_data(soil_data_dir, matfile_path, run_config):
     """Function that prepares the soil input data for the STEMMUS_SCOPE model. It parses
     the data for the input location, and writes a file that can be easily read in by
     Matlab.
 
     Args:
         soil_data_dir (Path): Path to the directory which contains the soil data.
-        lat (float): Latitude of the site of interest (in degrees North)
-        lon (float): Longitude of the site of interest (in degrees East)
+        mathfile_path (Path): Path to the directory where soil parameter file
+            should be written to.
+        run_config (dict): Dictionary containing the configuration for the current
+            STEMMUS_SCOPE run.
     """
+    forcing_file = Path(run_config['ForcingPath']) / run_config['ForcingFileName']
+    lat, lon = _retrieve_latlon(forcing_file)
 
+    # Ensure pathlib Paths are used
     soil_data_path = Path(soil_data_dir)
+    matfile_path = Path(matfile_path)
 
     matfiledata = _collect_soil_data(soil_data_path, lat, lon)
 
