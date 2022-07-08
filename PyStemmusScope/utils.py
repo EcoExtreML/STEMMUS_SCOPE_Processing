@@ -21,4 +21,4 @@ def convert_to_lsm_coordinates(lat, lon):
     if lon < 0:
         lon += 720
 
-    return np.round(lat), np.round(lon)
+    return np.round(lat).astype(int), np.round(lon).astype(int)
