@@ -38,7 +38,7 @@ def read_forcing_data(forcing_file):
     ds_forcing = ds_forcing.squeeze(['x', 'y'])
 
     data = {}
-    
+
     # Expected time format is days (as floating point) since Jan 1st 00:00.
     data['doy_float'] = (
         ds_forcing['time'].dt.dayofyear - 1 +
@@ -47,17 +47,18 @@ def read_forcing_data(forcing_file):
     )
     data['year'] = ds_forcing['time'].dt.year.astype(float)
 
-    data['t_air_celcius'] = vc.kelvin_to_celcius(ds_forcing['Tair'])
-    data['psurf_hpa'] = vc.pa_to_hpa(ds_forcing['Psurf'])
+    data['t_air_celcius'] = ds_forcing['Tair'] - 273.15 # conversion from K to degC.
+    data['psurf_hpa'] = ds_forcing['Psurf'] / 100 # conversion from Pa to hPa
     data['co2_conv'] = vc.co2_molar_fraction_to_kg_per_m3(ds_forcing['CO2air'])
-    data['precip_conv'] = vc.precipitation_mm_s_to_cm_s(ds_forcing['Precip'])
+    data['precip_conv'] = ds_forcing['Precip'] / 10 # conversion from mm/s to cm/s
     data['lw_down'] = ds_forcing['LWdown']
     data['sw_down'] = ds_forcing['SWdown']
     data['wind_speed'] = ds_forcing['Wind']
     data['rh'] = ds_forcing['RH']
     data['vpd'] = ds_forcing['VPD']
     data['lai'] = vc.mask_data(ds_forcing['LAI'], min_value=0.01)
-    data['ea'] = vc.kpa_to_hpa(vc.calculate_ea(data['t_air_celcius'], data['rh']))
+    # calculate ea, conversion from kPa to hPa:
+    data['ea'] = vc.calculate_ea(data['t_air_celcius'], data['rh']) * 10
 
     # Load in non-timedependent variables
     data['sitename'] = forcing_file.name.split('_')[0]
@@ -167,7 +168,7 @@ def prepare_forcing(input_dir, forcing_file, config):
         config (dict): The PyStemmusScope configuration dictionary.
     """
     input_path = Path(input_dir)
-    
+
     # Read the required data from the forcing file into a dictionary
     data = read_forcing_data(forcing_file)
 

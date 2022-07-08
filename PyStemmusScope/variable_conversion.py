@@ -21,55 +21,6 @@ def calculate_ea(t_air_celcius, rh):
     return es * rh/100
 
 
-def kpa_to_hpa(pressure):
-    """Function to convert pressure data in kPa to hPa.
-
-    Args:
-        pressure (xr.DataArray): DataArray with pressure values in [kPa].
-
-    Returns:
-        xr.DataArray: Pressure data [hPa].
-
-    Raises:
-        ValueError if the input pressure is not in [kPa]
-    """
-    return pressure * 10
-
-
-def pa_to_hpa(pressure):
-    """Function to convert pressure data in Pa to hPa.
-
-    Args:
-        pressure (xr.DataArray): DataArray with pressure values in Pascal.
-
-    Returns:
-        xr.DataArray: Pressure data [hPa].
-
-    Raises:
-        ValueError if the input pressure is not in Pascal
-    """
-    if pressure.units == 'Pa':
-        return pressure / 100
-    raise ValueError('Input pressure is not in [Pa]')
-
-
-def kelvin_to_celcius(temperature):
-    """Function to convert temperature data in Kelvin to deg Celcius
-
-    Args:
-        temperature (xr.DataArray): DataArray with temperature values in Kelvin.
-
-    Returns:
-        xr.DataArray: Temperature in degrees Celcius.
-
-    Raises:
-        ValueError if the input temperature is not in Kelvin
-    """
-    if temperature.units=='K':
-        return temperature - 273.15
-    raise ValueError('Input temperature is not in [K]')
-
-
 def co2_molar_fraction_to_kg_per_m3(molar_fraction):
     """Function to convert CO2 molar fraction [mol cO2/mol air] to CO2
     concentration in [kg CO2 / m3 air]
@@ -90,18 +41,6 @@ def co2_molar_fraction_to_kg_per_m3(molar_fraction):
     return molar_fraction * molecular_weight_co2 / molar_density_air
 
 
-def precipitation_mm_s_to_cm_s(precipitation_rate):
-    """Function to convert precipitation rate in [kg/m2/s] or [mm/s] to [cm/s]
-
-    Args:
-        precipitation_rate (float, np.array): Precipitation rate in [kg/m2/s] or [mm/s].
-
-    Returns:
-        Same as input: Precipitation rate in [cm/s]
-    """
-    return precipitation_rate/10
-
-
 def mask_data(data, min_value=None, max_value=None):
     """Function to apply a mask to data.
 
@@ -115,18 +54,6 @@ def mask_data(data, min_value=None, max_value=None):
             given value.
     """
     return np.clip(data, min_value, max_value)
-
-
-def per_day_to_per_second(data):
-    """Converts data in [*/day] to a [*/second] format
-
-    Args:
-        data (float or np.array): Data with units [*/day]
-
-    Returns:
-        float or np.array: Data with units [*/second]
-    """
-    return data / (24 * 3600)
 
 
 def field_moisture_content(theta_r, theta_s, alpha, coef_n):
@@ -154,62 +81,3 @@ def field_moisture_content(theta_r, theta_s, alpha, coef_n):
         )**(1 -1/coef_n)
 
     return field_moisture_content
-
-
-def percent_to_fraction(data):
-    """Converts data in a percentage (1 - 100) to a fractional value (0.0 - 1.0)
-
-    Args:
-        data (float or int): value in percentage format
-
-    Returns:
-        float: value as a fraction
-    """
-    return data/100
-
-
-def hundredth_percent_to_fraction(data):
-    """Converts data in a hundredth of a percent to a fractional value (0.0 - 1.0)
-
-    Args:
-        data (float or int): value in a hundredth percentage format
-
-    Returns:
-        float: value as a fraction
-    """
-    return data/10000
-
-
-def lat_to_lsmlat(lat):
-    """Converts latitude in degrees North to NCAR's LSM coordinate system: Grid with
-    values ranging from 0 -- 360, representing a 0.5 degree resolution, where 0 is the
-    South Pole.
-
-    Args:
-        lat (float): Latitude in degrees North
-
-    Returns:
-        int: (nearest) latitude grid coordinate
-    """
-    lat += 90
-    lat *= 2
-    return round(lat)
-
-
-def lon_to_lsmlon(lon):
-    """Converts longitude in degrees East to NCAR's LSM coordinate system: Grid with
-    values ranging from 0 -- 720, representing a 0.5 degree resolution, where 0 is the
-    prime meridian.
-
-    Args:
-        lon (float): longitude in degrees East
-
-    Returns:
-        int: (nearest) longitude grid coordinate
-    """
-    lon *= 2
-
-    if lon < 0:
-        lon += 720
-
-    return round(lon)

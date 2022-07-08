@@ -2,6 +2,7 @@ from pathlib import Path
 import hdf5storage
 import numpy as np
 import xarray as xr
+from . import utils
 from . import variable_conversion as vc
 
 
@@ -29,7 +30,7 @@ def _open_multifile_datasets(paths, lat, lon, lat_key='lat', lon_key='lon'):
     return ds
 
 
-def _read_lambda_coef(lambda_directory, lat, lon):
+def _read_lambda_coef(lambda_directory, lat, lon, depth_indices):
     """Internal function that reads the lambda coefficient files and returns the data
     of interest in a dictionary.
 
@@ -37,24 +38,27 @@ def _read_lambda_coef(lambda_directory, lat, lon):
         lambda_directory (Path): Path to the directory which contains the lambda data.
         lat (float): Latitude of the site of interest (in degrees North)
         lon (float): Longitude of the site of interest (in degrees East)
+        depth_indices (list): List of which indices (0 - 7) should be selected from the
+            lambda variable dataset.
 
     Returns:
         dict: Dictionary containing the lambda coefficient data.
     """
+    if not np.all([d in range(0, 8) for d in depth_indices]):
+        raise ValueError("Incorrect depth indices provided. Indices range from 0 to 7")
+
     lambda_files = sorted(lambda_directory.glob("lambda_l*.nc"))
 
     ds = _open_multifile_datasets(lambda_files, lat, lon)
 
     # which depth indices the STEMMUS_SCOPE model expects
-    indices = [0, 2, 4, 5, 6, 7]
-    coef_lambda = ds['lambda'].isel(depth=indices).values
+    ds = ds.sortby("depth") # make sure that the depths are sorted in increasing order
+    coef_lambda = ds['lambda'].isel(depth=depth_indices).values
 
-    lambda_matfile = {'Coef_Lamda': coef_lambda}
-
-    return lambda_matfile
+    return {'Coef_Lamda': coef_lambda}
 
 
-def _read_soil_composition(soil_data_path, lat, lon):
+def _read_soil_composition(soil_data_path, lat, lon, depth_indices):
     """Internal function that reads the soil composition files and returns them in a
     dictionary.
 
@@ -62,7 +66,8 @@ def _read_soil_composition(soil_data_path, lat, lon):
         soil_data_path (Path): Path to the directory which contains the soil data.
         lat (float): Latitude of the site of interest (in degrees North)
         lon (float): Longitude of the site of interest (in degrees East)
-
+        depth_indices (list): List of which indices (0 - 7) should be selected from the
+            soil composition dataset.
     Returns:
         dict: Dictionary containing the soil composition data.
     """
@@ -73,23 +78,20 @@ def _read_soil_composition(soil_data_path, lat, lon):
 
     ds = _open_multifile_datasets(soil_comp_paths, lat, lon)
 
-    depths_indices = [0, 2, 4, 5, 6, 7]
-    ds = ds.isel(depth=depths_indices)
+    if not np.all([d in range(0, 8) for d in depth_indices]):
+        raise ValueError("Incorrect depth indices provided. Indices range from 0 to 7")
 
-    clay_fraction = vc.percent_to_fraction(ds['CLAY'].values)
-    sand_fraction = vc.percent_to_fraction(ds['SAND'].values)
-    organic_fraction = vc.hundredth_percent_to_fraction(ds['OC'].values)
+    ds = ds.sortby("depth") # make sure that the depths are sorted in increasing order
+    ds = ds.isel(depth=depth_indices)
 
-    soil_comp_matfiledata = {
-        'FOC': clay_fraction,
-        'FOS': sand_fraction,
-        'MSOC': organic_fraction,
-    }
+    clay_fraction = ds['CLAY'].values / 100 # convert % to fraction
+    sand_fraction = ds['SAND'].values / 100 # convert % to fraction
+    organic_fraction = ds['OC'].values / 10000 # convert from 1/100th % to fraction.
 
-    return soil_comp_matfiledata
+    return {'FOC': clay_fraction, 'FOS': sand_fraction, 'MSOC': organic_fraction}
 
 
-def _read_hydraulic_parameters(soil_data_path, lat, lon):
+def _read_hydraulic_parameters(soil_data_path, lat, lon, depths):
     """Internal function that reads the soil hydraulic parameters from the Schaap
     dataset and returns them in a dictionary.
 
@@ -97,6 +99,8 @@ def _read_hydraulic_parameters(soil_data_path, lat, lon):
         soil_data_path (Path): Path to the directory which contains the soil data.
         lat (float): Latitude of the site of interest (in degrees North)
         lon (float): Longitude of the site of interest (in degrees East)
+        depths (list): List of depths which should be selected from the dataset. The
+            valid depths are: 0, 5, 15, 30, 60, 100 and 200 cm.
 
     Returns:
         dict: Dictionary containing the hydraulic parameters.
@@ -106,31 +110,31 @@ def _read_hydraulic_parameters(soil_data_path, lat, lon):
         ptf_files, lat, lon, lat_key='latitude', lon_key='longitude'
     )
 
-    depths = [0, 5, 30, 60, 100, 200]
+    valid_depths = [0, 5, 15, 30, 60, 100, 200]
+    if not np.all([d in valid_depths for d in depths]):
+        raise ValueError("Incorrect depth value(s) provided. Available depths are"
+                         f"{valid_depths}")
 
-    alpha = np.zeros(len(depths))
-    Ks = np.zeros(len(depths))
-    theta_s = np.zeros(len(depths))
-    theta_r = np.zeros(len(depths))
-    coef_n = np.zeros(len(depths))
+    schaap_vars = ['alpha', 'Ks', 'thetas', 'thetar', 'n']
+    schaap_data = {key: np.zeros(len(depths)) for key in schaap_vars}
 
     for i, depth in enumerate(depths):
-        alpha[i] = ds[f"alpha_{depth}cm"]
-        Ks[i] = ds[f"Ks_{depth}cm"]
-        theta_s[i] = ds[f"thetas_{depth}cm"]
-        theta_r[i] = ds[f"thetar_{depth}cm"]
-        coef_n[i] = ds[f"n_{depth}cm"]
+        for var in schaap_vars:
+            schaap_data[var][i] = ds[f"{var}_{depth}cm"]
+
+    fieldmc = vc.field_moisture_content(schaap_data['thetar'], schaap_data['thetas'],
+                                        schaap_data['alpha'], schaap_data['n'])
 
     hydraulic_matfiledata = {
-        'SaturatedMC': theta_s,
-        'ResidualMC': theta_r,
-        'Coefficient_n': coef_n,
-        'Coefficient_Alpha': alpha,
-        'porosity': theta_s,
-        'Ks0': Ks[0],
-        'SaturatedK': vc.per_day_to_per_second(Ks),
-        'fieldMC': vc.field_moisture_content(theta_r, theta_s, alpha, coef_n),
-        'theta_s0': theta_s[0]
+        'SaturatedMC': schaap_data['thetas'],
+        'ResidualMC': schaap_data['thetar'],
+        'Coefficient_n': schaap_data['n'],
+        'Coefficient_Alpha': schaap_data['alpha'],
+        'porosity': schaap_data['thetas'],
+        'Ks0': schaap_data['Ks'][0],
+        'SaturatedK': schaap_data['Ks'] / (24 * 3600), # convert 1/day -> 1/s
+        'fieldMC': fieldmc,
+        'theta_s0': schaap_data['thetas'][0]
     }
 
     return hydraulic_matfiledata
@@ -149,14 +153,13 @@ def _read_surface_data(soil_data_path, lat, lon):
         dict: Dictionary containing the `fmax` value (maximum fractional saturated area)
     """
     ds = xr.open_dataset(soil_data_path / 'surfdata.nc')
+    lat, lon = utils.convert_to_lsm_coordinates(lat, lon)
     ds = ds.sel(
-        lsmlat=vc.lat_to_lsmlat(lat), lsmlon=vc.lon_to_lsmlon(lon))
+        lsmlat=lat, lsmlon=lon)
 
     fmax = ds['FMAX'].values
 
-    surface_matfiledata = {'fmax': fmax}
-
-    return surface_matfiledata
+    return {'fmax': fmax}
 
 
 def _collect_soil_data(soil_data_path, lat, lon):
@@ -171,35 +174,34 @@ def _collect_soil_data(soil_data_path, lat, lon):
     Returns:
         dict: Dictionary containing all the processed soil property data.
     """
+    lambda_directory = soil_data_path / "lambda"
 
-    matfiledata = {}
+    schaap_depths = [0, 5, 30, 60, 100, 200]
+    depth_indices = [0, 2, 4, 5, 6, 7]
 
-    lambda_directory = soil_data_path / 'lambda'
-
-    matfiledata.update(_read_lambda_coef(lambda_directory, lat, lon))
-    matfiledata.update(_read_hydraulic_parameters(soil_data_path, lat, lon))
-    matfiledata.update(_read_soil_composition(soil_data_path, lat, lon))
+    matfiledata = _read_lambda_coef(lambda_directory, lat, lon, depth_indices)
+    matfiledata.update(_read_hydraulic_parameters(soil_data_path, lat, lon,
+                                                  schaap_depths))
+    matfiledata.update(_read_soil_composition(soil_data_path, lat, lon, depth_indices))
     matfiledata.update(_read_surface_data(soil_data_path, lat, lon))
 
     return matfiledata
 
 
-def _retrieve_latlon(plumber2_file):
-    """Retrieves the latitude and longitude coordinates from the PLUMBER2 dataset file,
-    to allow for the
+def _retrieve_latlon(file):
+    """Retrieves the latitude and longitude coordinates from the dataset file.
 
     Args:
-        plumber2_file (Path): Full path to the netCDF file containing the site latitude
+        file (Path): Full path to the netCDF file containing the site latitude
             and longitude
 
     Returns:
         tuple(float, float): Tuple containing the latitude and longitude values.
             Latitude in degrees N, longitude in degrees E.
     """
-    ds = xr.open_dataset(plumber2_file)
-    ds = ds.squeeze()
-    lat = float(ds.latitude.values)
-    lon = float(ds.longitude.values)
+    ds = xr.open_dataset(file)
+    lon = ds.longitude.values.flatten()
+    lat = ds.latitude.values.flatten()
     return lat, lon
 
 
@@ -215,15 +217,16 @@ def prepare_soil_data(soil_data_dir, matfile_path, run_config):
         run_config (dict): Dictionary containing the configuration for the current
             STEMMUS_SCOPE run.
     """
-    forcing_file = Path(run_config['ForcingPath']) / run_config['ForcingFileName']
-    lat, lon = _retrieve_latlon(forcing_file)
+    forcing_file = Path(run_config["ForcingPath"]) / run_config["ForcingFileName"]
 
-    # Ensure pathlib Paths are used
-    soil_data_path = Path(soil_data_dir)
-    matfile_path = Path(matfile_path)
+    # Data missing at ID-Pag site. See github.com/EcoExtreML/STEMMUS_SCOPE/issues/77
+    if run_config["ForcingFileName"].startswith("ID"):
+        lat, lon = -1., 112.
+    else:
+        lat, lon = _retrieve_latlon(forcing_file)
 
-    matfiledata = _collect_soil_data(soil_data_path, lat, lon)
+    matfiledata = _collect_soil_data(Path(soil_data_dir), lat, lon)
 
     hdf5storage.savemat(
-        matfile_path / 'soil_parameters.mat', mdict=matfiledata, appendmat=False,
+        Path(matfile_path) / "soil_parameters.mat", mdict=matfiledata, appendmat=False,
     )
