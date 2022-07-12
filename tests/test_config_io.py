@@ -2,7 +2,7 @@
 """
 from pathlib import Path
 import pytest
-import PyStemmusScope
+from PyStemmusScope import config_io
 from . import data_folder
 
 
@@ -30,7 +30,7 @@ class TestIOStreamer:
 
     def test_read_config(self, dummy_config):
         path_to_config_file = data_folder / "config_file_test.txt"
-        config = PyStemmusScope.read_config(path_to_config_file)
+        config = config_io.read_config(path_to_config_file)
         expected_config = dummy_config
 
         assert config == expected_config
@@ -38,8 +38,8 @@ class TestIOStreamer:
     def test_create_io_dir(dummy_config):
         nc_file = "NL-dummy_1979-2021_FLUXNET2010_Met.nc"
         path_to_config_file = data_folder / "config_file_test.txt"
-        config = PyStemmusScope.read_config(path_to_config_file)
-        input_dir, output_dir, config_path = PyStemmusScope.create_io_dir(nc_file, config)
+        config = config_io.read_config(path_to_config_file)
+        input_dir, output_dir, config_path = config_io.create_io_dir(nc_file, config)
         assert Path(input_dir).is_dir()
         assert Path(output_dir).is_dir()
         assert Path(config_path).exists()
