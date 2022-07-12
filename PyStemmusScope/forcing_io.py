@@ -3,6 +3,7 @@ import hdf5storage
 import numpy as np
 import xarray as xr
 from . import variable_conversion as vc
+from . import config_io
 
 
 def _write_matlab_ascii(fname, data, ncols):
@@ -156,20 +157,21 @@ def prepare_global_variables(data, input_path, config):
     hdf5storage.savemat(input_path / 'forcing_globals.mat', matfiledata, appendmat=False)
 
 
-def prepare_forcing(input_dir, forcing_file, config):
+def prepare_forcing(config_file):
     """Function to prepare the forcing files required by STEMMUS_SCOPE. The input
         directory should be taken from the model configuration file.
 
     Args:
-        input_dir (path or str): Path to the input directory that will be read by
-            STEMMUS_SCOPE.
-        forcing_file (path or str): Path to the netCDF forcing file that will be used
-            to generate the input data.
-        config (dict): The PyStemmusScope configuration dictionary.
+        config_file (str): path to stemmus_scope config file.
     """
-    input_path = Path(input_dir)
+
+    # read config file and return it as a dict
+    config = config_io.read_config(config_file)
+
+    input_path = Path(config["InputPath"])
 
     # Read the required data from the forcing file into a dictionary
+    forcing_file = Path(config["ForcingPath"]) / config["ForcingFileName"]
     data = read_forcing_data(forcing_file)
 
     # Write the single-column ascii '.dat' files to the input directory
