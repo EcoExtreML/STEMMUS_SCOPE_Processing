@@ -68,13 +68,80 @@ class StemmusScope():
             if val is not None:
                  self.config[key] = val
 
-
-        input_dir, output_dir, cfg_file = config_io.create_io_dir(self.config["ForcingFileName"], self.config)
+        # create customized config file and input/output directories for model run
+        self.input_dir, self.output_dir, self.cfg_file = config_io.create_io_dir(
+            self.config["ForcingFileName"], self.config
+            )
 
         # read the run config file
-        self.config = config_io.read_config(cfg_file)
+        self.config = config_io.read_config(self.cfg_file)
 
-        return str(input_dir), str(output_dir), str(cfg_file)
+        # prepare forcing data
+        forcing_io.prepare_forcing(self.config)
+
+        # prepare soil data
+        soil_io.prepare_soil_data(self.config)
+
+        return str(self.input_dir), str(self.output_dir), str(self.cfg_file)
+
+    def run(self) -> Tuple[str, str, str]:
+        """Run model using executable.
+
+        Args:
+
+        Returns:
+            Tuple with stdout and stderr
+        """
+        # set matlab log dir
+        os.environ['MATLAB_LOG_DIR'] = str(self.config["InputPath"])
+
+        # run the model
+        args = [f"{self.exe_file} {self.cfg_file}"]
+        result = subprocess.Popen(
+            args, preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+        )
+        exit_code = result.wait()
+        stdout, stderr = result.communicate()
+        logger.info("%s", stdout)
+
+        if exit_code != 0:
+            raise subprocess.CalledProcessError(
+                returncode=exit_code, cmd=args, stderr=stderr, output=stdout
+            )
+
+        return stdout
+
+    # TODO
+    def _check_matlab_runtime_environment():
+        """"Check if MCR/MATLAB_Runtime is in LD_LIBRARY_PATH."""
+        exist = False
+        if "MCR" in os.environ['LD_LIBRARY_PATH']:
+            exist = True
+        if "MATLAB_Runtime" in os.environ['LD_LIBRARY_PATH']:
+            exist = True
+        return exist
+
+    # def _set_matlab_paths():
+    #     """Sets up the MATLAB Runtime environment for the current $ARCH."""
+    #     # matlab_path = whereis MATLAB
+    #     matlab_path = matlab_path.s.split(": ")[1]
+    #     os.environ['LD_LIBRARY_PATH'] = (
+    #         f"{matlab_path}/MATLAB_Runtime/v910/runtime/glnxa64:"
+    #         f"{matlab_path}/MATLAB_Runtime/v910/bin/glnxa64:"
+    #         f"{matlab_path}/MATLAB_Runtime/v910/sys/os/glnxa64:"
+    #         f"{matlab_path}/MATLAB_Runtime/v910/extern/bin/glnxa64:"
+    #         f"{matlab_path}/MATLAB_Runtime/v910/sys/opengl/lib/glnxa64")
+
+    def _whereis(app):
+        # which on wondows, whereis on unix
+        command = 'which' if os.name != 'nt' else 'whereis'
+        result = subprocess.check_output(f'{command} {app}', stderr=subprocess.STDOUT)
+
+        exit_code = result.wait()
+        if exit_code != 0:
+            raise subprocess.CalledProcessError(returncode=exit_code)
+
+        return result.decode().split()
 
 
     @property
