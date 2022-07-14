@@ -116,19 +116,15 @@ def test_dat_file_format(dat_files):
 
 
 def test_full_routine(tmp_path, dat_files):
-    # create dummy config file
-    dummy_config = [
-        f'NumberOfTimeSteps=5\n',
-        f'ForcingPath={str(forcing_data_folder)}/\n',
-        f'ForcingFileName=FI-Hyy_1996-2014_FLUXNET2015_Met.nc\n',
-        f'InputPath={str(tmp_path)}/\n',
-    ]
+    # create dummy config
+    config = {
+        'ForcingFileName': "FI-Hyy_1996-2014_FLUXNET2015_Met.nc",
+        'NumberOfTimeSteps': 5,
+        'ForcingPath': str(forcing_data_folder),
+        'InputPath': str(tmp_path),
+    }
 
-    config_file = tmp_path / 'config.txt'
-    with open(config_file, encoding="ascii", mode="w") as f:
-        f.writelines(dummy_config)
-
-    forcing_io.prepare_forcing(config_file)
+    forcing_io.prepare_forcing(config)
     fnames, _ = dat_files
     expected_files = fnames + ['LAI_.dat', 'Mdata.txt', 'forcing_globals.mat']
     for file in expected_files:

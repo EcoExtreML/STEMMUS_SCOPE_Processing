@@ -206,17 +206,14 @@ def _retrieve_latlon(file):
     return lat, lon
 
 
-def prepare_soil_data(config_file):
+def prepare_soil_data(config):
     """Function that prepares the soil input data for the STEMMUS_SCOPE model. It parses
     the data for the input location, and writes a file that can be easily read in by
     Matlab.
 
     Args:
-        config_file (str): path to stemmus_scope config file.
+        config (dict): The PyStemmusScope configuration dictionary.
     """
-
-    # read config file and return it as a dict
-    config = config_io.read_config(config_file)
 
     forcing_file = Path(config["ForcingPath"]) / config["ForcingFileName"]
 

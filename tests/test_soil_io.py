@@ -56,20 +56,16 @@ def expected_values():
 
 
 def test_full_routine(tmp_path):
-    # create dummy config file
-    dummy_config = [
-        f'ForcingPath={str(soil_data_folder)}/\n',
-        f'ForcingFileName=dummy_forcing_file.nc\n',
-        f'SoilPropertyPath={str(soil_data_folder)}/\n',
-        f'InputPath={str(tmp_path)}/\n',
-    ]
-
-    config_file = tmp_path / 'config.txt'
-    with open(config_file, encoding="ascii", mode="w") as f:
-        f.writelines(dummy_config)
+    # create dummy config
+    dummy_config = {
+        'ForcingPath' : str(soil_data_folder),
+        'ForcingFileName': 'dummy_forcing_file.nc',
+        'InputPath': str(tmp_path),
+        'SoilPropertyPath': str(soil_data_folder),
+    }
 
     matfile_path = Path(tmp_path) / 'soil_parameters.mat'
-    soil_io.prepare_soil_data(config_file)
+    soil_io.prepare_soil_data(dummy_config)
 
     assert matfile_path.exists()
 

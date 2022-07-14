@@ -157,16 +157,13 @@ def prepare_global_variables(data, input_path, config):
     hdf5storage.savemat(input_path / 'forcing_globals.mat', matfiledata, appendmat=False)
 
 
-def prepare_forcing(config_file):
+def prepare_forcing(config):
     """Function to prepare the forcing files required by STEMMUS_SCOPE. The input
         directory should be taken from the model configuration file.
 
     Args:
-        config_file (str): path to stemmus_scope config file.
+        config (dict): The PyStemmusScope configuration dictionary.
     """
-
-    # read config file and return it as a dict
-    config = config_io.read_config(config_file)
 
     input_path = Path(config["InputPath"])
 
