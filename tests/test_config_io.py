@@ -14,7 +14,7 @@ class TestIOStreamer:
             'WorkDir': 'tests/test_data/directories/',
             'SoilPropertyPath': 'tests/test_data/directories/model_parameters/soil_property/',
             'ForcingPath': 'tests/test_data/directories/forcing/plumber2_data/',
-            'ForcingFileName': 'NL-dummy_1979-2021_FLUXNET2010_Met.nc',
+            'ForcingFileName': 'XX-dummy_forcing_file.nc',
             'directional': 'tests/test_data/directories/model_parameters/vegetation_property/directional/',
             'fluspect_parameters': 'tests/test_data/directories/model_parameters/vegetation_property/fluspect_parameters/',
             'leafangles': 'tests/test_data/directories/model_parameters/vegetation_property/leafangles/',
@@ -36,7 +36,7 @@ class TestIOStreamer:
         assert config == expected_config
 
     def test_create_io_dir(dummy_config):
-        nc_file = "NL-dummy_1979-2021_FLUXNET2010_Met.nc"
+        nc_file = "XX-dummy_forcing_file.nc"
         path_to_config_file = data_folder / "config_file_test.txt"
         config = config_io.read_config(path_to_config_file)
         input_dir, output_dir, config_path = config_io.create_io_dir(nc_file, config)
