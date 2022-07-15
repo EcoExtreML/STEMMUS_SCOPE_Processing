@@ -2,8 +2,10 @@ from pathlib import Path
 import numpy as np
 import pytest
 from PyStemmusScope import soil_io
-from . import soil_data_folder
+from PyStemmusScope import config_io
+from . import data_folder
 
+soil_data_folder = data_folder / "directories"/ "model_parameters"/ "soil_property"
 
 @pytest.fixture(autouse=True)
 def coordinates():
@@ -57,15 +59,13 @@ def expected_values():
 
 def test_full_routine(tmp_path):
     # create dummy config
-    dummy_config = {
-        'ForcingPath' : str(soil_data_folder),
-        'ForcingFileName': 'dummy_forcing_file.nc',
-        'InputPath': str(tmp_path),
-        'SoilPropertyPath': str(soil_data_folder),
-    }
+    # create dummy config
+    cfg_file = data_folder / "config_file_test.txt"
+    config = config_io.read_config(cfg_file)
+    config['InputPath'] = str(tmp_path)
 
     matfile_path = Path(tmp_path) / 'soil_parameters.mat'
-    soil_io.prepare_soil_data(dummy_config)
+    soil_io.prepare_soil_data(config)
 
     assert matfile_path.exists()
 

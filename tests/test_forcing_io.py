@@ -3,11 +3,13 @@ import numpy as np
 import pandas as pd
 import pytest
 from PyStemmusScope import forcing_io
-from . import forcing_data_folder
+from PyStemmusScope import config_io
+from . import data_folder
 
 
 numbers = '0123456789'
 
+forcing_data_folder = data_folder / "directories"/ "forcing"/ "plumber2_data"
 
 def eval_element(el):
     assert el[0] in [' ', '-']
@@ -117,12 +119,11 @@ def test_dat_file_format(dat_files):
 
 def test_full_routine(tmp_path, dat_files):
     # create dummy config
-    config = {
-        'ForcingFileName': "FI-Hyy_1996-2014_FLUXNET2015_Met.nc",
-        'NumberOfTimeSteps': 5,
-        'ForcingPath': str(forcing_data_folder),
-        'InputPath': str(tmp_path),
-    }
+    cfg_file = data_folder / "config_file_test.txt"
+    config = config_io.read_config(cfg_file)
+    config['ForcingFileName'] =  "FI-Hyy_1996-2014_FLUXNET2015_Met.nc"
+    config['NumberOfTimeSteps'] = 5
+    config['InputPath'] = str(tmp_path)
 
     forcing_io.prepare_forcing(config)
     fnames, _ = dat_files
