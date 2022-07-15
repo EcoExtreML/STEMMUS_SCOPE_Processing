@@ -48,7 +48,7 @@ class StemmusScope():
             self.config["WorkDir"] = WorkDir
 
         if ForcingFileName:
-            self.config["ForcingFileName"] = WorkDir
+            self.config["ForcingFileName"] = ForcingFileName
 
         if NumberOfTimeSteps:
             self.config["NumberOfTimeSteps"] = NumberOfTimeSteps
