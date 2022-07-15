@@ -59,7 +59,6 @@ def expected_values():
 
 def test_full_routine(tmp_path):
     # create dummy config
-    # create dummy config
     cfg_file = data_folder / "config_file_test.txt"
     config = config_io.read_config(cfg_file)
     config['InputPath'] = str(tmp_path)
