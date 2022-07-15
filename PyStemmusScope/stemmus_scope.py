@@ -26,16 +26,7 @@ class StemmusScope():
     def setup(
         self,
         WorkDir: str = None,
-        SoilPropertyPath: str = None,
-        ForcingPath: str = None,
         ForcingFileName: str = None,
-        directional: str = None,
-        fluspect_parameters: str = None,
-        leafangles: str = None,
-        radiationdata: str = None,
-        soil_spectrum: str = None,
-        InitialConditionPath: str = None,
-        input_data: str = None,
         NumberOfTimeSteps: str = None,
     ) -> Tuple[str, str, str]:
         """Configure model run.
@@ -45,16 +36,7 @@ class StemmusScope():
 
         Args:
             WorkDir: path to a directory where input/output directories should be created.
-            SoilPropertyPath: path to a soil property data directory.
-            ForcingPath: path to a forcing data directory.
             ForcingFileName: forcing file name. Forcing file should be in netcdf format.
-            directional: path to a directional data directory.
-            fluspect_parameters: path to a fluspect parameters directory.
-            leafangles: path to a leafangles data directory.
-            radiationdata: path to a radiation data directory.
-            soil_spectrum:  path to a soil spectrum data directory.
-            InitialConditionPath: path to a soil initial condition directory.
-            input_data: path to input_data file in excel format.
             NumberOfTimeSteps: total number of time steps in which model runs. It can be
                 `NA` or a number. Example `10` runs the model for 10 time steps.
 
@@ -62,11 +44,14 @@ class StemmusScope():
             Paths to config file and input/output directories
         """
         # update config template if needed
-        arguments = vars().copy()
-        arguments.pop('self')
-        for key, val in arguments.items():
-            if val is not None:
-                 self.config[key] = val
+        if WorkDir:
+            self.config["WorkDir"] = WorkDir
+
+        if ForcingFileName:
+            self.config["ForcingFileName"] = WorkDir
+
+        if NumberOfTimeSteps:
+            self.config["NumberOfTimeSteps"] = NumberOfTimeSteps
 
         # create customized config file and input/output directories for model run
         self.input_dir, self.output_dir, self.cfg_file = config_io.create_io_dir(
@@ -110,38 +95,6 @@ class StemmusScope():
             )
 
         return stdout
-
-    # TODO
-    def _check_matlab_runtime_environment():
-        """"Check if MCR/MATLAB_Runtime is in LD_LIBRARY_PATH."""
-        exist = False
-        if "MCR" in os.environ['LD_LIBRARY_PATH']:
-            exist = True
-        if "MATLAB_Runtime" in os.environ['LD_LIBRARY_PATH']:
-            exist = True
-        return exist
-
-    # def _set_matlab_paths():
-    #     """Sets up the MATLAB Runtime environment for the current $ARCH."""
-    #     # matlab_path = whereis MATLAB
-    #     matlab_path = matlab_path.s.split(": ")[1]
-    #     os.environ['LD_LIBRARY_PATH'] = (
-    #         f"{matlab_path}/MATLAB_Runtime/v910/runtime/glnxa64:"
-    #         f"{matlab_path}/MATLAB_Runtime/v910/bin/glnxa64:"
-    #         f"{matlab_path}/MATLAB_Runtime/v910/sys/os/glnxa64:"
-    #         f"{matlab_path}/MATLAB_Runtime/v910/extern/bin/glnxa64:"
-    #         f"{matlab_path}/MATLAB_Runtime/v910/sys/opengl/lib/glnxa64")
-
-    def _whereis(app):
-        # which on wondows, whereis on unix
-        command = 'which' if os.name != 'nt' else 'whereis'
-        result = subprocess.check_output(f'{command} {app}', stderr=subprocess.STDOUT)
-
-        exit_code = result.wait()
-        if exit_code != 0:
-            raise subprocess.CalledProcessError(returncode=exit_code)
-
-        return result.decode().split()
 
 
     @property
