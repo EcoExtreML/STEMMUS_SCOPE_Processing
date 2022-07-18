@@ -61,6 +61,7 @@ def test_full_routine(tmp_path):
     # create dummy config
     cfg_file = data_folder / "config_file_test.txt"
     config = config_io.read_config(cfg_file)
+    config['ForcingFileName'] = "dummy_forcing_file.nc"
     config['InputPath'] = str(tmp_path)
 
     matfile_path = Path(tmp_path) / 'soil_parameters.mat'
