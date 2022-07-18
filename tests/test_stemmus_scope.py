@@ -24,23 +24,25 @@ class TestWithDefaults:
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-07-11-1200"
 
-            input_dir, output_dir, cfg_file = model.setup()
-            return model, input_dir, output_dir, cfg_file
+            cfg_file = model.setup()
+            return model, cfg_file
 
     def test_setup(self, model_with_setup):
-        _, input_dir, output_dir, cfg_file = model_with_setup
+        model, cfg_file = model_with_setup
 
-        actual_input_dir = f"{data_folder}/directories/input/XX-dummy_2022-07-11-1200"
-        actual_output_dir = f"{data_folder}/directories/output/XX-dummy_2022-07-11-1200"
-        actual_cfg_file = f"{actual_input_dir}/XX-dummy_2022-07-11-1200_config.txt"
+        actual_input_dir = f"{data_folder}/directories/input/XX-dummy_2022-07-11-1200/"
+        actual_output_dir = f"{data_folder}/directories/output/XX-dummy_2022-07-11-1200/"
+        actual_cfg_file = f"{actual_input_dir}XX-dummy_2022-07-11-1200_config.txt"
 
-        assert actual_input_dir == input_dir
-        assert actual_output_dir == output_dir
+        assert actual_input_dir == model.configs["InputPath"]
+        assert actual_output_dir == model.configs["OutputPath"]
         assert actual_cfg_file == cfg_file
+
+        # matlab log dir
+        assert os.environ['MATLAB_LOG_DIR'] == str(model.configs["InputPath"])
 
     @patch("subprocess.Popen")
     def test_run(self, mocked_popen, model_with_setup):
-        model, _, _, _ = model_with_setup
 
         actual_cfg_file = f"{data_folder}/directories/input/XX-dummy_2022-07-11-1200_config.txt"
         output = (
@@ -50,17 +52,16 @@ class TestWithDefaults:
         mocked_popen.return_value.communicate.return_value = (output, "error")
         mocked_popen.return_value.wait.return_value = 0
 
+        model, cfg_file = model_with_setup
         result = model.run()
 
-        expected = [f"{model.exe_file} {model.cfg_file}"]
+        expected = [f"{model.exe_file} {cfg_file}"]
         mocked_popen.assert_called_with(
         expected, preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
         )
 
         # output of subprocess
         assert result == output
-        # matlab log dir
-        assert os.environ['MATLAB_LOG_DIR'] == str(model.config["InputPath"])
 
 
 class TestWithCustomSetup:
@@ -74,27 +75,30 @@ class TestWithCustomSetup:
     def model_with_setup(self, model, tmp_path):
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-07-11-1200"
-            input_dir, output_dir, cfg_file = model.setup(
+            cfg_file = model.setup(
                 WorkDir = str(tmp_path),
                 ForcingFileName = "dummy_forcing_file.nc",
                 NumberOfTimeSteps = "5",
             )
-        return model, input_dir, output_dir, cfg_file
+        return model, cfg_file
 
     def test_setup(self, model_with_setup, tmp_path):
-        model, input_dir, output_dir, cfg_file = model_with_setup
+        model, cfg_file = model_with_setup
 
-        actual_input_dir = f"{tmp_path}/input/dummy_2022-07-11-1200"
-        actual_output_dir = f"{tmp_path}/output/dummy_2022-07-11-1200"
-        actual_cfg_file = f"{actual_input_dir}/dummy_2022-07-11-1200_config.txt"
+        actual_input_dir = f"{tmp_path}/input/dummy_2022-07-11-1200/"
+        actual_output_dir = f"{tmp_path}/output/dummy_2022-07-11-1200/"
+        actual_cfg_file = f"{actual_input_dir}dummy_2022-07-11-1200_config.txt"
 
-        assert actual_input_dir == input_dir
-        assert actual_output_dir == output_dir
+        assert actual_input_dir == model.configs["InputPath"]
+        assert actual_output_dir == model.configs["OutputPath"]
         assert actual_cfg_file == cfg_file
-        assert model.config["NumberOfTimeSteps"] == "5"
+        assert model.configs["NumberOfTimeSteps"] == "5"
+
+        # matlab log dir
+        assert os.environ['MATLAB_LOG_DIR'] == str(model.configs["InputPath"])
 
     def test_configs(self, model_with_setup):
-        model, _, _, cfg_file = model_with_setup
+        model, cfg_file = model_with_setup
         actual = config_io.read_config(cfg_file)
         assert actual == model.configs
 
@@ -108,15 +112,13 @@ class TestWithCustomSetup:
         mocked_popen.return_value.communicate.return_value = (output, "error")
         mocked_popen.return_value.wait.return_value = 0
 
-        model, _, _, _ = model_with_setup
+        model, cfg_file = model_with_setup
         result = model.run()
 
-        expected = [f"{model.exe_file} {model.cfg_file}"]
+        expected = [f"{model.exe_file} {cfg_file}"]
         mocked_popen.assert_called_with(
         expected, preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
         )
 
         # output of subprocess
         assert result == output
-        # matlab log dir
-        assert os.environ['MATLAB_LOG_DIR'] == str(model.config["InputPath"])
