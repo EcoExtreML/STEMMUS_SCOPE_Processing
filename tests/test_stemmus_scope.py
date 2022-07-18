@@ -15,8 +15,11 @@ class TestWithDefaults:
     def model(self, tmp_path):
         config_file = str(data_folder / "config_file_test.txt")
         exe_file = Path(tmp_path) / "STEMUUS_SCOPE"
+
         # create dummy exe file
-        f = open(exe_file, "x")
+        with open(exe_file, "x", encoding="utf8") as dummy_file:
+            dummy_file.close()
+
         yield StemmusScope(config_file, exe_file)
 
     @pytest.fixture
@@ -41,23 +44,23 @@ class TestWithDefaults:
         # matlab log dir
         assert os.environ['MATLAB_LOG_DIR'] == str(model.configs["InputPath"])
 
-    @patch("subprocess.Popen")
-    def test_run(self, mocked_popen, model_with_setup):
+    @patch("subprocess.run")
+    def test_run(self, mocked_run, model_with_setup):
 
         actual_cfg_file = f"{data_folder}/directories/input/XX-dummy_2022-07-11-1200_config.txt"
         output = (
             f"b'Reading config from {actual_cfg_file}\n\n "
             "The calculations start now \r\n The calculations end now \r'"
             )
-        mocked_popen.return_value.communicate.return_value = (output, "error")
-        mocked_popen.return_value.wait.return_value = 0
+
+        mocked_run.return_value.stdout = output
 
         model, cfg_file = model_with_setup
         result = model.run()
 
         expected = [f"{model.exe_file} {cfg_file}"]
-        mocked_popen.assert_called_with(
-        expected, preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+        mocked_run.assert_called_with(
+        expected, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, check=True,
         )
 
         # output of subprocess
@@ -102,22 +105,22 @@ class TestWithCustomSetup:
         actual = config_io.read_config(cfg_file)
         assert actual == model.configs
 
-    @patch("subprocess.Popen")
-    def test_run(self, mocked_popen, model_with_setup, tmp_path):
+    @patch("subprocess.run")
+    def test_run(self, mocked_run, model_with_setup, tmp_path):
         actual_cfg_file = f"{tmp_path}/input/dummy_2022-07-11-1200_config.txt"
         output = (
             f"b'Reading config from {actual_cfg_file}\n\n "
             "The calculations start now \r\n The calculations end now \r'"
             )
-        mocked_popen.return_value.communicate.return_value = (output, "error")
-        mocked_popen.return_value.wait.return_value = 0
+
+        mocked_run.return_value.stdout = output
 
         model, cfg_file = model_with_setup
         result = model.run()
 
         expected = [f"{model.exe_file} {cfg_file}"]
-        mocked_popen.assert_called_with(
-        expected, preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+        mocked_run.assert_called_with(
+        expected, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, check=True,
         )
 
         # output of subprocess

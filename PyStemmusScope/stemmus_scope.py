@@ -2,7 +2,6 @@
 
 import os
 import logging
-from pathlib import Path
 from typing import Tuple, Iterable, Any
 import subprocess
 from . import forcing_io
@@ -83,18 +82,13 @@ class StemmusScope():
 
         # run the model
         args = [f"{self.exe_file} {self.cfg_file}"]
-        result = subprocess.Popen(
-            args, preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+        result = subprocess.run(
+            args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, check=True,
         )
-        exit_code = result.wait()
-        stdout, stderr = result.communicate()
+        stdout = result.stdout
+
         # TODO return log info line by line!
         logger.info("%s", stdout)
-
-        if exit_code != 0:
-            raise subprocess.CalledProcessError(
-                returncode=exit_code, cmd=args, stderr=stderr, output=stdout
-            )
 
         return stdout
 
@@ -103,4 +97,3 @@ class StemmusScope():
     def configs(self) -> Iterable[Tuple[str, Any]]:
         """Return the configurations for this model."""
         return self._configs
-
