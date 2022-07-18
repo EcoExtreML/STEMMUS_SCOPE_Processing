@@ -4,7 +4,6 @@ import numpy as np
 import xarray as xr
 from . import utils
 from . import variable_conversion as vc
-from . import config_io
 
 
 def _open_multifile_datasets(paths, lat, lon, lat_key='lat', lon_key='lon'):

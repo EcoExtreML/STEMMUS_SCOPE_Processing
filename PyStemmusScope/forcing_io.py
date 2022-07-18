@@ -3,7 +3,6 @@ import hdf5storage
 import numpy as np
 import xarray as xr
 from . import variable_conversion as vc
-from . import config_io
 
 
 def _write_matlab_ascii(fname, data, ncols):

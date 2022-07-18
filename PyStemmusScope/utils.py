@@ -49,9 +49,9 @@ def to_absolute_path(
         if must_be_in_parent:
             try:
                 pathlike.relative_to(parent)
-            except ValueError:
+            except ValueError as exc:
                 raise ValueError(
                     f"Input path {input_path} is not a subpath of parent {parent}"
-                )
+                ) from exc
 
     return pathlike.expanduser().resolve(strict=must_exist)
