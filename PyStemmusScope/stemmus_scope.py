@@ -21,7 +21,7 @@ class StemmusScope():
         self.exe_file = utils.to_absolute_path(exe_file)
 
         # read config template
-        self.config = config_io.read_config(config_file)
+        self._configs = config_io.read_config(config_file)
 
     def setup(
         self,
@@ -45,29 +45,32 @@ class StemmusScope():
         """
         # update config template if needed
         if WorkDir:
-            self.config["WorkDir"] = WorkDir
+            self._configs["WorkDir"] = WorkDir
 
         if ForcingFileName:
-            self.config["ForcingFileName"] = ForcingFileName
+            self._configs["ForcingFileName"] = ForcingFileName
 
         if NumberOfTimeSteps:
-            self.config["NumberOfTimeSteps"] = NumberOfTimeSteps
+            self._configs["NumberOfTimeSteps"] = NumberOfTimeSteps
 
         # create customized config file and input/output directories for model run
-        self.input_dir, self.output_dir, self.cfg_file = config_io.create_io_dir(
-            self.config["ForcingFileName"], self.config
+        _, _, self.cfg_file = config_io.create_io_dir(
+            self._configs["ForcingFileName"], self._configs
             )
 
         # read the run config file
-        self.config = config_io.read_config(self.cfg_file)
+        self._configs = config_io.read_config(self.cfg_file)
 
         # prepare forcing data
-        forcing_io.prepare_forcing(self.config)
+        forcing_io.prepare_forcing(self._configs)
 
         # prepare soil data
-        soil_io.prepare_soil_data(self.config)
+        soil_io.prepare_soil_data(self._configs)
 
-        return str(self.input_dir), str(self.output_dir), str(self.cfg_file)
+        # set matlab log dir
+        os.environ['MATLAB_LOG_DIR'] = str(self._configs["InputPath"])
+
+        return str(self.cfg_file)
 
     def run(self) -> Tuple[str, str, str]:
         """Run model using executable.
@@ -77,8 +80,6 @@ class StemmusScope():
         Returns:
             Tuple with stdout and stderr
         """
-        # set matlab log dir
-        os.environ['MATLAB_LOG_DIR'] = str(self.config["InputPath"])
 
         # run the model
         args = [f"{self.exe_file} {self.cfg_file}"]
@@ -87,6 +88,7 @@ class StemmusScope():
         )
         exit_code = result.wait()
         stdout, stderr = result.communicate()
+        # TODO return log info line by line!
         logger.info("%s", stdout)
 
         if exit_code != 0:
@@ -100,5 +102,5 @@ class StemmusScope():
     @property
     def configs(self) -> Iterable[Tuple[str, Any]]:
         """Return the configurations for this model."""
-        return self.config
+        return self._configs
 
