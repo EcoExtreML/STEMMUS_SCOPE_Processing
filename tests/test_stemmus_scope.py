@@ -33,12 +33,12 @@ class TestWithDefaults:
     def test_setup(self, model_with_setup):
         model, cfg_file = model_with_setup
 
-        actual_input_dir = f"{data_folder}/directories/input/XX-dummy_2022-07-11-1200/"
-        actual_output_dir = f"{data_folder}/directories/output/XX-dummy_2022-07-11-1200/"
-        actual_cfg_file = f"{actual_input_dir}XX-dummy_2022-07-11-1200_config.txt"
+        actual_input_dir = data_folder / "directories" / "input" / "XX-dummy_2022-07-11-1200"
+        actual_output_dir = data_folder / "directories" / "output" / "XX-dummy_2022-07-11-1200"
+        actual_cfg_file = str(actual_input_dir / "XX-dummy_2022-07-11-1200_config.txt")
 
-        assert actual_input_dir == model.configs["InputPath"]
-        assert actual_output_dir == model.configs["OutputPath"]
+        assert actual_input_dir == Path(model.configs["InputPath"])
+        assert actual_output_dir == Path(model.configs["OutputPath"])
         assert actual_cfg_file == cfg_file
 
         # matlab log dir
@@ -47,7 +47,7 @@ class TestWithDefaults:
     @patch("subprocess.run")
     def test_run(self, mocked_run, model_with_setup):
 
-        actual_cfg_file = f"{data_folder}/directories/input/XX-dummy_2022-07-11-1200_config.txt"
+        actual_cfg_file = data_folder / "directories" / "input" / "XX-dummy_2022-07-11-1200_config.txt"
         output = (
             f"b'Reading config from {actual_cfg_file}\n\n "
             "The calculations start now \r\n The calculations end now \r'"
@@ -88,12 +88,12 @@ class TestWithCustomSetup:
     def test_setup(self, model_with_setup, tmp_path):
         model, cfg_file = model_with_setup
 
-        actual_input_dir = f"{tmp_path}/input/dummy_2022-07-11-1200/"
-        actual_output_dir = f"{tmp_path}/output/dummy_2022-07-11-1200/"
-        actual_cfg_file = f"{actual_input_dir}dummy_2022-07-11-1200_config.txt"
+        actual_input_dir = tmp_path / "input" / "dummy_2022-07-11-1200"
+        actual_output_dir = tmp_path / "output" / "dummy_2022-07-11-1200"
+        actual_cfg_file = str(actual_input_dir / "dummy_2022-07-11-1200_config.txt")
 
-        assert actual_input_dir == model.configs["InputPath"]
-        assert actual_output_dir == model.configs["OutputPath"]
+        assert actual_input_dir == Path(model.configs["InputPath"])
+        assert actual_output_dir == Path(model.configs["OutputPath"])
         assert actual_cfg_file == cfg_file
         assert model.configs["NumberOfTimeSteps"] == "5"
 
@@ -107,7 +107,8 @@ class TestWithCustomSetup:
 
     @patch("subprocess.run")
     def test_run(self, mocked_run, model_with_setup, tmp_path):
-        actual_cfg_file = f"{tmp_path}/input/dummy_2022-07-11-1200_config.txt"
+
+        actual_cfg_file = tmp_path / "input" / "dummy_2022-07-11-1200_config.txt"
         output = (
             f"b'Reading config from {actual_cfg_file}\n\n "
             "The calculations start now \r\n The calculations end now \r'"
