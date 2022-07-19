@@ -72,6 +72,10 @@ class TestWithCustomSetup:
     def model(self, tmp_path):
         config_file = str(data_folder / "config_file_test.txt")
         exe_file = Path(tmp_path) / "STEMUUS_SCOPE"
+
+        # create dummy exe file
+        with open(exe_file, "x", encoding="utf8") as dummy_file:
+            dummy_file.close()
         yield StemmusScope(config_file, exe_file)
 
     @pytest.fixture
