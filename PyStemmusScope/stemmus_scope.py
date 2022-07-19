@@ -30,7 +30,7 @@ class StemmusScope():
         WorkDir: str = None,
         ForcingFileName: str = None,
         NumberOfTimeSteps: str = None,
-    ) -> Tuple[str, str, str]:
+    ) -> str:
         """Configure model run.
 
         1. Creates config file and input/output directories based on the config template.
@@ -74,7 +74,7 @@ class StemmusScope():
 
         return str(self.cfg_file)
 
-    def run(self) -> Tuple[str, str, str]:
+    def run(self) -> str:
         """Run model using executable.
 
         Args:
