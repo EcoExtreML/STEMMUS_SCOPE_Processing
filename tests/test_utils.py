@@ -9,9 +9,14 @@ from PyStemmusScope import utils
 
 
 def test_to_absolute_path():
-    input_path = "~/nonexistent_file.txt"
+    input_path = "~/input_dir"
+    expected = Path.home() / "input_dir"
+
+    # care for windows, see issue 22
+    Path(expected).mkdir(exist_ok=True)
+
     parsed = utils.to_absolute_path(input_path)
-    expected = Path.home() / "nonexistent_file.txt"
+
     assert parsed == expected
 
 
