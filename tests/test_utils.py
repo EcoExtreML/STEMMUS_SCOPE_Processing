@@ -14,6 +14,7 @@ def test_to_absolute_path():
     expected = Path.home() / "nonexistent_file.txt"
     assert parsed == expected
 
+
 @patch("PyStemmusScope.utils.os_name")
 def test_to_absolute_path_must_exist(mocked_osname):
     input_path = "~/nonexistent_file.txt"

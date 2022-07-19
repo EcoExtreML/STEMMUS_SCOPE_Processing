@@ -47,11 +47,13 @@ def to_absolute_path(
     Returns:
         The input path that is an absolute path and a :py:class:`pathlib.Path` object.
     """
-    # care for windows, see issue 22
-    must_exist = os_name() == 'nt'
 
+    must_exist = False
     pathlike = Path(input_path)
     if parent:
+        if not parent.is_absolute():
+            # care for windows, see issue 22
+            must_exist = os_name() == 'nt'
         pathlike = parent.joinpath(pathlike)
         if must_be_in_parent:
             try:
@@ -60,5 +62,8 @@ def to_absolute_path(
                 raise ValueError(
                     f"Input path {input_path} is not a subpath of parent {parent}"
                 ) from exc
+    else:
+        # care for windows, see issue 22
+        must_exist = os_name() == 'nt'
 
     return pathlike.expanduser().resolve(strict=must_exist)
