@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import numpy as np
 
@@ -25,10 +26,13 @@ def convert_to_lsm_coordinates(lat, lon):
     return np.round(lat).astype(int), np.round(lon).astype(int)
 
 
+def os_name():
+    return os.name
+
+
 def to_absolute_path(
     input_path: str,
     parent: Path = None,
-    must_exist: bool = False,
     must_be_in_parent=True,
 ) -> Path:
     """Parse input string as :py:class:`pathlib.Path` object.
@@ -43,6 +47,9 @@ def to_absolute_path(
     Returns:
         The input path that is an absolute path and a :py:class:`pathlib.Path` object.
     """
+    # care for windows, see issue 22
+    must_exist = os_name() == 'nt'
+
     pathlike = Path(input_path)
     if parent:
         pathlike = parent.joinpath(pathlike)
