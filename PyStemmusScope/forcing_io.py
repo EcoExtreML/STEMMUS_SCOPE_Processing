@@ -78,8 +78,7 @@ def read_forcing_data(forcing_file):
     data['canopy_height'] = ds_forcing['canopy_height'].values
 
     # these are needed by save.py
-    data['time_units'] = ds_forcing["time"].encoding["units"]
-    data['calendar'] = ds_forcing["time"].encoding["calendar"]
+    data['time'] = ds_forcing["time"]
     data['Qair'] = ds_forcing['Qair']
 
     return data
