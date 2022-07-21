@@ -14,6 +14,22 @@ logger = logging.getLogger(__name__)
 
 
 class StemmusScope():
+    """PyStemmusScope wrapper around Stemmus_Scope model.
+    see https://gmd.copernicus.org/articles/14/1379/2021/
+
+    It sets the model with a configuration file and executable file.
+    It also prepares forcing and soil data for model run.
+
+    Args:
+        config_file(str): path to Stemmus_Scope configuration file. An example
+        config_file can be found in tests/test_data in `STEMMUS_SCOPE_Processing
+        repository <https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing>`_
+        exe_file(str): path to Stemmus_Scope executable file.
+
+    Example:
+        See notebooks/run_model_in_notebook.ipynb in `STEMMUS_SCOPE_Processing
+        repository <https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing>`_
+    """
 
     def __init__(self, config_file: str, exe_file: str):
         # make sure paths are abolute and path objects
