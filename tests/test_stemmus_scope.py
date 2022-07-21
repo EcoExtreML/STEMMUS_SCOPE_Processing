@@ -14,7 +14,7 @@ class TestWithDefaults:
     @pytest.fixture
     def model(self, tmp_path):
         config_file = str(data_folder / "config_file_test.txt")
-        exe_file = Path(tmp_path) / "STEMUUS_SCOPE"
+        exe_file = Path(tmp_path) / "STEMMUS_SCOPE"
 
         # create dummy exe file
         with open(exe_file, "x", encoding="utf8") as dummy_file:
