@@ -9,6 +9,7 @@ https://web.lmd.jussieu.fr/~polcher/ALMA/convention_output_3.html
 
 import logging
 import pandas as pd
+from rdflib import Dataset
 import xarray as xr
 import numpy as np
 
@@ -20,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 
-def select_forcing_variables(config: Dict) -> xr.Dataset:
+def _select_forcing_variables(config, forcing_dict, forcing_name, alma_name) -> xr.DataArray:
     """Reads forcing data, and select the variables needed by ALMA convention.
 
     Args:
@@ -30,41 +31,23 @@ def select_forcing_variables(config: Dict) -> xr.Dataset:
         dict: Dictionary containing the different variables required by ALMA convention.
     """
 
-    forcing_file = Path(config['ForcingPath']) / config['ForcingFileName']
+    data_array = forcing_dict[forcing_name]
+    data_array.rename({forcing_name:alma_name})
+    data_array = resize_data_array(data_array, config)
+    return data_array
 
-    # read forcing file into a dict
-    forcing_dict = forcing_io.read_forcing_data(forcing_file)
-
-    # list of required variables
-    var_names = [
-        't_air_celcius',
-        'sw_down',
-        'lw_down',
-        'wind_speed',
-        'psurf_hpa',
-        'rh',
-        'year',
-        'precip_conv',
-        'co2_conv',
-        'Qair',
-        ]
-
-    data_list = [forcing_dict[var_name] for var_name in var_names]
-
-    # add lat/lon to the list
-    data_list.extend(
-        [{'latitude': forcing_dict['latitude']},
-        {'longitude': forcing_dict['longitude']}]
-    )
-
+def _update_dims(dataset, forcing_dict):
     # merge into one dataset
-    dataset = xr.merge(data_list)
+
 
     # add time attributes
+    time_units = forcing_dict["time"].encoding["units"]
+    calendar = forcing_dict["time"].encoding["calendar"]
+
     dataset['time'].attrs.update(
         {
-            'calendar': forcing_dict['calendar'],
-            'time_units': forcing_dict['time_units'],
+            'calendar': calendar,
+            'time_units': time_units,
             }
             )
     # add x/y dims to the dataset
@@ -76,14 +59,14 @@ def select_forcing_variables(config: Dict) -> xr.Dataset:
     # update values of x and y coords
     dataset_reordered.assign_coords(
         {
-            "x":forcing_dict['longitude'],
-            "y":forcing_dict['latitude'],
+            "x":dataset_reordered['longitude'].values.flatten(),
+            "y":dataset_reordered['latitude'].values.flatten(),
             }
         )
     return dataset_reordered
 
 
-def resize_data_frame(config: Dict, data: xr.Dataset)-> xr.Dataset:
+def resize_data_array(data: xr.DataArray, config)-> xr.Dataset:
     """Resize data based on `NumberOfTimeSteps` in configuration file.
 
     Args:
@@ -93,51 +76,129 @@ def resize_data_frame(config: Dict, data: xr.Dataset)-> xr.Dataset:
     Returns:
         xr.Dataset: subset of data with the lenght of time equal to `NumberOfTimeSteps`.
     """
+
     # subset data, if needed
     time_steps_lenght = config['NumberOfTimeSteps']
+
     if time_steps_lenght != 'NA':
-        time_length = int(time_steps_lenght) - 1
-        data_subset = data.isel(time=np.arange(0, time_length))
+        time_length = int(time_steps_lenght)
+        data = data.isel(time=np.arange(0, time_length))
 
-    return data_subset
-
-
-def read_convetion(filename: str) -> pd.DataFrame:
-    """Read convention file and return it as a data frame.
-
-    example file: Variables_will_be_in_NetCDF_file.csv
-
-    Args:
-
-    Returns:
-
-    """
-    return pd.read_csv(filename)
+    return data
 
 
-def create_dataarray(dataset, filename, var_name, metadat):
-    data = pd.read_csv(filename)
-    variable = data[var_name]
+def _create_3d_dataarray(csv_file_name: str, model_name: str, time: List) -> xr.DataArray:
 
-    if metadat['dimension'] == 'XYT':
-        dims=["x", "y", "time"]
-    else:
-        dims=["x", "y", "z", "time"]
+    data = pd.read_csv(csv_file_name)
+    data_frame = data[model_name].loc[1:]
 
-    if var_name in dataset:
-        # update attrs
-    else:
-        # add it to dataset
-        # update attrs
+    data_array = data_frame.to_xarray()
+    data_array["index"] = time
+    return data_array.rename({"index":"time"})
 
 
+def _create_4d_dataarray(csv_file_name: str, model_name: str, time: List) -> xr.DataArray:
+
+    data_frame = pd.read_csv(csv_file_name, skiprows=1)
+
+    data_array = data_frame.to_xarray()
+    data_array["index"] = time
+    return data_array.rename({"index":"time"})
+
+
+def _add_attrs(data: xr.DataArray, metadata: Dict) -> xr.DataArray:
+    data.attrs = {
+        "units": metadata['unit'],
+        "long_name": metadata['long_name'],
+        "standard_name": metadata['standard_name'],
+        "STEMMUS-SCOPE_name": metadata['Variable name in STEMMUS-SCOPE'],
+        "definition": metadata['definition'],
+    }
+    return data
 
 
 def save(config, cf_filename):
-    dataset = select_forcing_variables(config)
-    dataset = resize_data_frame(config, dataset)
+    # list of required variables, Alma_short_name: forcing_io_name
+    var_names = {
+        'Ta': 't_air_celcius',
+        'Rin': 'sw_down',
+        'Rli': 'lw_down',
+        'u': 'wind_speed',
+        'p': 'psurf_hpa',
+        'RH': 'rh',
+        'year': 'year',
+        'Pre': 'precip_conv',
+        'CO2air': 'co2_conv',
+        'Qair': 'Qair',
+    }
 
-    conventions = read_convetion(cf_filename)
+    forcing_file = Path(config['ForcingPath']) / config['ForcingFileName']
+
+    # read forcing file into a dict
+    forcing_dict = forcing_io.read_forcing_data(forcing_file)
+
+    # get time info
+    time = resize_data_array(forcing_dict["time"], config)
+
+    # read convention file
+    conventions = pd.read_csv(cf_filename)
+
+    # variable metadat
+    metadata_list = [
+        "unit",
+        "long_name",
+        "standard_name",
+        "Variable name in STEMMUS-SCOPE",
+        "definition",
+        ]
+
+    alma_short_names = conventions["short_name_alma"]
+    data_list = []
+    for name in alma_short_names:
+        file_name = conventions.loc[alma_short_names == name, ['File name']]
+        file_name = file_name.values.flatten()[0]
+
+        model_name = conventions.loc[alma_short_names == name, ['Variable name in STEMMUS-SCOPE']]
+        model_name = model_name.values.flatten()[0]
+
+        dimension = conventions.loc[alma_short_names == name, ['dimension']]
+        dimension = dimension.values.flatten()[0]
+
+        metadata = conventions.loc[conventions['short_name_alma']== name, metadata_list]
+
+        if name in var_names:
+            # select data
+            forcing_name = var_names[name]
+            dataarray = _select_forcing_variables(config, forcing_dict, forcing_name, name)
+        else:
+            # create data array
+            if file_name == 'Sim_Temp.csv':
+                #TODO check Sim_Temp.csv
+                dataarray = _create_4d_dataarray(file_name, model_name, time)
+            else:
+                dataarray = _create_3d_dataarray(file_name, model_name, time)
+
+        # update metadat
+        dataarray = _add_attrs(dataarray, metadata)
+
+        # add to list
+        dara_list.append(dataarray)
+
+    # add lat/lon to the list
+    data_list.extend(
+        [{'latitude': forcing_dict['latitude']},
+        {'longitude': forcing_dict['longitude']}]
+    )
+
+    # merge to a dataset
+    dataset = xr.merge(data_list)
+
+    dataset = _update_dims(dataset, forcing_dict)
+
+
+
+
+
 
 
 
