@@ -37,12 +37,12 @@ class TestWithDefaults:
         actual_output_dir = data_folder / "directories" / "output" / "XX-dummy_2022-07-11-1200"
         actual_cfg_file = str(actual_input_dir / "XX-dummy_2022-07-11-1200_config.txt")
 
-        assert actual_input_dir == Path(model.configs["InputPath"])
-        assert actual_output_dir == Path(model.configs["OutputPath"])
+        assert actual_input_dir == Path(model.config["InputPath"])
+        assert actual_output_dir == Path(model.config["OutputPath"])
         assert actual_cfg_file == cfg_file
 
         # matlab log dir
-        assert os.environ['MATLAB_LOG_DIR'] == str(model.configs["InputPath"])
+        assert os.environ['MATLAB_LOG_DIR'] == str(model.config["InputPath"])
 
     @patch("subprocess.run")
     def test_run(self, mocked_run, model_with_setup):
@@ -96,18 +96,18 @@ class TestWithCustomSetup:
         actual_output_dir = tmp_path / "output" / "dummy_2022-07-11-1200"
         actual_cfg_file = str(actual_input_dir / "dummy_2022-07-11-1200_config.txt")
 
-        assert actual_input_dir == Path(model.configs["InputPath"])
-        assert actual_output_dir == Path(model.configs["OutputPath"])
+        assert actual_input_dir == Path(model.config["InputPath"])
+        assert actual_output_dir == Path(model.config["OutputPath"])
         assert actual_cfg_file == cfg_file
-        assert model.configs["NumberOfTimeSteps"] == "5"
+        assert model.config["NumberOfTimeSteps"] == "5"
 
         # matlab log dir
-        assert os.environ['MATLAB_LOG_DIR'] == str(model.configs["InputPath"])
+        assert os.environ['MATLAB_LOG_DIR'] == str(model.config["InputPath"])
 
-    def test_configs(self, model_with_setup):
+    def test_config(self, model_with_setup):
         model, cfg_file = model_with_setup
         actual = config_io.read_config(cfg_file)
-        assert actual == model.configs
+        assert actual == model.config
 
     @patch("subprocess.run")
     def test_run(self, mocked_run, model_with_setup, tmp_path):

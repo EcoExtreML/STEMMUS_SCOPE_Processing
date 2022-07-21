@@ -3,9 +3,7 @@
 import logging
 import os
 import subprocess
-from typing import Any
-from typing import Iterable
-from typing import Tuple
+from typing import Dict
 from . import config_io
 from . import forcing_io
 from . import soil_io
@@ -97,6 +95,6 @@ class StemmusScope():
 
 
     @property
-    def configs(self) -> Iterable[Tuple[str, Any]]:
+    def config(self) -> Dict:
         """Return the configurations for this model."""
         return self._configs
