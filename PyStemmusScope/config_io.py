@@ -7,7 +7,7 @@ import logging
 import os
 import shutil
 import time
-from pathlib import Path
+from . import utils
 
 
 logger = logging.getLogger(__name__)
@@ -42,27 +42,28 @@ def create_io_dir(forcing_filename, config):
     # get start time with the format Y-M-D-HM
     timestamp = time.strftime('%Y-%m-%d-%H%M')
     station_name = forcing_filename.split('_')[0]
+
     # create input directory
-    input_dir = Path(f"{config['WorkDir']}/input/{station_name}_{timestamp}")
-    Path(input_dir).mkdir(parents=True, exist_ok=True)
+    work_dir = utils.to_absolute_path(config['WorkDir'])
+    input_dir = work_dir / "input" / f"{station_name}_{timestamp}"
+    input_dir.mkdir(parents=True, exist_ok=True)
     message = f"Prepare work directory {input_dir} for the station: {station_name}"
     logger.info("%s", message)
+
     # copy model parameters to work directory
     _copy_data(input_dir, config)
-    input_dir = str(input_dir)
 
     # create output directory
-    output_dir = Path(f"{config['WorkDir']}/output/{station_name}_{timestamp}")
+    output_dir = work_dir / "output" / f"{station_name}_{timestamp}"
     output_dir.mkdir(parents=True, exist_ok=True)
     message = f"Prepare work directory {output_dir} for the station: {station_name}"
     logger.info("%s", message)
-    output_dir = str(output_dir)
 
     # update config file for ForcingFileName and InputPath
     config_file_path = _update_config_file(forcing_filename, input_dir, output_dir,
         config, station_name, timestamp)
 
-    return input_dir, output_dir, config_file_path
+    return str(input_dir), str(output_dir), config_file_path
 
 def _copy_data(input_dir, config):
     """Copy required data to the work directory.
@@ -98,7 +99,7 @@ def _update_config_file(nc_file, input_dir, output_dir, config, station_name, ti
     Returns:
         Path to updated config file.
     """
-    config_file_path = Path(input_dir, f"{station_name}_{timestamp}_config.txt")
+    config_file_path = input_dir / f"{station_name}_{timestamp}_config.txt"
     with open(config_file_path, 'w', encoding="utf8") as f:
         for key, value in config.items():
             if key == "ForcingFileName":
