@@ -83,16 +83,16 @@ def field_moisture_content(theta_r, theta_s, alpha, coef_n):
     return field_moisture_content
 
 
-def soil_moisture(volumetric_water_content, thickness) -> np.array:
+def soil_moisture(volumetric_water_content:np.array, thickness:np.array) -> np.array:
     """Calculates the soil moisture (kg/m2) from volumetric water content(m3/m3), based on SM =
         VolumetricWaterContent * Density * Thickness.
 
     Args:
-        volumetric_water_content: volumetric water content in m3/m3
-        thickness: compute from depth in m
+        volumetric_water_content(np.array): volumetric water content in m3/m3
+        thickness(np.array): soil layer thickness in m
 
     Returns:
-        np.array: soil moisture  in kg/m2
+        np.array: soil moisture in kg/m2
     """
     # Density: constant (water_density = 1000 kg per m3)
     return  (1000.0 * volumetric_water_content * thickness)
