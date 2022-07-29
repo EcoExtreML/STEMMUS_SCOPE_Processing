@@ -1,4 +1,4 @@
-# STEMMUS SCOPE Processing
+# PyStemmusScope
 
 <!-- (Customize these badges with your own links, and check https://shields.io/ or https://badgen.net/ to see which other badges are available.) -->
 
@@ -19,7 +19,8 @@
 [![markdown-link-check](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/markdown-link-check.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/markdown-link-check.yml) -->
 
 
-This repositary includes python modules for running the STEMMUS-SCOPE model in a notebook.
+This repositary includes python modules for running the STEMMUS-SCOPE model in a jupyter
+notebook.
 
 The workflow is executed using python and MATLAB Runtime on a Unix-like system.
 The python packages are listed in the
