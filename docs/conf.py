@@ -17,9 +17,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = u"PyStemmusScope"
-copyright = u"2022, Netherlands eScience Center"
-author = u"Sarah Alidoost"
+project = "PyStemmusScope"
+copyright = "2022, Netherlands eScience Center"
+author = "Sarah Alidoost"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -75,6 +75,20 @@ html_theme = "sphinx_rtd_theme"
 # documentation.
 #
 # html_theme_options = {}
+
+# Custom sidebar templates, must be a dictionary that maps document names
+# to template names.
+#
+# This is required for the alabaster theme
+# refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
+html_sidebars = {
+    "**": [
+        'globaltoc.html',
+        "relations.html",  # needs 'show_related': True theme option to display
+        "searchbox.html",
+    ]
+}
+
 
 # -- Options for Intersphinx
 
