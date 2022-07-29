@@ -3,12 +3,21 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to PyStemmusScope's documentation!
-==========================================================
+
+.. include:: ../README.md
+   :parser: myst_parser.sphinx_
 
 .. toctree::
   :maxdepth: 2
   :caption: Contents:
+  :hidden:
+
+  Readme <readme_link>
+  Project Setup <project_setup.md>
+  Developer Readme <README.dev.md>
+  Contributing <contributing_link>
+  Code of Conduct <CODE_OF_CONDUCT.md>
+  Changelog <CHANGELOG.md>
 
 Indices and tables
 ==================

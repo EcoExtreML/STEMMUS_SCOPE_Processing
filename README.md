@@ -8,18 +8,18 @@
 [![fair-software badge](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu)
 [![sonarcloud](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/sonarcloud.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/sonarcloud.yml)
 [![github license badge](https://img.shields.io/github/license/EcoExtreML/stemmus_scope_processing)](https://github.com/EcoExtreML/stemmus_scope_processing)
+[![Documentation Status](https://readthedocs.org/projects/pystemmusscope/badge/?version=latest)](https://pystemmusscope.readthedocs.io/en/latest/?badge=latest)
 
-<!-- [![RSD](https://img.shields.io/badge/rsd-pystemmusscope-00a3e3.svg)](https://www.research-software.nl/software/pystemmusscope) 
-[![workflow pypi badge](https://img.shields.io/pypi/v/pystemmusscope.svg?colorB=blue)](https://pypi.python.org/project/pystemmusscope/) 
+<!-- [![RSD](https://img.shields.io/badge/rsd-pystemmusscope-00a3e3.svg)](https://www.research-software.nl/software/pystemmusscope)
+[![workflow pypi badge](https://img.shields.io/pypi/v/pystemmusscope.svg?colorB=blue)](https://pypi.python.org/project/pystemmusscope/)
 [![DOI](https://zenodo.org/badge/DOI/<replace-with-created-DOI>.svg)](https://doi.org/<replace-with-created-DOI>)
 [![workflow cii badge](https://bestpractices.coreinfrastructure.org/projects/<replace-with-created-project-identifier>/badge)](https://bestpractices.coreinfrastructure.org/projects/<replace-with-created-project-identifier>)
 [![workflow scc badge](https://sonarcloud.io/api/project_badges/measure?project=EcoExtreML_stemmus_scope_processing&metric=coverage)](https://sonarcloud.io/dashboard?id=EcoExtreML_stemmus_scope_processing)
-[![Documentation Status](https://readthedocs.org/projects/stemmus_scope_processing/badge/?version=latest)](https://stemmus_scope_processing.readthedocs.io/en/latest/?badge=latest)
-[![cffconvert](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/cffconvert.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/cffconvert.yml) 
+[![cffconvert](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/cffconvert.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/cffconvert.yml)
 [![markdown-link-check](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/markdown-link-check.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/markdown-link-check.yml) -->
 
 
-This repositary includes python modules for running the STEMMUS-SCOPE model in a notebook. 
+This repositary includes python modules for running the STEMMUS-SCOPE model in a notebook.
 
 The workflow is executed using python and MATLAB Runtime on a Unix-like system.
 The python packages are listed in the
@@ -65,7 +65,7 @@ In a terminal:
 # Download MATLAB Runtime for Linux
 wget https://ssd.mathworks.com/supportfiles/downloads/R2021a/Release/6/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2021a_Update_6_glnxa64.zip
 
-# Unzip the file 
+# Unzip the file
 unzip MATLAB_Runtime_R2021a_Update_6_glnxa64.zip
 
 # Install it
@@ -114,7 +114,7 @@ can not be installed there.
 The execution of the model includes following steps:
 
 - Update/set config files
-- Create input directories, prepare input files 
+- Create input directories, prepare input files
 - Run the model
 - Create output directories, prepare output files
 
