@@ -1,7 +1,7 @@
-# processing
+# Contributing Guide
 
 This repositary includes python modules for running the STEMMUS-SCOPE model in a
-notebook. 
+notebook.
 
 The workflow is executed using python and MATLAB on a Unix-like system.
 The python packages are listed in the
@@ -17,7 +17,7 @@ Run the commands below in a terminal:
 ```sh
 # Download and install Conda
 wget https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-pypy3-Linux-x86_64.sh
-bash Mambaforge-pypy3-Linux-x86_64.sh 
+bash Mambaforge-pypy3-Linux-x86_64.sh
 -b -p ~/mamba
 
 # Update base environment
@@ -51,7 +51,7 @@ Snellius, see the script
 on how to load the module.
 </details>
 
-# Run jupyter notebook
+## Run jupyter notebook
 
 **On Snellius:**
 
@@ -69,18 +69,18 @@ interactively.
    "InputPath" and "OutputPath".
 3. click on the `Remote Desktop` in the
 Launcher. Click on the `Applications`. You will find the 'MATLAB' software under
-the `Research`. 
+the `Research`.
 4. After clicking on 'MATLAB', it asks for your account information that is
 connected to a MATLAB license.
 5. Open the file `run_model_in_matlab_dev.m` and set the paths inside the script.
 6. Then, run the main script `run_model_in_matlab_dev.m`.
 
-# Recipe of model execution
+## Recipe of model execution
 
 The execution of the model includes following steps:
 
 - Update/set config files
-- Create input directories, prepare input files 
+- Create input directories, prepare input files
 - Run the model
 - Create output directories, prepare output files
 - Create exe file

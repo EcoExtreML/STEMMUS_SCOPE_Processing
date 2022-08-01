@@ -1,4 +1,3 @@
-# PyStemmusScope
 
 <!-- (Customize these badges with your own links, and check https://shields.io/ or https://badgen.net/ to see which other badges are available.) -->
 
@@ -17,7 +16,6 @@
 [![workflow scc badge](https://sonarcloud.io/api/project_badges/measure?project=EcoExtreML_stemmus_scope_processing&metric=coverage)](https://sonarcloud.io/dashboard?id=EcoExtreML_stemmus_scope_processing)
 [![cffconvert](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/cffconvert.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/cffconvert.yml)
 [![markdown-link-check](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/markdown-link-check.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/markdown-link-check.yml) -->
-
 
 This repositary includes python modules for running the STEMMUS-SCOPE model in a jupyter
 notebook.
@@ -87,7 +85,7 @@ Snellius, see the script
 on how to load the module.
 </details>
 
-# Run jupyter notebook
+## Run jupyter notebook
 
 Open a terminal and run:
 
@@ -110,7 +108,7 @@ interactively.
 Currently, running the notebook on CRIB is not supported because MATLAB Runtime
 can not be installed there.
 
-# Recipe of model execution
+## Recipe of model execution
 
 The execution of the model includes following steps:
 
