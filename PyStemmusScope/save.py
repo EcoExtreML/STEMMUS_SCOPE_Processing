@@ -1,13 +1,14 @@
 """PyStemmusScope save module.
 
-Module designed to create csv files (following SCOPE format) and a netcdf
-file (following ALMA cf convention) in the output directory.
+Module designed to create a netcdf file (following ALMA cf convention) from csv
+files (following SCOPE format) in the output directory.
 
 https://scope-model.readthedocs.io/en/latest/outfiles.html
 https://web.lmd.jussieu.fr/~polcher/ALMA/convention_output_3.html
 """
 
 import logging
+from multiprocessing.sharedctypes import Value
 import pandas as pd
 import xarray as xr
 import numpy as np
@@ -187,20 +188,13 @@ def _update_dataset_attrs_dims(dataset: xr.Dataset, forcing_dict: Dict) -> xr.Da
     dataset_expanded = dataset.expand_dims(["x", "y"])
 
     # change the order of dims
-    dataset_reordered = dataset_expanded.transpose("time", "y", "x", "z")
-
-    # update x, y attributes
-    dataset_reordered["x"].attrs = {
-            "long_name": "Gridbox longitude",
-            "standard_name": "longitude",
-            "units": "degrees",
-            }
-
-    dataset_reordered["y"].attrs = {
-            "long_name": "Gridbox latitude",
-            "standard_name": "latitude",
-            "units": "degrees",
-            }
+    try:
+        dataset_reordered = dataset_expanded.transpose("time", "y", "x", "z")
+    except ValueError:
+        try:
+            dataset_reordered = dataset_expanded.transpose("time", "y", "x")
+        except ValueError as err:
+            raise ValueError("Data should have time dimension.") from err
 
     # additional metadata
     lat = forcing_dict["latitude"]
@@ -226,6 +220,20 @@ def _update_dataset_attrs_dims(dataset: xr.Dataset, forcing_dict: Dict) -> xr.Da
             "y": [lat],
             }
         )
+
+    # update x, y attributes
+    dataset["x"].attrs = {
+            "long_name": "Gridbox longitude",
+            "standard_name": "longitude",
+            "units": "degrees",
+            }
+
+    dataset["y"].attrs = {
+            "long_name": "Gridbox latitude",
+            "standard_name": "latitude",
+            "units": "degrees",
+            }
+
     return dataset
 
 
@@ -283,7 +291,6 @@ def to_netcdf(config: Dict, cf_filename: str) -> str:
 
         # create data array
         elif alma_name in {"SoilTemp", "SoilMoist"}:
-            #TODO fix bin_to_csv.m for correct Sim_Temp.csv file Sim_Theta.csv
             data_array = _prepare_4d_data(file_name, alma_name, time.values)
         else:
             data_array = _prepare_3d_data(file_name, model_name, alma_name, time.values)

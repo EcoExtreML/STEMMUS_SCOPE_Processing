@@ -1,12 +1,10 @@
-"""Tests for the s2s.initializer module.
-"""
 from pathlib import Path
 import pytest
 from PyStemmusScope import config_io
 from . import data_folder
 
 
-class TestIOStreamer:
+class TestConfigIO:
     # define required input/expected values as fixtures
     @pytest.fixture()
     def dummy_config(self):
