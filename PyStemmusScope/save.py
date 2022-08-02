@@ -86,6 +86,9 @@ def _prepare_4d_data(file_name: str, var_name: str, time: List) -> xr.DataArray:
         depths.append(np.float32(depth))
         thicknesses.append(np.float32(thickness))
 
+    # soil layer metadata
+    soil_metadata = _create_soil_layer_metadata(thicknesses, depths)
+
     # drop thickness
     data = data.droplevel(level=1, axis=1)
 
@@ -110,9 +113,6 @@ def _prepare_4d_data(file_name: str, var_name: str, time: List) -> xr.DataArray:
     data.index.names = ["time", "z"]
     data.index = data.index.set_levels([time, layers], level=["time", "z"])
     data.name = var_name
-
-    # soil layer metadata
-    soil_metadata = _create_soil_layer_metadata(thicknesses, depths)
 
     # convert dataframe to xarray data array
     data_array = data.to_xarray()
@@ -162,9 +162,9 @@ def _prepare_3d_data(file_name: str, model_name: str, alma_name: str, time: List
 
 def _create_soil_layer_metadata(thicknesses: List, depths: List) -> List:
     """
-    layer_1: 0 - 1 cm
-    layer_2: 1 - 2 cm
-    layer_3: 2 - 3 cm
+    layer_1: 0.0 - 1.0 cm
+    layer_2: 1.0 - 2.0 cm
+    layer_3: 2.0 - 3.0 cm
     """
 
     metadata = []
@@ -315,8 +315,7 @@ def to_netcdf(config: Dict, cf_filename: str) -> str:
 
     # # save to nc file
     nc_filename = output_dir / f"{output_dir.stem}_STEMMUS_SCOPE.nc"
-    # TODO check if NETCDF3_CLASSIC is required
-    # TODO check if nchar is required
+
     dataset.to_netcdf(path= nc_filename, mode='w')
     return str(nc_filename)
 
