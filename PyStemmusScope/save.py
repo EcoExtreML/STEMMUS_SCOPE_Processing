@@ -8,15 +8,15 @@ https://web.lmd.jussieu.fr/~polcher/ALMA/convention_output_3.html
 """
 
 import logging
-from multiprocessing.sharedctypes import Value
+from pathlib import Path
+from typing import Dict
+from typing import List
+import numpy as np
 import pandas as pd
 import xarray as xr
-import numpy as np
-
-from pathlib import Path
-from typing import Dict, List
 from PyStemmusScope import forcing_io
 from . import variable_conversion as vc
+
 
 logger = logging.getLogger(__name__)
 
@@ -261,14 +261,14 @@ def to_netcdf(config: Dict, cf_filename: str) -> str:
         "Wind": "wind_speed", # u
         "Precip": "precip_conv", # Pre
     }
-    output_dir = Path(config["OutputPath"])
-    forcing_file = Path(config["ForcingPath"]) / config["ForcingFileName"]
 
     # Number of time steps from configuration file
     time_steps = config["NumberOfTimeSteps"]
 
     # read forcing file into a dict
-    forcing_dict = forcing_io.read_forcing_data(forcing_file)
+    forcing_dict = forcing_io.read_forcing_data(
+        Path(config["ForcingPath"]) / config["ForcingFileName"]
+    )
 
     # get time info
     time = _resize_data_array(forcing_dict["time"], time_steps)
@@ -280,20 +280,20 @@ def to_netcdf(config: Dict, cf_filename: str) -> str:
     data_list = []
     for alma_name in alma_short_names:
         df = conventions.loc[alma_short_names == alma_name].iloc[0]
-        file_name = output_dir / df["File name"]
-        model_name = df["Variable name in STEMMUS-SCOPE"]
+        file_name = Path(config["OutputPath"]) / df["File name"]
 
         if alma_name in var_names:
             # select data
-            forcing_name = var_names[alma_name]
-            data_array = _select_forcing_variables(forcing_dict, forcing_name, alma_name)
+            data_array = _select_forcing_variables(forcing_dict, var_names[alma_name], alma_name)
             data_array = _resize_data_array(data_array, time_steps)
 
         # create data array
         elif alma_name in {"SoilTemp", "SoilMoist"}:
             data_array = _prepare_4d_data(file_name, alma_name, time.values)
         else:
-            data_array = _prepare_3d_data(file_name, model_name, alma_name, time.values)
+            data_array = _prepare_3d_data(
+                file_name, df["Variable name in STEMMUS-SCOPE"], alma_name, time.values
+                )
 
         # update attributes of array
         data_array.attrs = {
@@ -314,17 +314,7 @@ def to_netcdf(config: Dict, cf_filename: str) -> str:
     dataset = _update_dataset_attrs_dims(dataset, forcing_dict)
 
     # # save to nc file
-    nc_filename = output_dir / f"{output_dir.stem}_STEMMUS_SCOPE.nc"
+    nc_filename = Path(config["OutputPath"]) / f"{Path(config['OutputPath']).stem}_STEMMUS_SCOPE.nc"
 
     dataset.to_netcdf(path= nc_filename, mode='w')
     return str(nc_filename)
-
-
-
-
-
-
-
-
-
-
