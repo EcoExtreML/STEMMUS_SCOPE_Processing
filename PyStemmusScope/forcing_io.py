@@ -148,10 +148,10 @@ def prepare_global_variables(data, input_path, config):
         input_path (Path): Path to which the file should be written to.
         config (dict): The PyStemmusScope configuration dictionary.
     """
-    if int(config['NumberOfTimeSteps']) > data['total_timesteps']:
-        total_duration = data['total_timesteps']
+    if config['NumberOfTimeSteps'] != 'NA':
+        total_duration = min(int(config['NumberOfTimeSteps']), data['total_timesteps'])
     else:
-        total_duration = int(config['NumberOfTimeSteps'])
+        total_duration = data['total_timesteps']
 
     matfile_vars = ['latitude', 'longitude', 'elevation', 'IGBP_veg_long',
                     'reference_height', 'canopy_height', 'DELT', 'sitename']
