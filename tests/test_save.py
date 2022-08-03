@@ -44,35 +44,6 @@ class TestSaveForcingData:
                 )
             return model
 
-    def test_select_forcing_variables(self, model_with_setup):
-        model = model_with_setup
-
-        forcing_file = Path(model.config["ForcingPath"]) / model.config["ForcingFileName"]
-        forcing_data = forcing_io.read_forcing_data(forcing_file)
-        parsed_data = save._select_forcing_variables(forcing_data, "t_air_celcius", "Tair")
-
-        # check if alma_name is used
-        assert parsed_data.name == "Tair"
-        # check values
-        expected_data = np.array([-8.915009, -8.78598 , -8.656982, -8.528992, -8.399994], dtype=np.float32)
-        np.testing.assert_array_equal(expected_data, parsed_data.values)
-
-    def test_resize_data_array(self, model_with_setup):
-        model = model_with_setup
-
-        forcing_data = forcing_io.read_forcing_data(
-            Path(model.config["ForcingPath"]) / model.config["ForcingFileName"]
-            )
-
-        parsed_time = save._resize_data_array(
-            forcing_data["time"], model.config["NumberOfTimeSteps"]
-            )
-
-        # check if time is the name
-        assert parsed_time.name == "time"
-        # check shape
-        assert parsed_time.shape[0] == 3
-
     def test_save_to_netcdf(self, cf_convention, model_with_setup):
         model = model_with_setup
         saved_nc_file = save.to_netcdf(model.config, cf_convention)
@@ -138,7 +109,7 @@ class TestSave3dData:
                 )
             return model
 
-    @pytest.fixture
+    @pytest.fixture(name="make_csv_file")
     def make_csv_file(self, model_with_setup):
         model = model_with_setup
         data = [
@@ -221,7 +192,7 @@ class Test4dData:
                 )
             return model
 
-    @pytest.fixture
+    @pytest.fixture(name="make_csv_file")
     def make_csv_file(self, model_with_setup):
         model = model_with_setup
         data = [
@@ -310,7 +281,7 @@ class TestSaveToNetcdf:
                 )
             return model
 
-    @pytest.fixture
+    @pytest.fixture(name="make_csv_file")
     def make_csv_file(self, model_with_setup):
         model = model_with_setup
         data = [
