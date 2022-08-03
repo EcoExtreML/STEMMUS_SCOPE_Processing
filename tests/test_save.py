@@ -9,6 +9,14 @@ from PyStemmusScope import save
 from . import data_folder
 
 
+# create dummy exe file
+def write_exe(dir):
+    exe_file = Path(dir) / "STEMMUS_SCOPE"
+    with open(exe_file, "x", encoding="utf8") as dummy_file:
+        dummy_file.close()
+    return exe_file
+
+# create csv file
 def write_csv(data, filename):
     with open(filename, "w", encoding="utf8") as file:
         for line in data:
@@ -31,7 +39,7 @@ class TestSaveForcingData:
     @pytest.fixture
     def model_with_setup(self, tmp_path):
         config_file = str(data_folder / "config_file_test.txt")
-        exe_file = Path(tmp_path) / "STEMMUS_SCOPE"
+        exe_file = write_exe(tmp_path)
         model = StemmusScope(config_file, exe_file)
 
         with patch("time.strftime") as mocked_time:
@@ -96,7 +104,7 @@ class TestSave3dData:
     @pytest.fixture
     def model_with_setup(self, tmp_path):
         config_file = str(data_folder / "config_file_test.txt")
-        exe_file = Path(tmp_path) / "STEMMUS_SCOPE"
+        exe_file = write_exe(tmp_path)
         model = StemmusScope(config_file, exe_file)
 
         with patch("time.strftime") as mocked_time:
@@ -109,8 +117,8 @@ class TestSave3dData:
                 )
             return model
 
-    @pytest.fixture(name="make_csv_file")
-    def make_csv_file(self, model_with_setup):
+    @pytest.fixture(name="_make_csv_file")
+    def fixture_make_csv_file(self, model_with_setup):
         model = model_with_setup
         data = [
             "simulation_number,year,DoY,Netlong",
@@ -125,7 +133,7 @@ class TestSave3dData:
         csv_file = Path(model.config["OutputPath"]) / "radiation.csv"
         write_csv(data, csv_file)
 
-    def test_save_to_netcdf(self, cf_convention, make_csv_file, model_with_setup):
+    def test_save_to_netcdf(self, cf_convention, _make_csv_file, model_with_setup):
         model = model_with_setup
         saved_nc_file = save.to_netcdf(model.config, cf_convention)
 
@@ -179,7 +187,7 @@ class Test4dData:
     @pytest.fixture
     def model_with_setup(self, tmp_path):
         config_file = str(data_folder / "config_file_test.txt")
-        exe_file = Path(tmp_path) / "STEMMUS_SCOPE"
+        exe_file = write_exe(tmp_path)
         model = StemmusScope(config_file, exe_file)
 
         with patch("time.strftime") as mocked_time:
@@ -192,8 +200,8 @@ class Test4dData:
                 )
             return model
 
-    @pytest.fixture(name="make_csv_file")
-    def make_csv_file(self, model_with_setup):
+    @pytest.fixture(name="_make_csv_file")
+    def fixture_make_csv_file(self, model_with_setup):
         model = model_with_setup
         data = [
             "1,2,3,5",
@@ -209,7 +217,7 @@ class Test4dData:
         csv_file = Path(model.config["OutputPath"]) / "Sim_Theta.csv"
         write_csv(data, csv_file)
 
-    def test_save_to_netcdf(self, cf_convention, make_csv_file, model_with_setup):
+    def test_save_to_netcdf(self, cf_convention, _make_csv_file, model_with_setup):
         model = model_with_setup
         saved_nc_file = save.to_netcdf(model.config, cf_convention)
 
@@ -268,7 +276,7 @@ class TestSaveToNetcdf:
     @pytest.fixture
     def model_with_setup(self, tmp_path):
         config_file = str(data_folder / "config_file_test.txt")
-        exe_file = Path(tmp_path) / "STEMMUS_SCOPE"
+        exe_file = write_exe(tmp_path)
         model = StemmusScope(config_file, exe_file)
 
         with patch("time.strftime") as mocked_time:
@@ -281,8 +289,8 @@ class TestSaveToNetcdf:
                 )
             return model
 
-    @pytest.fixture(name="make_csv_file")
-    def make_csv_file(self, model_with_setup):
+    @pytest.fixture(name="_make_csv_file")
+    def fixture_make_csv_file(self, model_with_setup):
         model = model_with_setup
         data = [
             "1,2,3,5",
@@ -309,7 +317,7 @@ class TestSaveToNetcdf:
         csv_file = Path(model.config["OutputPath"]) / "radiation.csv"
         write_csv(data, csv_file)
 
-    def test_save_to_netcdf(self, cf_convention, make_csv_file, model_with_setup):
+    def test_save_to_netcdf(self, cf_convention, _make_csv_file, model_with_setup):
         model = model_with_setup
         saved_nc_file = save.to_netcdf(model.config, cf_convention)
 
