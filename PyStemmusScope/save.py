@@ -316,5 +316,5 @@ def to_netcdf(config: Dict, cf_filename: str) -> str:
     # # save to nc file
     nc_filename = Path(config["OutputPath"]) / f"{Path(config['OutputPath']).stem}_STEMMUS_SCOPE.nc"
 
-    dataset.to_netcdf(path= nc_filename, mode='w')
+    dataset.to_netcdf(path= nc_filename)
     return str(nc_filename)
