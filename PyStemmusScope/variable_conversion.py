@@ -17,8 +17,17 @@ def calculate_ea(t_air_celcius, rh):
     # Teten O. Über einige meteorologische Begriffe. Z. Geophys., 1930; 6. 297-309.
     # Murray FW. On the computation of saturation vapor pressure,
     #   J. Appl. Meteorol., 1967; 6, 203-204
-    es = 0.61078 * 10**(t_air_celcius*7.5 / (237.3+t_air_celcius))
-    return es * rh/100
+
+    # check rh values
+    if rh.min() < 0.0 or rh.max() > 100.0:
+        raise ValueError("relative humidity should be in percentage ranging from 0 - 100")
+
+    # check lengths
+    if rh.shape != t_air_celcius.shape:
+        raise ValueError("input arrays should have the same shape (size).")
+
+    es = 0.61078 * 10 ** (t_air_celcius * 7.5 / (237.3 + t_air_celcius))
+    return es * rh / 100
 
 
 def co2_molar_fraction_to_kg_per_m3(molar_fraction):
@@ -94,5 +103,9 @@ def soil_moisture(volumetric_water_content:np.array, thickness:np.array) -> np.a
     Returns:
         np.array: soil moisture in kg/m2
     """
+    # check lengths
+    if volumetric_water_content.shape != thickness.shape:
+        raise ValueError("input arrays should have the same shape (size).")
+
     # Density: constant (water_density = 1000 kg per m3)
     return  (1000.0 * volumetric_water_content * thickness)
