@@ -10,8 +10,8 @@ from . import data_folder
 
 
 # create dummy exe file
-def write_exe(dir):
-    exe_file = Path(dir) / "STEMMUS_SCOPE"
+def write_exe(in_dir):
+    exe_file = Path(in_dir) / "STEMMUS_SCOPE"
     with open(exe_file, "x", encoding="utf8") as dummy_file:
         dummy_file.close()
     return exe_file
