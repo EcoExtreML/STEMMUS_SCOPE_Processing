@@ -85,7 +85,7 @@ class TestSaveForcingData:
         assert "z" not in dataset
 
 
-class TestSave3dData:
+class TestSaveSimulatedData:
     @pytest.fixture
     def cf_convention(self, tmp_path):
         convention = [
