@@ -216,16 +216,14 @@ def _update_dataset_attrs_dims(dataset: xr.Dataset, forcing_dict: Dict) -> xr.Da
     dataset_expanded = dataset.expand_dims(["x", "y"])
 
     # change the order of dims
+    req_dims = ['time', 'x', 'y']
+    if any(dim not in dataset_expanded.dims for dim in req_dims):
+        raise ValueError("Data should have dimensions time, y, x.")
+
     if "z" in dataset_expanded.dims:
-        try:
-            dataset_reordered = dataset_expanded.transpose("time",  "z", "y", "x")
-        except ValueError as err:
-            raise ValueError("Data should have dimensions time, y, x, z.") from err
+        dataset_reordered = dataset_expanded.transpose("time", "z", "y", "x")
     else:
-        try:
-            dataset_reordered = dataset_expanded.transpose("time", "y", "x")
-        except ValueError as err:
-            raise ValueError("Data should have dimensions time, y, x.") from err
+        dataset_reordered = dataset_expanded.transpose("time", "y", "x")
 
     # additional metadata
     lat = forcing_dict["latitude"]
