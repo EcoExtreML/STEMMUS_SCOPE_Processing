@@ -133,7 +133,7 @@ def _prepare_soil_data(file_name: str, var_name: str, time: List) -> xr.DataArra
             volumetric_water_content = np.array(data.loc[index])
             data.loc[index] = vc.soil_moisture(volumetric_water_content, thicknesses)
 
-    # reshape the data frame
+    # reshape the data frame, it returns Series
     data = data.stack()
 
     # set values
@@ -142,7 +142,7 @@ def _prepare_soil_data(file_name: str, var_name: str, time: List) -> xr.DataArra
     data.index = data.index.set_levels([time, layers], level=["time", "z"])
     data.name = var_name
 
-    # convert dataframe to xarray data array
+    # convert data to xarray data array
     data_array = data.to_xarray()
 
     # add z attributes
