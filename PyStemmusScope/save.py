@@ -12,13 +12,13 @@ convention table <https://docs.google.com/spreadsheets/d/1CA3aTvI9piXqRqO-3MGrsH
 
 Example:
 
-    >>>from PyStemmusScope import StemmusScope
-    >>>from PyStemmusScope import save
+    >>> from PyStemmusScope import StemmusScope
+    >>> from PyStemmusScope import save
 
-    >>>model = StemmusScope(config_file, exe_file)
-    >>>model.setup()
-    >>>model.run()
-    >>>save.to_netcdf(model.config, "required_netcf_variables.csv")
+    >>> model = StemmusScope(config_file, exe_file)
+    >>> model.setup()
+    >>> model.run()
+    >>> save.to_netcdf(model.config, "required_netcf_variables.csv")
 
 """
 
