@@ -24,7 +24,9 @@ Example:
 
 import logging
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict
+from typing import List
+from typing import Union
 import numpy as np
 import pandas as pd
 import xarray as xr
