@@ -174,7 +174,7 @@ def _prepare_simulated_data(file_name: str, model_name: str, alma_name: str, tim
     return data.to_xarray()
 
 
-def _create_soil_layer_metadata(thicknesses: List, depths: List) -> List:
+def _create_soil_layer_metadata(thicknesses: List[float], depths: List[float]) -> List[str]:
     """
     layer_1: 0.0 - 1.0 cm
     layer_2: 1.0 - 2.0 cm
