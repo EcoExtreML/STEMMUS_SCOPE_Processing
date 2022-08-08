@@ -1,15 +1,14 @@
 """PyStemmusScope save module.
 
-Module designed to create a netcdf file following [ALMA
-convention](https://web.lmd.jussieu.fr/~polcher/ALMA/) from csv files following
-[SCOPE format](https://scope-model.readthedocs.io/en/latest/outfiles.html) in
+Module designed to create a netcdf file following `ALMA
+convention <https://web.lmd.jussieu.fr/~polcher/ALMA/>`_ from csv files following
+`SCOPE format <https://scope-model.readthedocs.io/en/latest/outfiles.html>`_ in
 the output directory.
 
 The file
-[Variables_will_be_in_NetCDF_file.csv](https://github.com/EcoExtreML/STEMMUS_SCOPE/blob/main/utils/csv_to_nc/Variables_will_be_in_NetCDF_file.csv)
-lists required variable names and their attributes based on [`ALMA+CF`
-convention
-table](https://docs.google.com/spreadsheets/d/1CA3aTvI9piXqRqO-3MGrsH1vW-Sd87D8iZXHGrqK42o/edit#gid=2085475627)..
+`Variables_will_be_in_NetCDF_file.csv <https://github.com/EcoExtreML/STEMMUS_SCOPE/blob/main/utils/csv_to_nc/Variables_will_be_in_NetCDF_file.csv>`_
+lists required variable names and their attributes based on `ALMA+CF
+convention table <https://docs.google.com/spreadsheets/d/1CA3aTvI9piXqRqO-3MGrsH1vW-Sd87D8iZXHGrqK42o/edit#gid=2085475627>`_.
 
 Example:
 
