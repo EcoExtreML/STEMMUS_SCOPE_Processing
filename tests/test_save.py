@@ -28,7 +28,7 @@ class TestSaveForcingData:
     @pytest.fixture
     def cf_convention(self, tmp_path):
         convention = [
-            "short_name_alma,standard_name,long_name,definition,unit,File name,Variable name in STEMMUS-SCOPE" ,
+            "short_name_alma,standard_name,long_name,definition,unit,file_name_STEMMUS-SCOPE,short_name_STEMMUS-SCOPE" ,
             "LWdown_ec,surface_downwelling_longwave_flux_in_air,Downward long-wave radiation,,W/m2,ECdata.csv,Rli"
             ]
 
@@ -89,7 +89,7 @@ class TestSaveSimulatedData:
     @pytest.fixture
     def cf_convention(self, tmp_path):
         convention = [
-            'short_name_alma,standard_name,long_name,definition,unit,File name,Variable name in STEMMUS-SCOPE',
+            'short_name_alma,standard_name,long_name,definition,unit,file_name_STEMMUS-SCOPE,short_name_STEMMUS-SCOPE',
             (
                 'LWnet,surface_net_downward_longwave_flux,Net longwave radiation,'
                 '"Incident longwave radiation less the simulated outgoing longwave radiation, '
@@ -171,7 +171,7 @@ class TestSoilData:
     @pytest.fixture
     def cf_convention(self, tmp_path):
         convention = [
-            'short_name_alma,standard_name,long_name,definition,unit,File name,Variable name in STEMMUS-SCOPE',
+            'short_name_alma,standard_name,long_name,definition,unit,file_name_STEMMUS-SCOPE,short_name_STEMMUS-SCOPE',
             (
             'SoilMoist,moisture_content_of_soil_layer,Average layer soil moisture,'
             '"Soil water content in each user-defined soil layer (3D variable). '
@@ -254,7 +254,7 @@ class TestSaveToNetcdf:
     @pytest.fixture
     def cf_convention(self, tmp_path):
         convention = [
-            'short_name_alma,standard_name,long_name,definition,unit,File name,Variable name in STEMMUS-SCOPE',
+            'short_name_alma,standard_name,long_name,definition,unit,file_name_STEMMUS-SCOPE,short_name_STEMMUS-SCOPE',
             (
                 'LWnet,surface_net_downward_longwave_flux,Net longwave radiation,'
                 '"Incident longwave radiation less the simulated outgoing longwave radiation, '

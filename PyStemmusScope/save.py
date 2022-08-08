@@ -6,7 +6,7 @@ convention <https://web.lmd.jussieu.fr/~polcher/ALMA/>`_ from csv files followin
 the output directory.
 
 The file
-`Variables_will_be_in_NetCDF_file.csv <https://github.com/EcoExtreML/STEMMUS_SCOPE/blob/main/utils/csv_to_nc/Variables_will_be_in_NetCDF_file.csv>`_
+`required_netcf_variables.csv <https://github.com/EcoExtreML/STEMMUS_SCOPE/blob/main/utils/csv_to_nc/required_netcf_variables.csv>`_
 lists required variable names and their attributes based on `ALMA+CF
 convention table <https://docs.google.com/spreadsheets/d/1CA3aTvI9piXqRqO-3MGrsH1vW-Sd87D8iZXHGrqK42o/edit#gid=2085475627>`_.
 
@@ -18,7 +18,7 @@ Example:
     >>>model = StemmusScope(config_file, exe_file)
     >>>model.setup()
     >>>model.run()
-    >>>save.to_netcdf(model.config, "Variables_will_be_in_NetCDF_file.csv")
+    >>>save.to_netcdf(model.config, "required_netcf_variables.csv")
 
 """
 
@@ -35,6 +35,18 @@ from . import variable_conversion as vc
 
 
 logger = logging.getLogger(__name__)
+
+DATASET_ATTRS = {
+    'model': 'STEMMUS_SCOPE',
+    'institution': 'University of Twente; Northwest A&F University',
+    'contact': (
+        'Zhongbo Su, z.su@utwente.nl; '
+        'Yijian Zeng, y.zeng@utwente.nl; '
+        'Yunfei Wang, y.wang-3@utwente.nl'
+        ),
+    'license_type': 'CC BY 4.0',
+    'license_url': 'https://creativecommons.org/licenses/by/4.0/',
+}
 
 
 def _select_forcing_variables(forcing_dict: Dict, forcing_var: str, alma_var: str) -> xr.DataArray:
@@ -218,19 +230,9 @@ def _update_dataset_attrs_dims(dataset: xr.Dataset, forcing_dict: Dict) -> xr.Da
     # additional metadata
     lat = forcing_dict["latitude"]
     lon = forcing_dict["longitude"]
-    dataset_reordered.attrs = {
-        'model': 'STEMMUS_SCOPE',
-        'institution': 'University of Twente; Northwest A&F University',
-        'contact': (
-            'Zhongbo Su, z.su@utwente.nl; '
-            'Yijian Zeng, y.zeng@utwente.nl; '
-            'Yunfei Wang, y.wang-3@utwente.nl'
-            ),
-        'license_type': 'CC BY 4.0',
-        'license_url': 'https://creativecommons.org/licenses/by/4.0/',
-        'latitude': lat,
-        'longitude': lon,
-        }
+    dataset_reordered.attrs = DATASET_ATTRS
+    dataset_reordered.attrs['latitude'] = lat
+    dataset_reordered.attrs['longitude'] = lon
 
     # update values of x and y coords
     dataset = dataset_reordered.assign_coords(
@@ -298,7 +300,7 @@ def to_netcdf(config: Dict, cf_filename: str) -> str:
     data_list = []
     for alma_name in alma_short_names:
         df = conventions.loc[alma_short_names == alma_name].iloc[0]
-        file_name = Path(config["OutputPath"]) / df["File name"]
+        file_name = Path(config["OutputPath"]) / df["file_name_STEMMUS-SCOPE"]
 
         if alma_name in var_names:
             # select data
@@ -310,7 +312,7 @@ def to_netcdf(config: Dict, cf_filename: str) -> str:
             data_array = _prepare_soil_data(file_name, alma_name, time.values)
         else:
             data_array = _prepare_simulated_data(
-                file_name, df["Variable name in STEMMUS-SCOPE"], alma_name, time.values
+                file_name, df["short_name_STEMMUS-SCOPE"], alma_name, time.values
                 )
 
         # update attributes of array
@@ -318,7 +320,7 @@ def to_netcdf(config: Dict, cf_filename: str) -> str:
             "units": df["unit"],
             "long_name": df["long_name"],
             "standard_name": df["standard_name"],
-            "STEMMUS-SCOPE_name": df["Variable name in STEMMUS-SCOPE"],
+            "STEMMUS-SCOPE_name": df["short_name_STEMMUS-SCOPE"],
             "definition": df["definition"],
         }
 
