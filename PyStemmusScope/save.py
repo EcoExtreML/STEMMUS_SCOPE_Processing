@@ -202,13 +202,16 @@ def _update_dataset_attrs_dims(dataset: xr.Dataset, forcing_dict: Dict) -> xr.Da
     dataset_expanded = dataset.expand_dims(["x", "y"])
 
     # change the order of dims
-    try:
-        dataset_reordered = dataset_expanded.transpose("time", "y", "x", "z")
-    except ValueError:
+    if "z" in dataset_expanded.dims:
+        try:
+            dataset_reordered = dataset_expanded.transpose("time",  "z", "y", "x")
+        except ValueError as err:
+            raise ValueError("Data should have dimensions time, y, x, z.") from err
+    else:
         try:
             dataset_reordered = dataset_expanded.transpose("time", "y", "x")
         except ValueError as err:
-            raise ValueError("Data should have time dimension.") from err
+            raise ValueError("Data should have dimensions time, y, x.") from err
 
     # additional metadata
     lat = forcing_dict["latitude"]
@@ -264,7 +267,6 @@ def to_netcdf(config: Dict, cf_filename: str) -> str:
     """
 
     # list of required forcing variables, Alma_short_name: forcing_io_name, # model_name
-    # they called ECdata
     var_names = {
         "RH": "rh", # RH
         "SWdown_ec": "sw_down", # Rin
