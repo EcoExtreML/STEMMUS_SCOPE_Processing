@@ -56,12 +56,12 @@ def _select_forcing_variables(forcing_dict: Dict, forcing_var: str, alma_var: st
     return data_array
 
 
-def _resize_data_array(data: xr.DataArray, time_steps: str)-> xr.DataArray:
-    """Resize data based on time_steps.
+def _shorten_data_array(data: xr.DataArray, time_steps: str)-> xr.DataArray:
+    """Shorten data based on time_steps.
 
     Args:
-        data(xr.DataArray): data to be resized.
-        time_steps(str): number of time steps to resize.
+        data(xr.DataArray): data to be shortend.
+        time_steps(str): number of time steps to shorten.
 
     Returns:
         xr.DataArray: subset of data with the lenght of time equal to time_steps.
@@ -286,7 +286,7 @@ def to_netcdf(config: Dict, cf_filename: str) -> str:
     )
 
     # get time info
-    time = _resize_data_array(forcing_dict["time"], time_steps)
+    time = _shorten_data_array(forcing_dict["time"], time_steps)
 
     # read convention file
     conventions = pd.read_csv(cf_filename)
@@ -300,7 +300,7 @@ def to_netcdf(config: Dict, cf_filename: str) -> str:
         if alma_name in var_names:
             # select data
             data_array = _select_forcing_variables(forcing_dict, var_names[alma_name], alma_name)
-            data_array = _resize_data_array(data_array, time_steps)
+            data_array = _shorten_data_array(data_array, time_steps)
 
         # create data array
         elif alma_name in {"SoilTemp", "SoilMoist"}:
