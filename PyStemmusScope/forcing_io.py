@@ -57,11 +57,13 @@ def read_forcing_data(forcing_file):
     data['rh'] = ds_forcing['RH']
     data['vpd'] = ds_forcing['VPD']
     data['lai'] = vc.mask_data(ds_forcing['LAI'], min_value=0.01)
+
     # calculate ea, conversion from kPa to hPa:
     data['ea'] = vc.calculate_ea(data['t_air_celcius'], data['rh']) * 10
 
     # Load in non-timedependent variables
     data['sitename'] = forcing_file.name.split('_')[0]
+
     # Forcing data timestep size in seconds
     time_delta = (ds_forcing.time.values[1] -
                   ds_forcing.time.values[0]) / np.timedelta64(1, 's')
@@ -74,6 +76,10 @@ def read_forcing_data(forcing_file):
     data['IGBP_veg_long'] = ds_forcing['IGBP_veg_long'].values
     data['reference_height'] = ds_forcing['reference_height'].values
     data['canopy_height'] = ds_forcing['canopy_height'].values
+
+    # these are needed by save.py
+    data['time'] = ds_forcing["time"]
+    data['Qair'] = ds_forcing['Qair']
 
     return data
 
@@ -142,10 +148,10 @@ def prepare_global_variables(data, input_path, config):
         input_path (Path): Path to which the file should be written to.
         config (dict): The PyStemmusScope configuration dictionary.
     """
-    if int(config['NumberOfTimeSteps']) > data['total_timesteps']:
-        total_duration = data['total_timesteps']
+    if config['NumberOfTimeSteps'] != 'NA':
+        total_duration = min(int(config['NumberOfTimeSteps']), data['total_timesteps'])
     else:
-        total_duration = int(config['NumberOfTimeSteps'])
+        total_duration = data['total_timesteps']
 
     matfile_vars = ['latitude', 'longitude', 'elevation', 'IGBP_veg_long',
                     'reference_height', 'canopy_height', 'DELT', 'sitename']
