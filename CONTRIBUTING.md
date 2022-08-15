@@ -76,8 +76,8 @@ on how to load the module.
 
 The script
 [`run_jupyter_lab_snellius_dev.sh`](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/run_jupyter_lab_snellius_dev.sh)
-creates a jupyter lab server on Snellius for running the notebook
-interactively. Make sure that you create the `pystemmusscope` conda environment, see [README](./README.m).
+also creates a jupyter lab server on Snellius for running the notebook
+interactively. Make sure that you create the `pystemmusscope` conda environment, see [User guide](https://pystemmusscope.readthedocs.io/en/latest/readme_link.html#installations).
 
 ### Development on CRIB using MATLAB
 
@@ -93,4 +93,3 @@ the `Research`.
 connected to a MATLAB license.
 5. Open the file `STEMMUS_SCOPE_run.m` and set the paths inside the script and setup the model.
 6. Then, run the main script `STEMMUS_SCOPE_run.m`.
-
