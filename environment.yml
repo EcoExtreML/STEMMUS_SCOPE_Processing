@@ -1,9 +1,10 @@
 ---
-name: stemmus
+name: pystemmusscope
 channels:
   - conda-forge
 dependencies:
-  - python=3.9
-  - netcdf4>=1.5.8,<2
-  - pandas
-  - jupyterlab
+  - pip
+  - python=3.8 # supported by matlab R2021a, see issue #31
+  - jupyterlab # needed to run notebooks
+  - pip:
+      - git+https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing.git@main # will be replaced by `pip install pystemmusscope`
