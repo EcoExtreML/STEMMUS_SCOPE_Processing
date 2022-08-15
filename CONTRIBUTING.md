@@ -1,66 +1,85 @@
 # Contributing Guide
 
-This repositary includes python modules for running the STEMMUS-SCOPE model in a
-notebook.
+This repository includes the python package `PyStemmusScope` for running the STEMMUS-SCOPE model.
 
-The workflow is executed using python and MATLAB on a Unix-like system.
-The python packages are listed in the
-[`environment.yml`](https://github.com/EcoExtreML/processing/blob/main/environment.yml)
-file. Follow the instructions below to create conda environment and install
-MATLAB Runtime.
+## Configure the python package for development and testing
 
-<details>
-  <summary>Create conda environment </summary>
+To contribute to development of the python package, we recommend installing the package in development mode. 
 
-Run the commands below in a terminal:
+
+### Installation 
+
+First, clone this repository:
 
 ```sh
-# Download and install Conda
-wget https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-pypy3-Linux-x86_64.sh
-bash Mambaforge-pypy3-Linux-x86_64.sh
--b -p ~/mamba
-
-# Update base environment
-. ~/mamba/bin/activate
-mamba update --name base mamba
-
-# Clone this repository
-git clone https://github.com/EcoExtreML/processing.git
-
-# Create a conda environment called 'stemmus' with all required dependencies
-cd processing
-mamba env create
-
-# The environment can be activated with
-. ~/mamba/bin/activate stemmus
-
+git clone https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing.git
 ```
-</details>
 
-<details>
-  <summary>Use MATLAB </summary>
+Then install the package:
 
-To run the STEMMUS_SCOPE, you need MATLAB version `>=2019`.
+```sh
+cd STEMMUS_SCOPE_Processing
+pip install -e .
+```
 
-**On Snellius:**
+or
+
+```sh
+python setup.py develop
+```
+
+### Run tests
+
+The testing framework used here is [PyTest](https://pytest.org). You can run
+tests as:
+
+```sh
+pytest
+```
+
+### Build documentation
+
+To build the documentation locally:
+
+```sh
+cd docs/
+make html
+```
+
+Then open `_build/html/index.html` in a web broser to preview the documentation.
+
+### Run formatting tools
+
+You can use `prospector` to get information about errors, potential problems and convention violations. To run:
+
+```sh
+prospector
+```
+
+To format the import statements, you can use `isort` as:
+
+```sh
+isort
+```
+
+## Development of STEMMUS_SCOPE model
+
+To contribuute to STEMMUS_SCOPE model, you need access to model source code that is stored in the repository [STEMMUS_SCOPE](https://github.com/EcoExtreML/STEMMUS_SCOPE). You also need a MATLAB license.
+
+### Development on Snellius using MATLAB
 
 [Snellius](https://servicedesk.surfsara.nl/wiki/display/WIKI/Snellius) is the
-Dutch National supercomputer hosted at SURF. MATLAB Runtime is installed on
+Dutch National supercomputer hosted at SURF. To run the STEMMUS_SCOPE, you need MATLAB version `>=2019`. MATLAB is installed on
 Snellius, see the script
-[`run_jupyter_lab_snellius_dev.sh`](https://github.com/EcoExtreML/processing/blob/main/run_jupyter_lab_snellius_dev.sh)
+[`run_jupyter_lab_snellius_dev.sh`](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/run_jupyter_lab_snellius_dev.sh)
 on how to load the module.
-</details>
 
-## Run jupyter notebook
+The script
+[`run_jupyter_lab_snellius_dev.sh`](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/run_jupyter_lab_snellius_dev.sh)
+creates a jupyter lab server on Snellius for running the notebook
+interactively. Make sure that you create the `pystemmusscope` conda environment, see [README](./README.m).
 
-**On Snellius:**
-
-Use the script
-[`run_jupyter_lab_snellius_dev.sh`](https://github.com/EcoExtreML/processing/blob/main/run_jupyter_lab_snellius_dev.sh)
-to create a jupyter lab server on Snellius for running the notebook
-interactively.
-
-**On CRIB:**
+### Development on CRIB using MATLAB
 
 [CRIB](https://crib.utwente.nl/) is the ITC Geospatial Computing Platform.
 
@@ -72,15 +91,6 @@ Launcher. Click on the `Applications`. You will find the 'MATLAB' software under
 the `Research`.
 4. After clicking on 'MATLAB', it asks for your account information that is
 connected to a MATLAB license.
-5. Open the file `run_model_in_matlab_dev.m` and set the paths inside the script.
-6. Then, run the main script `run_model_in_matlab_dev.m`.
+5. Open the file `STEMMUS_SCOPE_run.m` and set the paths inside the script and setup the model.
+6. Then, run the main script `STEMMUS_SCOPE_run.m`.
 
-## Recipe of model execution
-
-The execution of the model includes following steps:
-
-- Update/set config files
-- Create input directories, prepare input files
-- Run the model
-- Create output directories, prepare output files
-- Create exe file

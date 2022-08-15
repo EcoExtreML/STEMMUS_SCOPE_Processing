@@ -17,22 +17,27 @@
 [![cffconvert](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/cffconvert.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/cffconvert.yml)
 [![markdown-link-check](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/markdown-link-check.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/markdown-link-check.yml) -->
 
-This repositary includes python modules for running the STEMMUS-SCOPE model in a jupyter
-notebook.
+This repository includes the python package `PyStemmusScope` for running the STEMMUS-SCOPE model. The model source code is in MATLAB and available in the [STEMMUS_SCOPE repository](https://github.com/EcoExtreML/STEMMUS_SCOPE). We assume that two groups of `users` and `developers` want to run the model. See the relevant instructions for each group below.
 
-The workflow is executed using python and MATLAB Runtime on a Unix-like system.
-The python packages are listed in the
-[`environment.yml`](https://github.com/EcoExtreML/processing/blob/main/environment.yml)
-file. Follow the instructions below to create conda environment and install
-MATLAB Runtime.
+## Users
+
+As a user, you don't need to have a MATLAB license to run the STEMMUS-SCOPE model. The workflow is executed using python and MATLAB Runtime on a Unix-like system.
+
+### Installations 
+
+Follow the instructions below to install `PyStemmusScope` and MATLAB Runtime.
 
 <details>
-  <summary>Create conda environment </summary>
+  <summary>Install PyStemmusScope in a conda environment</summary>
+
+PyStemmusScope is installed in a conda environment, see the the
+[`environment.yml`](https://github.com/EcoExtreML/processing/blob/main/environment.yml)
+file.
 
 Run the commands below in a terminal:
 
 ```sh
-# Download and install Conda
+# Download and install Mamba on linux
 wget https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-pypy3-Linux-x86_64.sh
 bash Mambaforge-pypy3-Linux-x86_64.sh -b -p ~/mamba
 
@@ -40,15 +45,14 @@ bash Mambaforge-pypy3-Linux-x86_64.sh -b -p ~/mamba
 . ~/mamba/bin/activate
 mamba update --name base mamba
 
-# Clone this repository
-git clone https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing.git
+# Download environment file
+wget https://github.com/EcoExtreML/processing/blob/main/environment.yml
 
-# Create a conda environment called 'stemmus' with all required dependencies
-cd STEMMUS_SCOPE_Processing
-mamba env create
+# Create a conda environment called 'pystemmusscope' with all required dependencies
+mamba env create -f environment.yml
 
 # The environment can be activated with
-. ~/mamba/bin/activate stemmus
+. ~/mamba/bin/activate pystemmusscope
 
 ```
 </details>
@@ -76,59 +80,35 @@ For more information on how to download and install it, see the links below:
 - [download](https://nl.mathworks.com/products/compiler/matlab-runtime.html)
 - [intallation](https://nl.mathworks.com/help/compiler/install-the-matlab-runtime.html)
 
-**On Snellius:**
-
-[Snellius](https://servicedesk.surfsara.nl/wiki/display/WIKI/Snellius) is the
-Dutch National supercomputer hosted at SURF. MATLAB Runtime is installed on
-Snellius, see the script
-[`run_jupyter_lab_snellius.sh`](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/run_jupyter_lab_snellius.sh)
-on how to load the module.
 </details>
 
-## Run jupyter notebook
-
-Open a terminal and run:
+Open a terminal, make sure the environment is activated. Then, run `jupyter lab`:
 
 ```sh
 jupyter lab
 ```
 
-JupyterLab will open automatically in your browser.
+JupyterLab will open automatically in your browser. Now, you can run the notebook [run_model_in_notebook.ipynb](./notebooks/run_model_in_notebook.ipynb).
 
-**On Snellius:**
+### On Snellius
 
-Use the script
+[Snellius](https://servicedesk.surfsara.nl/wiki/display/WIKI/Snellius) is the
+Dutch National supercomputer hosted at SURF. MATLAB Runtime is installed on
+Snellius, see the script
+[`run_jupyter_lab_snellius.sh`](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/run_jupyter_lab_snellius.sh)
+on how to load the module. Use the script
 [`run_jupyter_lab_snellius.sh`](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/run_jupyter_lab_snellius.sh)
 to create a jupyter lab server on Snellius for running the notebook
 interactively.
 
-**On CRIB:**
+### On CRIB
 
 [CRIB](https://crib.utwente.nl/) is the ITC Geospatial Computing Platform.
-Currently, running the notebook on CRIB is not supported because MATLAB Runtime
+Currently, running the model exceutable file and therefore the notebook
+`run_model_in_notebook.ipynb` on CRIB is not supported because MATLAB Runtime
 can not be installed there.
 
-## Recipe of model execution
-
-The execution of the model includes following steps:
-
-- Update/set config files
-- Create input directories, prepare input files
-- Run the model
-- Create output directories, prepare output files
-
-## Configure the package for development and testing
-The testing framework used here is [PyTest](https://pytest.org). Before running the test, the package need to be installed and configured as via the command:
-
-```py
-pip install -e .
-```
-or
-```py
-python setup.py develop
-```
-
-## Contributing
+## Developers
 
 If you want to contribute to the development of PyStemmusScope,
 have a look at the [contribution guidelines](CONTRIBUTING.md).
