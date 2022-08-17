@@ -65,10 +65,10 @@ In a terminal:
 wget https://ssd.mathworks.com/supportfiles/downloads/R2021a/Release/6/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2021a_Update_6_glnxa64.zip
 
 # Unzip the file
-unzip MATLAB_Runtime_R2021a_Update_6_glnxa64.zip
+unzip MATLAB_Runtime_R2021a_Update_6_glnxa64.zip -d MATLAB_Runtime
 
 # Install it
-cd MATLAB_Runtime_R2021a_Update_6_glnxa64
+cd MATLAB_Runtime
 sudo -H ./install -mode silent -agreeToLicense yes
 ```
 
