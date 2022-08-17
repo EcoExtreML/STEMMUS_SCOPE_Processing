@@ -17,11 +17,11 @@
 [![cffconvert](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/cffconvert.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/cffconvert.yml)
 [![markdown-link-check](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/markdown-link-check.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/markdown-link-check.yml) -->
 
-This repository includes the python package `PyStemmusScope` for running the STEMMUS-SCOPE model.
-<!-- markdown-link-check-disable-next-line -->
-The model source code is in MATLAB and available in the [STEMMUS_SCOPE repository](https://github.com/EcoExtreML/STEMMUS_SCOPE).
-
-See the relevant instructions for `Users` or `Developers` on how to run the model.
+<!-- markdown-link-check-disable-next-line --> 
+This repository includes the python package `PyStemmusScope` for running the
+STEMMUS-SCOPE model. The model source code is in MATLAB and available in the
+[STEMMUS_SCOPE repository](https://github.com/EcoExtreML/STEMMUS_SCOPE). See the
+relevant instructions for `Users` or `Developers` on how to run the model.
 
 ## Users
 
