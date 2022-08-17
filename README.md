@@ -29,34 +29,26 @@ As a user, you don't need to have a MATLAB license to run the STEMMUS-SCOPE mode
 
 ### Installations 
 
-Follow the instructions below to install `PyStemmusScope` and MATLAB Runtime.
+Follow the instructions below to install `PyStemmusScope`, `jupyterlab` and MATLAB Runtime.
 
 <details>
-  <summary>Install PyStemmusScope in a conda environment</summary>
-
-PyStemmusScope is installed in a conda environment, see the the
-[`environment.yml`](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/environment.yml)
-file.
+  <summary>Install PyStemmusScope</summary>
 
 Run the commands below in a terminal:
 
 ```sh
-# Download and install Mamba on linux
-wget https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-pypy3-Linux-x86_64.sh
-bash Mambaforge-pypy3-Linux-x86_64.sh -b -p ~/mamba
+# will be replaced by `pip install pystemmusscope`
+pip install git+https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing.git@main 
+```
 
-# Update base environment
-. ~/mamba/bin/activate
-mamba update --name base mamba
+</details>
 
-# Download environment file
-wget https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/environment.yml
+<details>
+  <summary>Install jupyterlab</summary>
+Jupyterlab is needed to run notebooks. Run the commands below in a terminal:
 
-# Create a conda environment called 'pystemmusscope' with all required dependencies
-mamba env create -f environment.yml
-
-# The environment can be activated with
-. ~/mamba/bin/activate pystemmusscope
+```sh
+pip install jupyterlab
 
 ```
 </details>
@@ -80,9 +72,9 @@ cd MATLAB_Runtime_R2021a_Update_6_glnxa64
 sudo -H ./install -mode silent -agreeToLicense yes
 ```
 
-For more information on how to download and install it, see the links below:
-- [download](https://nl.mathworks.com/products/compiler/matlab-runtime.html)
-- [intallation](https://nl.mathworks.com/help/compiler/install-the-matlab-runtime.html)
+For more information on how to download and install MATLAB Runtime, see the links below:
+  - [download](https://nl.mathworks.com/products/compiler/matlab-runtime.html)
+  - [intallation](https://nl.mathworks.com/help/compiler/install-the-matlab-runtime.html)
 
 </details>
 
