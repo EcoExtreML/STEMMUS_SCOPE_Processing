@@ -65,7 +65,7 @@ isort
 ## Development of STEMMUS_SCOPE model
 
 <!-- markdown-link-check-disable-next-line -->
-To contribute to STEMMUS_SCOPE model, you need access to model source code that is stored in the repository [STEMMUS_SCOPE](https://github.com/EcoExtreML/STEMMUS_SCOPE). You also need a MATLAB license.
+To contribute to the STEMMUS_SCOPE model, you need access to the model source code that is stored in the repository [STEMMUS_SCOPE](https://github.com/EcoExtreML/STEMMUS_SCOPE). You also need a MATLAB license.
 
 ### Development on Snellius using MATLAB
 
