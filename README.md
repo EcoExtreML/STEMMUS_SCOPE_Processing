@@ -73,7 +73,7 @@ sudo -H ./install -mode silent -agreeToLicense yes
 
 For more information on how to download and install MATLAB Runtime, see the links below:
   - [download](https://nl.mathworks.com/products/compiler/matlab-runtime.html)
-  - [intallation](https://nl.mathworks.com/help/compiler/install-the-matlab-runtime.html)
+  - [installation](https://nl.mathworks.com/help/compiler/install-the-matlab-runtime.html)
 
 </details>
 
