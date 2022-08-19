@@ -109,7 +109,7 @@ mamba env create -f environment.yml
 
 [CRIB](https://crib.utwente.nl/) is the ITC Geospatial Computing Platform.
 
-MATLAB `2021a` is installed on CRIB that is compatiable with Python `3.8`, see [Versions of Python Compatible with MATLAB Products](https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/support/sysreq/files/python-compatibility.pdf).
+MATLAB `2021a` is installed on CRIB, and supports Python `3.8`, see [Versions of Python Compatible with MATLAB Products](https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/support/sysreq/files/python-compatibility.pdf).
 
 1. Log in CRIB with your username and password and select a proper compute unit.
 2. Install `PyStemmusScope` package. This step needs to be done once.
