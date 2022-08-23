@@ -26,7 +26,33 @@ instructions for `Users` or `Developers` on how to run the model.
 
 As a user, you don't need to have a MATLAB license to run the STEMMUS-SCOPE model. The workflow is executed using python and MATLAB Runtime on a Unix-like system.
 
-### Installations 
+As the STEMMUS-SCOPE executable only supports Unix-like systems, Windows users cannot run STEMMUS-SCOPE natively.
+However, users of Windows 10 and newer can use WSL ([Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/)) to run the model.
+
+<details>
+  <summary>WSL installation instructions.</summary>
+  Check the <a href="https://docs.microsoft.com/en-us/windows/wsl/install">Microsoft Guide</a> for a compatibility information and for general WSL instructions.
+
+  If no installation exists, a Ubuntu distribution can be installed using the following commands:
+  ```sh
+  wsl --install
+  ```
+
+  After installation, you can start up the WSL instance and update the default software:
+
+  ```sh
+  sudo apt update && sudo apt upgrade
+  ```
+
+  You can now set up a python environment using either python's `venv`, or use Conda/Mamba.
+  Note that the command to run python and pip can be `python3` and `pip3` by default.
+
+  For the rest of the installation instructions simply follow the steps below.
+  Note that it is possible to access files from the Windows filesystem from within WSL, by accessing, e.g., `/mnt/c/` instead of `C:\`.
+  This means that large input data files can be stored on your Windows installation instead of inside the WSL distro.
+</details>
+
+### Installations
 
 Follow the instructions below to install `PyStemmusScope`, `jupyterlab` and MATLAB Runtime.
 
@@ -37,7 +63,7 @@ Run the commands below in a terminal:
 
 ```sh
 # will be replaced by `pip install pystemmusscope`
-pip install git+https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing.git@main 
+pip install git+https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing.git@main
 ```
 
 </details>
