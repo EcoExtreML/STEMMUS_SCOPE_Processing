@@ -93,7 +93,7 @@ bash Mambaforge-pypy3-Linux-x86_64.sh -b -p ~/mamba
 mamba update --name base mamba
 
 # Download environment file
-wget https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/environment.yml
+wget https://raw.githubusercontent.com/EcoExtreML/STEMMUS_SCOPE_Processing/main/environment.yml
 
 # Create a conda environment called 'pystemmusscope' with all required dependencies
 mamba env create -f environment.yml
@@ -128,7 +128,7 @@ MATLAB `2021a` is installed on CRIB, and supports Python `3.8`, see [Versions of
   mamba update --name base mamba
 
   # Download environment file
-  wget https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/environment_3.8.yml
+  wget https://raw.githubusercontent.com/EcoExtreML/STEMMUS_SCOPE_Processing/main/environment_3.8.yml
 
   # Create a conda environment called 'pystemmusscope' with all required dependencies
   mamba env create -f environment_3.8.yml
