@@ -133,7 +133,7 @@ on CRIB is not supported because MATLAB Runtime can not be installed there.
 ## Developers
 
 If you want to contribute to the development of PyStemmusScope,
-have a look at the [contribution guidelines](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/CONTRIBUTING.md).
+have a look at the [contribution guidelines](https://pystemmusscope.readthedocs.io/en/latest/contributing_link.html).
 
 ## Credits
 
