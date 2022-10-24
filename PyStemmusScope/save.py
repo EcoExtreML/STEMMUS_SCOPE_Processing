@@ -277,16 +277,13 @@ def to_netcdf(config_file: str, cf_filename: str) -> str:
         "Precip": "precip_conv", # Pre
     }
 
-    # Number of time steps from configuration file
-    time_steps = config["NumberOfTimeSteps"]
-
     # read forcing file into a dict
     forcing_dict = forcing_io.read_forcing_data(
         Path(config["ForcingPath"]) / config["ForcingFileName"]
     )
 
     # get time info
-    time = _shorten_data_array(forcing_dict["time"], time_steps)
+    time = _shorten_data_array(forcing_dict["time"], config["NumberOfTimeSteps"])
 
     # read convention file
     conventions = pd.read_csv(cf_filename)
@@ -300,7 +297,7 @@ def to_netcdf(config_file: str, cf_filename: str) -> str:
         if alma_name in var_names:
             # select data
             data_array = _select_forcing_variables(forcing_dict, var_names[alma_name], alma_name)
-            data_array = _shorten_data_array(data_array, time_steps)
+            data_array = _shorten_data_array(data_array, config["NumberOfTimeSteps"])
 
         # create data array
         elif alma_name in {"SoilTemp", "SoilMoist"}:
