@@ -24,7 +24,8 @@ from typing import Union
 import numpy as np
 import pandas as pd
 import xarray as xr
-from PyStemmusScope import config_io, forcing_io
+from PyStemmusScope import config_io
+from PyStemmusScope import forcing_io
 from . import variable_conversion as vc
 
 
