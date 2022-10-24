@@ -45,16 +45,16 @@ class TestSaveForcingData:
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-08-01-1200"
 
-            _ = model.setup(
+            config_path = model.setup(
                 WorkDir = str(tmp_path),
                 ForcingFileName = "dummy_forcing_file.nc",
                 NumberOfTimeSteps = "3", # less than forcing temporal range
                 )
-            return model
+            return model, config_path
 
     def test_save_to_netcdf(self, cf_convention, model_with_setup):
-        model = model_with_setup
-        saved_nc_file = save.to_netcdf(model.config, cf_convention)
+        model, config_path = model_with_setup
+        saved_nc_file = save.to_netcdf(config_path, cf_convention)
 
         expected_nc_file = (
             "tests/test_data/directories/output/dummy-2022-08-01-1200/dummy-2022-08-01-1200_STEMMUS_SCOPE.nc"
@@ -110,16 +110,16 @@ class TestSaveSimulatedData:
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-08-01-1200"
 
-            _ = model.setup(
+            config_path = model.setup(
                 WorkDir = str(tmp_path),
                 ForcingFileName = "dummy_forcing_file.nc",
                 NumberOfTimeSteps = "NA", # use temporal range of forcing data
                 )
-            return model
+            return model, config_path
 
     @pytest.fixture(name="_make_csv_file")
     def fixture_make_csv_file(self, model_with_setup):
-        model = model_with_setup
+        model, _ = model_with_setup
         data = [
             "simulation_number,year,DoY,Netlong",
             ",,,W m-2",
@@ -134,8 +134,8 @@ class TestSaveSimulatedData:
         write_csv(data, csv_file)
 
     def test_save_to_netcdf(self, cf_convention, _make_csv_file, model_with_setup):
-        model = model_with_setup
-        saved_nc_file = save.to_netcdf(model.config, cf_convention)
+        model, config_path = model_with_setup
+        saved_nc_file = save.to_netcdf(config_path, cf_convention)
 
         expected_nc_file = (
             "tests/test_data/directories/output/dummy-2022-08-01-1200/dummy-2022-08-01-1200_STEMMUS_SCOPE.nc"
@@ -193,16 +193,16 @@ class TestSoilData:
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-08-01-1200"
 
-            _ = model.setup(
+            config_path = model.setup(
                 WorkDir = str(tmp_path),
                 ForcingFileName = "dummy_forcing_file.nc",
                 NumberOfTimeSteps = "5",
                 )
-            return model
+            return model, config_path
 
     @pytest.fixture(name="_make_csv_file")
     def fixture_make_csv_file(self, model_with_setup):
-        model = model_with_setup
+        model, _ = model_with_setup
         data = [
             "1,2,3,5",
             "1,1,1,2",
@@ -218,8 +218,8 @@ class TestSoilData:
         write_csv(data, csv_file)
 
     def test_save_to_netcdf(self, cf_convention, _make_csv_file, model_with_setup):
-        model = model_with_setup
-        saved_nc_file = save.to_netcdf(model.config, cf_convention)
+        model, config_path = model_with_setup
+        saved_nc_file = save.to_netcdf(config_path, cf_convention)
 
         expected_nc_file = (
             "tests/test_data/directories/output/dummy-2022-08-01-1200/dummy-2022-08-01-1200_STEMMUS_SCOPE.nc"
@@ -282,16 +282,16 @@ class TestSaveToNetcdf:
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-08-01-1200"
 
-            _ = model.setup(
+            config_path = model.setup(
                 WorkDir = str(tmp_path),
                 ForcingFileName = "dummy_forcing_file.nc",
                 NumberOfTimeSteps = "NA",
                 )
-            return model
+            return model, config_path
 
     @pytest.fixture(name="_make_csv_file")
     def fixture_make_csv_file(self, model_with_setup):
-        model = model_with_setup
+        model, _ = model_with_setup
         data = [
             "1,2,3,5",
             "1,1,1,2",
@@ -318,8 +318,8 @@ class TestSaveToNetcdf:
         write_csv(data, csv_file)
 
     def test_save_to_netcdf(self, cf_convention, _make_csv_file, model_with_setup):
-        model = model_with_setup
-        saved_nc_file = save.to_netcdf(model.config, cf_convention)
+        model, config_path = model_with_setup
+        saved_nc_file = save.to_netcdf(config_path, cf_convention)
 
         expected_nc_file = (
             "tests/test_data/directories/output/dummy-2022-08-01-1200/dummy-2022-08-01-1200_STEMMUS_SCOPE.nc"
