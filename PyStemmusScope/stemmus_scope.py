@@ -4,6 +4,8 @@ import logging
 import os
 import subprocess
 from typing import Dict
+from pathlib import Path
+from oct2py import octave
 from . import config_io
 from . import forcing_io
 from . import soil_io
@@ -13,28 +15,81 @@ from . import utils
 logger = logging.getLogger(__name__)
 
 
+def _is_model_src_exe(model_src_path: Path):
+    #TODO add docstring
+
+    #TODO add documentation links in msg below
+    if model_src_path.is_file():
+        msg = ("The model executable file can be used on a Unix system "
+            "where MCR is installed, see the documentaion.")
+        logger.info("%s", msg)
+        return True
+    elif model_src_path.is_dir():
+        return False
+    msg = (
+        "Provide a valid path to an executable file or "
+        "to a directory containing model source codes, "
+        "see the documentaion.")
+    raise ValueError(msg)
+
+
+def _check_sub_process(sub_process: str):
+    if sub_process not in {"Octave" , "Matlab"}:
+        msg = (
+            "Set `sub_process` as Octave or Matlab to run the model using source codes."
+            "Otherwise set `model_src_path` to model executable file, "
+            "see the documentaion.")
+        raise ValueError(msg)
+
+
+def _run_subprocess(args, cwd=None, env=None):
+
+    result = subprocess.run(
+        args, cwd=cwd, env=env,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        shell=True, check=True,
+    )
+    stdout = result.stdout
+
+    # TODO return log info line by line!
+    logger.info("%s", stdout)
+    return stdout
+
+
 class StemmusScope():
     """PyStemmusScope wrapper around Stemmus_Scope model.
     see https://gmd.copernicus.org/articles/14/1379/2021/
 
-    It sets the model with a configuration file and executable file.
-    It also prepares forcing and soil data for model run.
+    It sets the model with a configuration file and executable file. It also
+    prepares forcing and soil data for model run.
 
     Args:
         config_file(str): path to Stemmus_Scope configuration file. An example
         config_file can be found in tests/test_data in `STEMMUS_SCOPE_Processing
         repository <https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing>`_
-        exe_file(str): path to Stemmus_Scope executable file.
+        model_src_path(str): path to Stemmus_Scope executable file or to a
+        directory containing model source codes.
+        sub_process(str, optional): use `Matlab` or `Octave`. It is optional if
+        `model_src_path` is a path to Stemmus_Scope executable file.
 
     Example:
         See notebooks/run_model_in_notebook.ipynb in `STEMMUS_SCOPE_Processing
         repository <https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing>`_
     """
 
-    def __init__(self, config_file: str, exe_file: str):
+    def __init__(self, config_file: str, model_src_path: str, sub_process: str = None):
         # make sure paths are abolute and path objects
         config_file = utils.to_absolute_path(config_file)
-        self.exe_file = utils.to_absolute_path(exe_file)
+        model_src_path = utils.to_absolute_path(model_src_path)
+
+        # check the path to model source
+        if _is_model_src_exe(model_src_path):
+            self.exe_file = model_src_path
+        else:
+            _check_sub_process(sub_process)
+
+        self.model_src = model_src_path
+        self.sub_process = sub_process
 
         # read config template
         self._configs = config_io.read_config(config_file)
@@ -83,9 +138,6 @@ class StemmusScope():
         # prepare soil data
         soil_io.prepare_soil_data(self._configs)
 
-        # set matlab log dir
-        os.environ['MATLAB_LOG_DIR'] = str(self._configs["InputPath"])
-
         return str(self.cfg_file)
 
     def run(self) -> str:
@@ -96,18 +148,29 @@ class StemmusScope():
         Returns:
             Tuple with stdout and stderr
         """
-
         # run the model
-        args = [f"{self.exe_file} {self.cfg_file}"]
-        result = subprocess.run(
-            args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, check=True,
-        )
-        stdout = result.stdout
+         # TODO find executables and set env PATH
+        if self.exe_file:
+            # run using MCR
+            args = [f"{self.exe_file} {self.cfg_file}"]
+            # set matlab log dir
+            env = {"MATLAB_LOG_DIR": str(self._configs["InputPath"])}
+        elif self.sub_process=="Matlab":
+            # set Matlab arguments
+            cwd = self.model_src
+            path_to_config = f"'{self.cfg_file}'"
+            matlab = 'matlab'
+            command_line = f'"STEMMUS_SCOPE_exe({path_to_config});exit;"'
+            args = [matlab, "-nodisplay", "-nosplash", "-nodesktop", "-r", command_line]
+        elif self.sub_process=="Octave":
+            # set Octave arguments
+            cwd = self.model_src
+            path_to_config = f"'{self.cfg_file}'"
+            octave = 'octave'
+            command_line = f'"STEMMUS_SCOPE_exe({path_to_config});exit;"'
+            args = [octave, "--no-gui", "--interactive", "--silent", "--eval", command_line]
 
-        # TODO return log info line by line!
-        logger.info("%s", stdout)
-
-        return stdout
+        return _run_subprocess(args, cwd, env)
 
 
     @property
