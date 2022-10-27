@@ -5,7 +5,6 @@ import os
 import subprocess
 from typing import Dict
 from pathlib import Path
-from oct2py import octave
 from . import config_io
 from . import forcing_io
 from . import soil_io
@@ -13,7 +12,6 @@ from . import utils
 
 
 logger = logging.getLogger(__name__)
-
 
 def _is_model_src_exe(model_src_path: Path):
     #TODO add docstring
@@ -37,18 +35,19 @@ def _check_sub_process(sub_process: str):
     if sub_process not in {"Octave" , "Matlab"}:
         msg = (
             "Set `sub_process` as Octave or Matlab to run the model using source codes."
-            "Otherwise set `model_src_path` to model executable file, "
+            "Otherwise set `model_src_path` to the model executable file, "
             "see the documentaion.")
         raise ValueError(msg)
 
 
-def _run_subprocess(args, cwd=None, env=None):
+def _run_sub_process(args, cwd):
 
     result = subprocess.run(
-        args, cwd=cwd, env=env,
+        args, cwd=cwd,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         shell=True, check=True,
     )
+    #TODO handle stderr properly
     stdout = result.stdout
 
     # TODO return log info line by line!
@@ -83,6 +82,7 @@ class StemmusScope():
         model_src_path = utils.to_absolute_path(model_src_path)
 
         # check the path to model source
+        self.exe_file = None
         if _is_model_src_exe(model_src_path):
             self.exe_file = model_src_path
         else:
@@ -149,28 +149,27 @@ class StemmusScope():
             Tuple with stdout and stderr
         """
         # run the model
-         # TODO find executables and set env PATH
+        # TODO find executables and set env PATH
+        cwd = None
         if self.exe_file:
             # run using MCR
             args = [f"{self.exe_file} {self.cfg_file}"]
             # set matlab log dir
-            env = {"MATLAB_LOG_DIR": str(self._configs["InputPath"])}
+            os.environ['MATLAB_LOG_DIR'] = str(self._configs["InputPath"])
         elif self.sub_process=="Matlab":
             # set Matlab arguments
             cwd = self.model_src
             path_to_config = f"'{self.cfg_file}'"
-            matlab = 'matlab'
             command_line = f'"STEMMUS_SCOPE_exe({path_to_config});exit;"'
-            args = [matlab, "-nodisplay", "-nosplash", "-nodesktop", "-r", command_line]
+            args = ["matlab", "-nodisplay", "-nosplash", "-nodesktop", "-r", command_line]
         elif self.sub_process=="Octave":
             # set Octave arguments
             cwd = self.model_src
             path_to_config = f"'{self.cfg_file}'"
-            octave = 'octave'
-            command_line = f'"STEMMUS_SCOPE_exe({path_to_config});exit;"'
-            args = [octave, "--no-gui", "--interactive", "--silent", "--eval", command_line]
+            command_line = f'"STEMMUS_SCOPE_octave({path_to_config});exit;"'
+            args = ["octave", "--no-gui", "--interactive", "--silent", "--eval", command_line]
 
-        return _run_subprocess(args, cwd, env)
+        return _run_sub_process(args, cwd)
 
 
     @property
