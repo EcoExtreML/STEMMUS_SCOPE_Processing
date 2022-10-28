@@ -23,7 +23,7 @@ def _is_model_src_exe(model_src_path: Path):
             "where MCR is installed, see the documentaion.")
         logger.info("%s", msg)
         return True
-    elif model_src_path.is_dir():
+    if model_src_path.is_dir():
         return False
     msg = (
         "Provide a valid path to an executable file or "
