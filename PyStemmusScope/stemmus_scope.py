@@ -166,8 +166,8 @@ class StemmusScope():
             # set Octave arguments
             cwd = self.model_src
             path_to_config = f"'{self.cfg_file}'"
-            command_line = f'"STEMMUS_SCOPE_octave({path_to_config});exit;"'
-            args = ["octave", "--no-gui", "--interactive", "--silent", "--eval", command_line]
+            command_line = f'octave --eval "STEMMUS_SCOPE_octave({path_to_config});"'
+            args = [command_line, "--no-gui", "--interactive", "--silent"]
 
         return _run_sub_process(args, cwd)
 
