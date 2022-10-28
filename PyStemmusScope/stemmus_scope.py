@@ -3,8 +3,8 @@
 import logging
 import os
 import subprocess
-from typing import Dict
 from pathlib import Path
+from typing import Dict
 from oct2py import octave
 from . import config_io
 from . import forcing_io
