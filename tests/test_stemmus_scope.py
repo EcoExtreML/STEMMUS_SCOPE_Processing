@@ -1,10 +1,11 @@
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 import pytest
 
 import os
 import subprocess
+import oct2py
 from PyStemmusScope import StemmusScope
 from PyStemmusScope import config_io
 from . import data_folder
@@ -212,3 +213,56 @@ class TestWithMatlab:
             )
 
         assert result == expected_log
+
+
+# class TestWithOctave:
+#     @pytest.fixture
+#     def model(self, tmp_path):
+#         config_file = str(data_folder / "config_file_test.txt")
+
+#         # create dummy src folder with .m script
+#         model_src = Path(tmp_path) / "src"
+#         model_src.mkdir(exist_ok=True)
+#         model_src_code = model_src / "STEMMUS_SCOPE_octave.m"
+#         # create dummy .m script
+#         with open(model_src_code, "x", encoding="utf8") as dummy_file:
+#             dummy_file.close()
+
+#         yield StemmusScope(config_file, model_src_path=model_src, sub_process="Octave")
+
+#     @pytest.fixture
+#     def model_with_setup(self, model):
+#         with patch("time.strftime") as mocked_time:
+#             mocked_time.return_value = "2022-07-11-1200"
+
+#             cfg_file = model.setup()
+#             return model, cfg_file
+
+#     def test_run_octave(self, model_with_setup, tmp_path):
+
+#         actual_cfg_file = data_folder / "directories" / "input" / "XX-dummy_2022-07-11-1200" / "XX-dummy_2022-07-11-1200_config.txt"
+#         actual_log = [
+#             f"Reading config from {actual_cfg_file}",
+#             "The calculations start now",
+#             "The calculations end now",
+#         ]
+
+#         with patch("oct2py.octave.addpath") as mocked_addpath:
+#             mocked_addpath.return_value = str(tmp_path / "src")
+
+#             with patch("oct2py.octave.eval") as mocked_eval:
+#                 mocked_eval.return_value = actual_log
+
+#                 model, cfg_file = model_with_setup
+#                 result = model.run()
+
+#         # expected = f"STEMMUS_SCOPE_octave('{actual_cfg_file}');"
+#         # mocked__run_octave.eval.assert_called_with(expected, cwd=str(tmp_path / "src"))
+
+#         # output of subprocess
+#         expected_log = " ".join([
+#             f"Reading config from {cfg_file}",
+#             "The calculations start now",
+#             "The calculations end now",
+#         ])
+#         assert result == expected_log
