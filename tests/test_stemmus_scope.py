@@ -20,7 +20,7 @@ class TestWithDefaults:
         with open(exe_file, "x", encoding="utf8") as dummy_file:
             dummy_file.close()
 
-        yield StemmusScope(config_file, exe_file)
+        yield StemmusScope(config_file, model_src_path=exe_file)
 
     @pytest.fixture
     def model_with_setup(self, model):
@@ -41,11 +41,9 @@ class TestWithDefaults:
         assert actual_output_dir == Path(model.config["OutputPath"])
         assert actual_cfg_file == cfg_file
 
-        # matlab log dir
-        assert os.environ['MATLAB_LOG_DIR'] == str(model.config["InputPath"])
 
     @patch("subprocess.run")
-    def test_run(self, mocked_run, model_with_setup):
+    def test_run_exe_file(self, mocked__run_sub_process, model_with_setup):
 
         actual_cfg_file = data_folder / "directories" / "input" / "XX-dummy_2022-07-11-1200_config.txt"
         output = (
@@ -53,18 +51,20 @@ class TestWithDefaults:
             "The calculations start now \r\n The calculations end now \r'"
             )
 
-        mocked_run.return_value.stdout = output
+        mocked__run_sub_process.return_value.stdout = output
 
         model, cfg_file = model_with_setup
         result = model.run()
 
         expected = [f"{model.exe_file} {cfg_file}"]
-        mocked_run.assert_called_with(
-        expected, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, check=True,
+        mocked__run_sub_process.assert_called_with(
+        expected, cwd=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, check=True,
         )
 
         # output of subprocess
         assert result == output
+        # matlab log dir
+        assert os.environ['MATLAB_LOG_DIR'] == str(model.config["InputPath"])
 
 
 class TestWithCustomSetup:
@@ -76,7 +76,7 @@ class TestWithCustomSetup:
         # create dummy exe file
         with open(exe_file, "x", encoding="utf8") as dummy_file:
             dummy_file.close()
-        yield StemmusScope(config_file, exe_file)
+        yield StemmusScope(config_file, model_src_path=exe_file)
 
     @pytest.fixture
     def model_with_setup(self, model, tmp_path):
@@ -101,16 +101,13 @@ class TestWithCustomSetup:
         assert actual_cfg_file == cfg_file
         assert model.config["NumberOfTimeSteps"] == "5"
 
-        # matlab log dir
-        assert os.environ['MATLAB_LOG_DIR'] == str(model.config["InputPath"])
-
     def test_config(self, model_with_setup):
         model, cfg_file = model_with_setup
         actual = config_io.read_config(cfg_file)
         assert actual == model.config
 
     @patch("subprocess.run")
-    def test_run(self, mocked_run, model_with_setup, tmp_path):
+    def test_run_exe_file(self, mocked_run, model_with_setup, tmp_path):
 
         actual_cfg_file = tmp_path / "input" / "dummy_2022-07-11-1200_config.txt"
         output = (
@@ -125,8 +122,10 @@ class TestWithCustomSetup:
 
         expected = [f"{model.exe_file} {cfg_file}"]
         mocked_run.assert_called_with(
-        expected, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, check=True,
+        expected, cwd=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, check=True,
         )
 
         # output of subprocess
         assert result == output
+        # matlab log dir
+        assert os.environ['MATLAB_LOG_DIR'] == str(model.config["InputPath"])
