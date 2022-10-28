@@ -41,7 +41,7 @@ def _check_sub_process(sub_process: str):
         raise ValueError(msg)
 
 
-def _run_sub_process(args, cwd):
+def _run_sub_process(args: list, cwd):
 
     result = subprocess.run(
         args, cwd=cwd,
@@ -54,6 +54,14 @@ def _run_sub_process(args, cwd):
     # TODO return log info line by line!
     logger.info("%s", stdout)
     return stdout
+
+
+def _run_octave(args: str, cwd: str):
+    # a list to capture print statements
+    log = []
+    octave.addpath(octave.genpath(cwd))
+    octave.eval(args, stream_handler=log.append)
+    return " ".join(log)
 
 
 class StemmusScope():
@@ -154,19 +162,20 @@ class StemmusScope():
             args = [f"{self.exe_file} {self.cfg_file}"]
             # set matlab log dir
             os.environ['MATLAB_LOG_DIR'] = str(self._config["InputPath"])
-            _run_sub_process(args, None)
-        elif self.sub_process=="Matlab":
+            result = _run_sub_process(args, None)
+        if self.sub_process=="Matlab":
             # set Matlab arguments
             path_to_config = f"'{self.cfg_file}'"
             command_line = f'matlab -r "STEMMUS_SCOPE_exe({path_to_config});exit;"'
             args = [command_line, "-nodisplay", "-nosplash", "-nodesktop"]
-            _run_sub_process(args, self.model_src)
-        elif self.sub_process=="Octave":
+            result = _run_sub_process(args, self.model_src)
+        if self.sub_process=="Octave":
             # set Octave arguments
             # use oct2py instead of sub_process,
             # see issue STEMMUS_SCOPE_Processing/issues/46
-            octave.addpath(octave.genpath(str(self.model_src)))
-            octave.eval(f"STEMMUS_SCOPE_octave('{self.cfg_file}');")
+            args = f"STEMMUS_SCOPE_octave('{self.cfg_file}');"
+            result = _run_octave(args, str(self.model_src))
+        return result
 
 
     @property
