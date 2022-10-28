@@ -93,7 +93,7 @@ class StemmusScope():
         self.sub_process = sub_process
 
         # read config template
-        self._configs = config_io.read_config(config_file)
+        self._config = config_io.read_config(config_file)
 
     def setup(
         self,
@@ -117,27 +117,27 @@ class StemmusScope():
         """
         # update config template if needed
         if WorkDir:
-            self._configs["WorkDir"] = WorkDir
+            self._config["WorkDir"] = WorkDir
 
         if ForcingFileName:
-            self._configs["ForcingFileName"] = ForcingFileName
+            self._config["ForcingFileName"] = ForcingFileName
 
         if NumberOfTimeSteps:
-            self._configs["NumberOfTimeSteps"] = NumberOfTimeSteps
+            self._config["NumberOfTimeSteps"] = NumberOfTimeSteps
 
         # create customized config file and input/output directories for model run
         _, _, self.cfg_file = config_io.create_io_dir(
-            self._configs["ForcingFileName"], self._configs
+            self._config["ForcingFileName"], self._config
             )
 
         # read the run config file
-        self._configs = config_io.read_config(self.cfg_file)
+        self._config = config_io.read_config(self.cfg_file)
 
         # prepare forcing data
-        forcing_io.prepare_forcing(self._configs)
+        forcing_io.prepare_forcing(self._config)
 
         # prepare soil data
-        soil_io.prepare_soil_data(self._configs)
+        soil_io.prepare_soil_data(self._config)
 
         return str(self.cfg_file)
 
@@ -153,7 +153,7 @@ class StemmusScope():
             # run using MCR
             args = [f"{self.exe_file} {self.cfg_file}"]
             # set matlab log dir
-            os.environ['MATLAB_LOG_DIR'] = str(self._configs["InputPath"])
+            os.environ['MATLAB_LOG_DIR'] = str(self._config["InputPath"])
             _run_sub_process(args, None)
         elif self.sub_process=="Matlab":
             # set Matlab arguments
@@ -172,4 +172,4 @@ class StemmusScope():
     @property
     def config(self) -> Dict:
         """Return the configurations for this model."""
-        return self._configs
+        return self._config
