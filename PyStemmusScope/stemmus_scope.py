@@ -5,6 +5,7 @@ import os
 import subprocess
 from typing import Dict
 from pathlib import Path
+from oct2py import octave
 from . import config_io
 from . import forcing_io
 from . import soil_io
@@ -156,20 +157,22 @@ class StemmusScope():
             args = [f"{self.exe_file} {self.cfg_file}"]
             # set matlab log dir
             os.environ['MATLAB_LOG_DIR'] = str(self._configs["InputPath"])
+            _run_sub_process(args, cwd)
         elif self.sub_process=="Matlab":
             # set Matlab arguments
             cwd = self.model_src
             path_to_config = f"'{self.cfg_file}'"
             command_line = f'matlab -r "STEMMUS_SCOPE_exe({path_to_config});exit;"'
             args = [command_line, "-nodisplay", "-nosplash", "-nodesktop"]
+            _run_sub_process(args, cwd)
         elif self.sub_process=="Octave":
             # set Octave arguments
+            # use oct2py instead of sub_process,
+            # see issue STEMMUS_SCOPE_Processing/issues/46
             cwd = self.model_src
             path_to_config = f"'{self.cfg_file}'"
-            command_line = f'octave --eval "STEMMUS_SCOPE_octave({path_to_config});"'
-            args = [command_line, "--no-gui", "--interactive", "--silent"]
-
-        return _run_sub_process(args, cwd)
+            octave.addpath(octave.genpath(cwd))
+            octave.eval(f"STEMMUS_SCOPE_octave({path_to_config});")
 
 
     @property
