@@ -147,32 +147,26 @@ class StemmusScope():
         Args:
 
         Returns:
-            Tuple with stdout and stderr
+            string, the model log
         """
-        # run the model
-        # TODO find executables and set env PATH
-        cwd = None
         if self.exe_file:
             # run using MCR
             args = [f"{self.exe_file} {self.cfg_file}"]
             # set matlab log dir
             os.environ['MATLAB_LOG_DIR'] = str(self._configs["InputPath"])
-            _run_sub_process(args, cwd)
+            _run_sub_process(args, None)
         elif self.sub_process=="Matlab":
             # set Matlab arguments
-            cwd = self.model_src
             path_to_config = f"'{self.cfg_file}'"
             command_line = f'matlab -r "STEMMUS_SCOPE_exe({path_to_config});exit;"'
             args = [command_line, "-nodisplay", "-nosplash", "-nodesktop"]
-            _run_sub_process(args, cwd)
+            _run_sub_process(args, self.model_src)
         elif self.sub_process=="Octave":
             # set Octave arguments
             # use oct2py instead of sub_process,
             # see issue STEMMUS_SCOPE_Processing/issues/46
-            cwd = self.model_src
-            path_to_config = f"'{self.cfg_file}'"
-            octave.addpath(octave.genpath(cwd))
-            octave.eval(f"STEMMUS_SCOPE_octave({path_to_config});")
+            octave.addpath(octave.genpath(self.model_src))
+            octave.eval(f"STEMMUS_SCOPE_octave('{self.cfg_file}');")
 
 
     @property
