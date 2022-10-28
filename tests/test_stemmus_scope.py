@@ -68,17 +68,16 @@ class TestWithDefaults:
         assert actual_output_dir == Path(model.config["OutputPath"])
         assert actual_cfg_file == cfg_file
 
-
     @patch("subprocess.run")
     def test_run_exe_file(self, mocked__run_sub_process, model_with_setup):
 
-        actual_cfg_file = data_folder / "directories" / "input" / "XX-dummy_2022-07-11-1200_config.txt"
-        output = (
+        actual_cfg_file = data_folder / "directories" / "input" / "XX-dummy_2022-07-11-1200" / "XX-dummy_2022-07-11-1200_config.txt"
+        actual_log = (
             f"b'Reading config from {actual_cfg_file}\n\n "
             "The calculations start now \r\n The calculations end now \r'"
             )
 
-        mocked__run_sub_process.return_value.stdout = output
+        mocked__run_sub_process.return_value.stdout = actual_log
 
         model, cfg_file = model_with_setup
         result = model.run()
@@ -89,7 +88,11 @@ class TestWithDefaults:
         )
 
         # output of subprocess
-        assert result == output
+        expected_log = (
+            f"b'Reading config from {cfg_file}\n\n "
+            "The calculations start now \r\n The calculations end now \r'"
+            )
+        assert result == expected_log
         # matlab log dir
         assert os.environ['MATLAB_LOG_DIR'] == str(model.config["InputPath"])
 
@@ -134,25 +137,71 @@ class TestWithCustomSetup:
         assert actual == model.config
 
     @patch("subprocess.run")
-    def test_run_exe_file(self, mocked_run, model_with_setup, tmp_path):
+    def test_run_exe_file(self, mocked__run_sub_process, model_with_setup, tmp_path):
 
-        actual_cfg_file = tmp_path / "input" / "dummy_2022-07-11-1200_config.txt"
-        output = (
+        actual_cfg_file = tmp_path / "input" / "dummy_2022-07-11-1200" / "dummy_2022-07-11-1200_config.txt"
+        actual_log = (
             f"b'Reading config from {actual_cfg_file}\n\n "
             "The calculations start now \r\n The calculations end now \r'"
             )
 
-        mocked_run.return_value.stdout = output
+        mocked__run_sub_process.return_value.stdout = actual_log
 
         model, cfg_file = model_with_setup
         result = model.run()
 
         expected = [f"{model.exe_file} {cfg_file}"]
-        mocked_run.assert_called_with(
+        mocked__run_sub_process.assert_called_with(
         expected, cwd=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, check=True,
         )
 
         # output of subprocess
-        assert result == output
+        expected_log = (
+            f"b'Reading config from {cfg_file}\n\n "
+            "The calculations start now \r\n The calculations end now \r'"
+            )
+        assert result == expected_log
         # matlab log dir
         assert os.environ['MATLAB_LOG_DIR'] == str(model.config["InputPath"])
+
+
+# class TestWithMatlab:
+#     @pytest.fixture
+#     def model(self, tmp_path):
+#         config_file = str(data_folder / "config_file_test.txt")
+#         yield StemmusScope(config_file, model_src_path=tmp_path, sub_process="Matlab")
+
+#     @pytest.fixture
+#     def model_with_setup(self, model):
+#         with patch("time.strftime") as mocked_time:
+#             mocked_time.return_value = "2022-07-11-1200"
+
+#             cfg_file = model.setup()
+#             return model, cfg_file
+
+#     @patch("subprocess.run")
+#     def test_run_matlab(self, mocked__run_sub_process, model_with_setup, tmp_path):
+
+#         actual_cfg_file = data_folder / "directories" / "input" / "XX-dummy_2022-07-11-1200_config.txt"
+#         output = (
+#             f"Reading config from {actual_cfg_file}\n\n "
+#             "The calculations start now\n The calculations end now\n"
+#             )
+
+#         mocked__run_sub_process.return_value.stdout = output
+
+#         model, _ = model_with_setup
+#         result = model.run()
+
+#         path_to_config = f"'{actual_cfg_file}'"
+#         command_line = f'matlab -r "STEMMUS_SCOPE_exe({path_to_config});exit;"'
+#         expected = [command_line, "-nodisplay", "-nosplash", "-nodesktop"]
+
+#         mocked__run_sub_process.assert_called_with(
+#         expected, cwd=tmp_path,
+#         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+#         shell=True, check=True,
+#         )
+
+#         # output of subprocess
+#         assert output in result
