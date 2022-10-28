@@ -10,6 +10,33 @@ from PyStemmusScope import config_io
 from . import data_folder
 
 
+class TestInit:
+    def test_model_without_exe(self, tmp_path):
+        config_file = str(data_folder / "config_file_test.txt")
+        exe_file = Path(tmp_path) / "STEMMUS_SCOPE"
+        with pytest.raises(ValueError) as excinfo:
+            StemmusScope(config_file, model_src_path=exe_file)
+        assert "Provide a valid path to an executable file" in str(excinfo.value)
+
+    def test_model_without_src(self):
+        config_file = str(data_folder / "config_file_test.txt")
+        with pytest.raises(ValueError) as excinfo:
+            StemmusScope(config_file, model_src_path="src")
+        assert "Provide a valid path to an executable file" in str(excinfo.value)
+
+    def test_model_without_subprocess(self, tmp_path):
+        config_file = str(data_folder / "config_file_test.txt")
+        with pytest.raises(ValueError) as excinfo:
+            StemmusScope(config_file, model_src_path=tmp_path)
+        assert "Set `sub_process` as Octave or Matlab" in str(excinfo.value)
+
+    def test_model_wrong_subprocess(self, tmp_path):
+        config_file = str(data_folder / "config_file_test.txt")
+        with pytest.raises(ValueError) as excinfo:
+            StemmusScope(config_file, model_src_path=tmp_path, sub_process="Nothing")
+        assert "Set `sub_process` as Octave or Matlab" in str(excinfo.value)
+
+
 class TestWithDefaults:
     @pytest.fixture
     def model(self, tmp_path):
