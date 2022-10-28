@@ -165,7 +165,7 @@ class StemmusScope():
             # set Octave arguments
             # use oct2py instead of sub_process,
             # see issue STEMMUS_SCOPE_Processing/issues/46
-            octave.addpath(octave.genpath(self.model_src))
+            octave.addpath(octave.genpath(str(self.model_src)))
             octave.eval(f"STEMMUS_SCOPE_octave('{self.cfg_file}');")
 
 
