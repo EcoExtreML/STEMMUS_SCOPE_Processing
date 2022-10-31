@@ -19,13 +19,13 @@ Then install the package:
 
 ```sh
 cd STEMMUS_SCOPE_Processing
-pip install -e .
+python3 -m install -e .[dev]
 ```
 
 or
 
 ```sh
-python setup.py develop
+python3 -m setup.py develop
 ```
 
 ### Run tests
@@ -34,7 +34,7 @@ The testing framework used here is [PyTest](https://pytest.org). You can run
 tests as:
 
 ```sh
-pytest
+python3 -m pytest
 ```
 
 ### Build documentation

@@ -63,7 +63,7 @@ Run the commands below in a terminal:
 
 ```sh
 # will be replaced by `pip install pystemmusscope`
-pip install git+https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing.git@main
+python3 -m pip install git+https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing.git@main
 ```
 
 </details>
@@ -73,7 +73,7 @@ pip install git+https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing.git@main
 Jupyterlab is needed to run notebooks. Run the commands below in a terminal:
 
 ```sh
-pip install jupyterlab
+python3 -m pip install jupyterlab
 
 ```
 </details>
