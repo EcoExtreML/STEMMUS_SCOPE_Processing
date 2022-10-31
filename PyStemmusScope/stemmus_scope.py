@@ -5,7 +5,6 @@ import os
 import subprocess
 from pathlib import Path
 from typing import Dict
-from oct2py import octave
 from . import config_io
 from . import forcing_io
 from . import soil_io
@@ -43,25 +42,26 @@ def _check_sub_process(sub_process: str):
 
 def _run_sub_process(args: list, cwd):
 
-    result = subprocess.run(
+    result = subprocess.Popen(
         args, cwd=cwd,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-        shell=True, check=True,
+        shell=True,
     )
+    exit_code = result.wait()
+    stdout, stderr = result.communicate()
     #TODO handle stderr properly
-    stdout = result.stdout
+    # when using octave, exit_code might be 139
+    # see issue STEMMUS_SCOPE_Processing/issues/46
+    if exit_code not in [0, 139]:
+        raise subprocess.CalledProcessError(
+            returncode=exit_code, cmd=args, stderr=stderr, output=stdout
+        )
+    if exit_code == 139:
+        logger.warning(stderr)
 
     # TODO return log info line by line!
-    logger.info("%s", stdout)
+    logger.info(stdout)
     return stdout
-
-
-def _run_octave(args: str, cwd: str):
-    # a list to capture print statements
-    log = []
-    octave.addpath(octave.genpath(cwd))
-    octave.eval(args, stream_handler=log.append)
-    return " ".join(log)
 
 
 class StemmusScope():
@@ -171,10 +171,12 @@ class StemmusScope():
             result = _run_sub_process(args, self.model_src)
         if self.sub_process=="Octave":
             # set Octave arguments
-            # use oct2py instead of sub_process,
+            # use subprocess instead of oct2py,
             # see issue STEMMUS_SCOPE_Processing/issues/46
-            args = f"STEMMUS_SCOPE_octave('{self.cfg_file}');"
-            result = _run_octave(args, str(self.model_src))
+            path_to_config = f"'{self.cfg_file}'"
+            command_line = f'octave --eval "STEMMUS_SCOPE_octave({path_to_config});exit;"'
+            args = [command_line, "--no-gui", "--silent"]
+            result = _run_sub_process(args, self.model_src)
         return result
 
 
