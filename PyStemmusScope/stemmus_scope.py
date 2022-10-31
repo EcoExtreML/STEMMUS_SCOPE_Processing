@@ -41,7 +41,7 @@ def _check_sub_process(sub_process: str):
 
 
 def _run_sub_process(args: list, cwd):
-
+    # pylint: disable=consider-using-with
     result = subprocess.Popen(
         args, cwd=cwd,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
