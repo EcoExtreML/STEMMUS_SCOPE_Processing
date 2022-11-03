@@ -174,9 +174,10 @@ class StemmusScope():
             # use subprocess instead of oct2py,
             # see issue STEMMUS_SCOPE_Processing/issues/46
             path_to_config = f"'{self.cfg_file}'"
-            eval_code = f'STEMMUS_SCOPE_exe({path_to_config});exit;'
-            eval_code = eval_command.replace("\\", "/")
-            args = ["octave", "--eval", eval_code, "--no-gui", "--silent"]
+            eval_command = f'STEMMUS_SCOPE_exe({path_to_config});exit;'
+            # fix for windows
+            eval_command = eval_command.replace("\\", "/")
+            args = ["octave", "--eval", eval_command, "--no-gui", "--silent"]
             result = _run_sub_process(args, self.model_src)
         return result
 
