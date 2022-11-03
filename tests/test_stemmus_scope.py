@@ -75,7 +75,7 @@ class TestWithDefaults:
         actual_log = (
             f"b'Reading config from {actual_cfg_file}\n\n "
             "The calculations start now \r\n The calculations end now \r'"
-            )
+            ).encode()
         mocked_popen.return_value.communicate.return_value = (actual_log, "error")
         mocked_popen.return_value.wait.return_value = 0
 
@@ -145,7 +145,7 @@ class TestWithCustomSetup:
         actual_log = (
             f"b'Reading config from {actual_cfg_file}\n\n "
             "The calculations start now \r\n The calculations end now \r'"
-            )
+            ).encode()
         mocked_popen.return_value.communicate.return_value = (actual_log, "error")
         mocked_popen.return_value.wait.return_value = 0
 
@@ -192,7 +192,7 @@ class TestWithMatlab:
             "b'MATLAB is selecting SOFTWARE OPENGL rendering.\n..."
             f"\nReading config from {actual_cfg_file}\n"
             "The calculations start now\n The calculations end now\n'"
-            )
+            ).encode()
         mocked_popen.return_value.communicate.return_value = (actual_log, "error")
         mocked_popen.return_value.wait.return_value = 0
 
@@ -240,7 +240,7 @@ class TestWithOctave:
         actual_log = (
             f"b'Reading config from {actual_cfg_file}\n"
             "The calculations start now\n The calculations end now \n'"
-            )
+            ).encode()
         mocked_popen.return_value.communicate.return_value = (actual_log, "error")
         mocked_popen.return_value.wait.return_value = 0
 

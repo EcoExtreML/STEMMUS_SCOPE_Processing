@@ -61,7 +61,7 @@ def _run_sub_process(args: list, cwd):
 
     # TODO return log info line by line!
     logger.info(stdout)
-    return stdout
+    return stdout.decode('utf-8')
 
 
 class StemmusScope():
