@@ -248,7 +248,7 @@ class TestWithOctave:
         result = model.run()
 
         path_to_config = f"'{actual_cfg_file}'"
-        command_line = f'octave --eval "STEMMUS_SCOPE_octave({path_to_config});exit;"'
+        command_line = f'octave --eval "STEMMUS_SCOPE_exe({path_to_config});exit;"'
         expected = [command_line, "--no-gui", "--silent"]
 
         mocked_popen.assert_called_with(
