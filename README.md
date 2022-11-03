@@ -70,7 +70,8 @@ Choose how do you want to run the model, see [Run the model](#run-the-model).
 
 ### Install PyStemmusScope
 
-Run the commands below in a terminal:
+Run the commands below in a terminal (On Windows, use `python` instead of
+`python3`):
 
 ```sh
 # will be replaced by `pip install pystemmusscope`

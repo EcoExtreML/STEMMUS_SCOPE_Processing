@@ -16,23 +16,17 @@ First, clone this repository:
 git clone https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing.git
 ```
 
-Then install the package:
+Then install the package (On Windows, use `python` instead of `python3`):
 
 ```sh
 cd STEMMUS_SCOPE_Processing
 python3 -m install -e .[dev]
 ```
 
-or
-
-```sh
-python3 -m setup.py develop
-```
-
 ### Run tests
 
 The testing framework used here is [PyTest](https://pytest.org). You can run
-tests as:
+tests as (On Windows, use `python` instead of `python3`):
 
 ```sh
 python3 -m pytest
