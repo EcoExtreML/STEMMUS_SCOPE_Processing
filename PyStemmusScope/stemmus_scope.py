@@ -77,8 +77,8 @@ class StemmusScope():
         repository <https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing>`_
         model_src_path(str): path to Stemmus_Scope executable file or to a
         directory containing model source codes.
-        interpreter(str, optional): use `Matlab` or `Octave`. It is optional if
-        `model_src_path` is a path to Stemmus_Scope executable file.
+        interpreter(str, optional): use `Matlab` or `Octave`. Only required if
+        `model_src_path` is a path to model source codes.
 
     Example:
         See notebooks/run_model_in_notebook.ipynb in `STEMMUS_SCOPE_Processing
