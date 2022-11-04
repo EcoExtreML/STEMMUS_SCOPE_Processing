@@ -176,8 +176,8 @@ class StemmusScope():
             path_to_config = f"'{self.cfg_file}'"
             # fix for windows
             path_to_config = path_to_config.replace("\\", "/")
-            command_line = f'octave --eval "STEMMUS_SCOPE_exe({path_to_config});exit;"'
-            args = [command_line, "--no-gui", "--silent"]
+            eval_code = f'STEMMUS_SCOPE_exe({path_to_config});exit;'
+            args = ["octave", "--eval", eval_code, "--no-gui", "--silent"]
             result = _run_sub_process(args, self.model_src)
         return result
 
