@@ -24,17 +24,17 @@ class TestInit:
             StemmusScope(config_file, model_src_path="src")
         assert "Provide a valid path to an executable file" in str(excinfo.value)
 
-    def test_model_without_subprocess(self, tmp_path):
+    def test_model_without_interpreter(self, tmp_path):
         config_file = str(data_folder / "config_file_test.txt")
         with pytest.raises(ValueError) as excinfo:
             StemmusScope(config_file, model_src_path=tmp_path)
-        assert "Set `sub_process` as Octave or Matlab" in str(excinfo.value)
+        assert "Set `interpreter` as Octave or Matlab" in str(excinfo.value)
 
-    def test_model_wrong_subprocess(self, tmp_path):
+    def test_model_wrong_interpreter(self, tmp_path):
         config_file = str(data_folder / "config_file_test.txt")
         with pytest.raises(ValueError) as excinfo:
-            StemmusScope(config_file, model_src_path=tmp_path, sub_process="Nothing")
-        assert "Set `sub_process` as Octave or Matlab" in str(excinfo.value)
+            StemmusScope(config_file, model_src_path=tmp_path, interpreter="Nothing")
+        assert "Set `interpreter` as Octave or Matlab" in str(excinfo.value)
 
 
 class TestWithDefaults:
@@ -174,7 +174,7 @@ class TestWithMatlab:
     @pytest.fixture
     def model(self, tmp_path):
         config_file = str(data_folder / "config_file_test.txt")
-        yield StemmusScope(config_file, model_src_path=tmp_path, sub_process="Matlab")
+        yield StemmusScope(config_file, model_src_path=tmp_path, interpreter="Matlab")
 
     @pytest.fixture
     def model_with_setup(self, model):
@@ -226,7 +226,7 @@ class TestWithOctave:
     @pytest.fixture
     def model(self, tmp_path):
         config_file = str(data_folder / "config_file_test.txt")
-        yield StemmusScope(config_file, model_src_path=tmp_path, sub_process="Octave")
+        yield StemmusScope(config_file, model_src_path=tmp_path, interpreter="Octave")
 
     @pytest.fixture
     def model_with_setup(self, model):

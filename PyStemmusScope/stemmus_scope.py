@@ -32,10 +32,10 @@ def _is_model_src_exe(model_src_path: Path):
     raise ValueError(msg)
 
 
-def _check_sub_process(sub_process: str):
-    if sub_process not in {"Octave" , "Matlab"}:
+def _check_interpreter(interpreter: str):
+    if interpreter not in {"Octave" , "Matlab"}:
         msg = (
-            "Set `sub_process` as Octave or Matlab to run the model using source codes."
+            "Set `interpreter` as Octave or Matlab to run the model using source codes."
             "Otherwise set `model_src_path` to the model executable file, "
             "see the documentaion.")
         raise ValueError(msg)
@@ -77,7 +77,7 @@ class StemmusScope():
         repository <https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing>`_
         model_src_path(str): path to Stemmus_Scope executable file or to a
         directory containing model source codes.
-        sub_process(str, optional): use `Matlab` or `Octave`. It is optional if
+        interpreter(str, optional): use `Matlab` or `Octave`. It is optional if
         `model_src_path` is a path to Stemmus_Scope executable file.
 
     Example:
@@ -85,7 +85,7 @@ class StemmusScope():
         repository <https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing>`_
     """
 
-    def __init__(self, config_file: str, model_src_path: str, sub_process: str = None):
+    def __init__(self, config_file: str, model_src_path: str, interpreter: str = None):
         # make sure paths are abolute and path objects
         config_file = utils.to_absolute_path(config_file)
         model_src_path = utils.to_absolute_path(model_src_path)
@@ -95,10 +95,10 @@ class StemmusScope():
         if _is_model_src_exe(model_src_path):
             self.exe_file = model_src_path
         else:
-            _check_sub_process(sub_process)
+            _check_interpreter(interpreter)
 
         self.model_src = model_src_path
-        self.sub_process = sub_process
+        self.interpreter = interpreter
 
         # read config template
         self._config = config_io.read_config(config_file)
@@ -163,7 +163,7 @@ class StemmusScope():
             # set matlab log dir
             os.environ['MATLAB_LOG_DIR'] = str(self._config["InputPath"])
             result = _run_sub_process(args, None)
-        if self.sub_process=="Matlab":
+        if self.interpreter=="Matlab":
             # set Matlab arguments
             path_to_config = f"'{self.cfg_file}'"
             eval_code= f'STEMMUS_SCOPE_exe({path_to_config});exit;'
@@ -172,7 +172,7 @@ class StemmusScope():
             if utils.os_name() !="nt":
                 args = shlex.join(args)
             result = _run_sub_process(args, self.model_src)
-        if self.sub_process=="Octave":
+        if self.interpreter=="Octave":
             # set Octave arguments
             # use subprocess instead of oct2py,
             # see issue STEMMUS_SCOPE_Processing/issues/46
