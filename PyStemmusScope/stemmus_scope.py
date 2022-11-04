@@ -15,12 +15,17 @@ from . import utils
 logger = logging.getLogger(__name__)
 
 def _is_model_src_exe(model_src_path: Path):
-    #TODO add docstring
+    """Check if input exists. Returns True if input is a file and False if it is
+        a directory.
 
-    #TODO add documentation links in msg below
+    Args:
+        model_src_path(Path): path to Stemmus_Scope executable file or to a
+        directory containing model source codes.
+    """
     if model_src_path.is_file():
         msg = ("The model executable file can be used on a Unix system "
-            "where MCR is installed, see the documentaion.")
+            "where MCR is installed, see the "
+            "`documentaion<https://pystemmusscope.readthedocs.io/>`_.")
         logger.info("%s", msg)
         return True
     if model_src_path.is_dir():
@@ -28,7 +33,7 @@ def _is_model_src_exe(model_src_path: Path):
     msg = (
         "Provide a valid path to an executable file or "
         "to a directory containing model source codes, "
-        "see the documentaion.")
+        "see the `documentaion<https://pystemmusscope.readthedocs.io/>`_.")
     raise ValueError(msg)
 
 
@@ -37,7 +42,7 @@ def _check_interpreter(interpreter: str):
         msg = (
             "Set `interpreter` as Octave or Matlab to run the model using source codes."
             "Otherwise set `model_src_path` to the model executable file, "
-            "see the documentaion.")
+            "see the `documentaion<https://pystemmusscope.readthedocs.io/>`_.")
         raise ValueError(msg)
 
 
