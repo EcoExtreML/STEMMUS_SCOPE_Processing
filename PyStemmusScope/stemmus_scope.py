@@ -166,8 +166,8 @@ class StemmusScope():
         if self.sub_process=="Matlab":
             # set Matlab arguments
             path_to_config = f"'{self.cfg_file}'"
-            command_line = f'matlab -r "STEMMUS_SCOPE_exe({path_to_config});exit;"'
-            args = [command_line, "-nodisplay", "-nosplash", "-nodesktop"]
+            eval_code= f"STEMMUS_SCOPE_exe({path_to_config});exit;"
+            args = ["matlab", "-r", eval_code, "-nodisplay", "-nosplash", "-nodesktop"]
             result = _run_sub_process(args, self.model_src)
         if self.sub_process=="Octave":
             # set Octave arguments
