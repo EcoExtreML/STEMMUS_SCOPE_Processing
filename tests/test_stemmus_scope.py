@@ -1,12 +1,12 @@
+import os
+import shlex
+import subprocess
 from pathlib import Path
 from unittest.mock import patch
-
 import pytest
-
-import os
-import subprocess
 from PyStemmusScope import StemmusScope
 from PyStemmusScope import config_io
+from PyStemmusScope import utils
 from . import data_folder
 
 
@@ -200,11 +200,14 @@ class TestWithMatlab:
         result = model.run()
 
         path_to_config = f"'{actual_cfg_file}'"
-        command_line = f'matlab -r "STEMMUS_SCOPE_exe({path_to_config});exit;"'
-        expected = [command_line, "-nodisplay", "-nosplash", "-nodesktop"]
+        eval_code= f'STEMMUS_SCOPE_exe({path_to_config});exit;'
+        args = ["matlab", "-r", eval_code, "-nodisplay", "-nosplash", "-nodesktop"]
+        # seperate args dont work on linux!
+        if utils.os_name() !="nt":
+            args = shlex.join(args)
 
         mocked_popen.assert_called_with(
-        expected, cwd=tmp_path,
+        args, cwd=tmp_path,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         shell=True,
         )
@@ -248,11 +251,16 @@ class TestWithOctave:
         result = model.run()
 
         path_to_config = f"'{actual_cfg_file}'"
-        command_line = f'octave --eval "STEMMUS_SCOPE_exe({path_to_config});exit;"'
-        expected = [command_line, "--no-gui", "--silent"]
+        # fix for windows
+        path_to_config = path_to_config.replace("\\", "/")
+        eval_code = f'STEMMUS_SCOPE_exe({path_to_config});exit;'
+        args = ["octave", "--eval", eval_code, "--no-gui", "--silent"]
+        # seperate args dont work on linux!
+        if utils.os_name() !="nt":
+            args = shlex.join(args)
 
         mocked_popen.assert_called_with(
-        expected, cwd=tmp_path,
+        args, cwd=tmp_path,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         shell=True,
         )

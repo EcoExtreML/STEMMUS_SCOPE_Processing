@@ -169,7 +169,7 @@ class StemmusScope():
             eval_code= f'STEMMUS_SCOPE_exe({path_to_config});exit;'
             args = ["matlab", "-r", eval_code, "-nodisplay", "-nosplash", "-nodesktop"]
             # seperate args dont work on linux!
-            if utils.os_name !="nt":
+            if utils.os_name() !="nt":
                 args = shlex.join(args)
             result = _run_sub_process(args, self.model_src)
         if self.sub_process=="Octave":
@@ -182,7 +182,7 @@ class StemmusScope():
             eval_code = f'STEMMUS_SCOPE_exe({path_to_config});exit;'
             args = ["octave", "--eval", eval_code, "--no-gui", "--silent"]
             # seperate args dont work on linux!
-            if utils.os_name !="nt":
+            if utils.os_name() !="nt":
                 args = shlex.join(args)
             result = _run_sub_process(args, self.model_src)
         return result
