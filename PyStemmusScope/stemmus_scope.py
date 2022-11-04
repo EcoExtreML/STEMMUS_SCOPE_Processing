@@ -2,6 +2,7 @@
 
 import logging
 import os
+import shlex
 import subprocess
 from pathlib import Path
 from typing import Dict
@@ -165,8 +166,11 @@ class StemmusScope():
         if self.sub_process=="Matlab":
             # set Matlab arguments
             path_to_config = f"'{self.cfg_file}'"
-            eval_code= f"STEMMUS_SCOPE_exe({path_to_config});exit;"
+            eval_code= f'STEMMUS_SCOPE_exe({path_to_config});exit;'
             args = ["matlab", "-r", eval_code, "-nodisplay", "-nosplash", "-nodesktop"]
+            # seperate args dont work on linux!
+            if utils.os_name !="nt":
+                args = shlex.join(args)
             result = _run_sub_process(args, self.model_src)
         if self.sub_process=="Octave":
             # set Octave arguments
@@ -177,6 +181,9 @@ class StemmusScope():
             path_to_config = path_to_config.replace("\\", "/")
             eval_code = f'STEMMUS_SCOPE_exe({path_to_config});exit;'
             args = ["octave", "--eval", eval_code, "--no-gui", "--silent"]
+            # seperate args dont work on linux!
+            if utils.os_name !="nt":
+                args = shlex.join(args)
             result = _run_sub_process(args, self.model_src)
         return result
 
