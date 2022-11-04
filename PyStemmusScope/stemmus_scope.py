@@ -68,8 +68,7 @@ class StemmusScope():
     """PyStemmusScope wrapper around Stemmus_Scope model.
     see https://gmd.copernicus.org/articles/14/1379/2021/
 
-    It sets the model with a configuration file and executable file. It also
-    prepares forcing and soil data for model run.
+   Configures the model and prepares forcing and soil data for the model run.
 
     Args:
         config_file(str): path to Stemmus_Scope configuration file. An example
