@@ -4,7 +4,7 @@ channels:
   - conda-forge
 dependencies:
   - pip
-  - python>=3.8
+  - python>=3.8, <3.11
   - jupyterlab # needed to run notebooks
   - pip:
       - git+https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing.git@main # will be replaced by `pip install pystemmusscope`
