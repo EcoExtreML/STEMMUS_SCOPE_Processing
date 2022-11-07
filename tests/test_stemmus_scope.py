@@ -14,15 +14,23 @@ class TestInit:
     def test_model_without_exe(self, tmp_path):
         config_file = str(data_folder / "config_file_test.txt")
         exe_file = Path(tmp_path) / "STEMMUS_SCOPE"
-        with pytest.raises(ValueError) as excinfo:
-            StemmusScope(config_file, model_src_path=exe_file)
-        assert "Provide a valid path to an executable file" in str(excinfo.value)
+        if utils.os_name() == 'nt':
+            with pytest.raises(FileNotFoundError):
+                StemmusScope(config_file, model_src_path=exe_file)
+        else:
+            with pytest.raises(ValueError) as excinfo:
+                StemmusScope(config_file, model_src_path=exe_file)
+            assert "Provide a valid path to an executable file" in str(excinfo.value)
 
     def test_model_without_src(self):
         config_file = str(data_folder / "config_file_test.txt")
-        with pytest.raises(ValueError) as excinfo:
-            StemmusScope(config_file, model_src_path="src")
-        assert "Provide a valid path to an executable file" in str(excinfo.value)
+        if utils.os_name() == 'nt':
+            with pytest.raises(FileNotFoundError):
+                StemmusScope(config_file, model_src_path="src")
+        else:
+            with pytest.raises(ValueError) as excinfo:
+                StemmusScope(config_file, model_src_path="src")
+            assert "Provide a valid path to an executable file" in str(excinfo.value)
 
     def test_model_without_interpreter(self, tmp_path):
         config_file = str(data_folder / "config_file_test.txt")
