@@ -79,9 +79,19 @@ def get_forcing_file(config):
     # elif fmt == "latlon"
     # elif fmt == "bbox"
 
-
 def check_location_fmt(loc):
-    """Check the format of location
+    """Check the format of location.
+
+    Three types of format are supported:
+    - Site name (e.g. "DE-Kli")
+    - Latitude and longitude (e.g. "(56.4, 112.0)")
+    - Bounding box (e.g. "(10,10), (10,20), (20,10), (20,20)")
+
+    Args:
+        loc: String of location extracted from config file.
+
+    Returns:
+        Location name (string) or location (tuple) lat,lon pair and its format
     """
     # remove all blanks
     loc = loc.replace(" ","")
@@ -89,10 +99,19 @@ def check_location_fmt(loc):
         location = loc
         fmt = "site"
     elif re.fullmatch("\(\d*[.,]?\d*,\d*[.,]?\d*\)", loc):
+        # turn string into tuples
         location = ast.literal_eval(loc)
-        # TO DO: check if the coordinate is valid
+        # check if the coordinate is valid
+        check_lat_lon(location)
         fmt = "latlon"
-    # if re.fullmatch
+    elif re.fullmatch("(\(\d*[.,]?\d*,\d*[.,]?\d*\)[,]?){4}", loc):
+        # find items between brackets
+        location = re.findall(r"\(.*?\)", loc)
+        # turn string into tuples
+        location = [ast.literal_eval(i) for i in location]
+        for coordinates in location:
+            check_lat_lon(coordinates)
+        fmt = "bbox"
     else:
         raise ValueError(
             f"Location '{loc}' in the config file does not match expected format."
@@ -102,4 +121,7 @@ def check_location_fmt(loc):
 
 def check_time_fmt(start_time, end_time):
     """Check the format of time."""
+
+def check_lat_lon(coordinates):
+    """Check if the coordinates exists."""
 
