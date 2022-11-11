@@ -42,7 +42,7 @@ class StemmusScope():
     def setup(
         self,
         WorkDir: str = None,
-        ForcingFileName: str = None,
+        Location: str = None,
         NumberOfTimeSteps: str = None,
     ) -> str:
         """Configure model run.
@@ -63,11 +63,14 @@ class StemmusScope():
         if WorkDir:
             self._configs["WorkDir"] = WorkDir
 
-        if ForcingFileName:
-            self._configs["ForcingFileName"] = ForcingFileName
+        if Location:
+            self._configs["Location"] = Location
 
         if NumberOfTimeSteps:
             self._configs["NumberOfTimeSteps"] = NumberOfTimeSteps
+
+        # get forcing files from location
+        forcing_file_name = utils.get_forcing_file(self._configs)
 
         # create customized config file and input/output directories for model run
         _, _, self.cfg_file = config_io.create_io_dir(

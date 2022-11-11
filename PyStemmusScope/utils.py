@@ -1,4 +1,6 @@
+import ast
 import os
+import re
 from pathlib import Path
 import numpy as np
 
@@ -67,3 +69,37 @@ def to_absolute_path(
         must_exist = os_name() == 'nt'
 
     return pathlike.expanduser().resolve(strict=must_exist)
+
+def get_forcing_file(config):
+    """Get forcing file from the location.
+    """
+    location, fmt = check_location_fmt(config["Location"])
+    # check if the forcing file exists for the given locaiton(s)
+    # if fmt == "site":
+    # elif fmt == "latlon"
+    # elif fmt == "bbox"
+
+
+def check_location_fmt(loc):
+    """Check the format of location
+    """
+    # remove all blanks
+    loc = loc.replace(" ","")
+    if re.fullmatch("[A-Z]{2}-[A-Z][a-z]{2}", loc):
+        location = loc
+        fmt = "site"
+    elif re.fullmatch("\(\d*[.,]?\d*,\d*[.,]?\d*\)", loc):
+        location = ast.literal_eval(loc)
+        # TO DO: check if the coordinate is valid
+        fmt = "latlon"
+    # if re.fullmatch
+    else:
+        raise ValueError(
+            f"Location '{loc}' in the config file does not match expected format."
+        )        
+    
+    return location, fmt
+
+def check_time_fmt(start_time, end_time):
+    """Check the format of time."""
+
