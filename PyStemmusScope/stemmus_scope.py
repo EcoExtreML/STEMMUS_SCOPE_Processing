@@ -2,6 +2,7 @@
 
 import logging
 import os
+import pandas as pd
 import subprocess
 from typing import Dict
 from . import config_io
@@ -43,7 +44,8 @@ class StemmusScope():
         self,
         WorkDir: str = None,
         Location: str = None,
-        NumberOfTimeSteps: str = None,
+        StartTime: str = None,
+        EndTime: str = None,
     ) -> str:
         """Configure model run.
 
@@ -66,15 +68,22 @@ class StemmusScope():
         if Location:
             self._configs["Location"] = Location
 
-        if NumberOfTimeSteps:
-            self._configs["NumberOfTimeSteps"] = NumberOfTimeSteps
+        if StartTime:
+            self._configs["StartTime"] = StartTime
+
+        if EndTime:
+            self._configs["EndTime"] = EndTime
+
+        # check time
+        if pd.Timestamp(StartTime) > pd.Timestamp(EndTime):
+            raise ValueError("Invalid time range. StartTime must be earlier than EndTime.")
 
         # get forcing files from location
         forcing_file_name = utils.get_forcing_file(self._configs)
 
         # create customized config file and input/output directories for model run
         _, _, self.cfg_file = config_io.create_io_dir(
-            self._configs["ForcingFileName"], self._configs
+            forcing_file_name, self._configs
             )
 
         # read the run config file
