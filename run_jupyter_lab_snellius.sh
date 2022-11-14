@@ -19,8 +19,11 @@
 
 # Load module needed to run the model (no need for license)
 module load 2021
-### This is for Matlab
+### This is for Matlab Runtime
 module load MCR/R2021a.3
+
+### This is for Matlab
+module load MATLAB/2021a-upd3
 
 # Some security: stop script on error and undefined variables
 set -euo pipefail
