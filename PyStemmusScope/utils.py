@@ -1,6 +1,7 @@
 import ast
 import os
 import re
+from itertools import product
 from pathlib import Path
 import numpy as np
 
@@ -75,9 +76,23 @@ def get_forcing_file(config):
     """
     location, fmt = check_location_fmt(config["Location"])
     # check if the forcing file exists for the given locaiton(s)
-    # if fmt == "site":
-    # elif fmt == "latlon"
-    # elif fmt == "bbox"
+    if fmt == "site":
+        # get forcing file list
+        forcing_filenames_list = [file.name for file in Path(config["ForcingPath"]).iterdir()]
+        forcing_file = [filename for filename in forcing_filenames_list if location in filename]
+        if not forcing_file:
+            raise ValueError(f"Forcing file does not exist for the given site {location}.")
+        elif len(forcing_file) > 1:
+            raise ValueError(f"Multiple forcing files exist for the given site {location}.")
+        else:
+            forcing_file = forcing_file[0]
+        
+    elif fmt == "latlon":
+        raise NotImplementedError
+    elif fmt == "bbox":
+        raise NotImplementedError
+
+    return forcing_file
 
 def check_location_fmt(loc):
     """Check the format of location.
@@ -85,7 +100,7 @@ def check_location_fmt(loc):
     Three types of format are supported:
     - Site name (e.g. "DE-Kli")
     - Latitude and longitude (e.g. "(56.4, 112.0)")
-    - Bounding box (e.g. "(10,10), (10,20), (20,10), (20,20)")
+    - Bounding box (lat_min, lat_max), (lon_min, lon_max) (e.g. "[19.5,20.5], [125.5,130.0]")
 
     Args:
         loc: String of location extracted from config file.
@@ -104,11 +119,12 @@ def check_location_fmt(loc):
         # check if the coordinate is valid
         check_lat_lon(location)
         fmt = "latlon"
-    elif re.fullmatch("(\(\d*[.,]?\d*,\d*[.,]?\d*\)[,]?){4}", loc):
+    elif re.fullmatch("(\[\d*[.,]?\d*,\d*[.,]?\d*\][,]?){2}", loc):
         # find items between brackets
-        location = re.findall(r"\(.*?\)", loc)
-        # turn string into tuples
-        location = [ast.literal_eval(i) for i in location]
+        bbox = re.findall(r"\[.*?\]", loc)
+        # turn string into list
+        bbox = [ast.literal_eval(i) for i in bbox]
+        location = [list(coordinate) for coordinate in product(bbox[0], bbox[1])]
         for coordinates in location:
             check_lat_lon(coordinates)
         fmt = "bbox"
@@ -121,7 +137,9 @@ def check_location_fmt(loc):
 
 def check_time_fmt(start_time, end_time):
     """Check the format of time."""
+    raise NotImplementedError
 
 def check_lat_lon(coordinates):
     """Check if the coordinates exists."""
+    raise NotImplementedError
 
