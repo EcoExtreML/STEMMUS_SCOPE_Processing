@@ -69,7 +69,15 @@ def to_absolute_path(
     return pathlike.expanduser().resolve(strict=must_exist)
 
 
-def sanitize_mat_file(filename):
+def remove_dates_from_header(filename):
+    """Removes the datetime string from the .mat file header.
+
+    MATLAB raises an error when some characters are non-UTF-8 (?), e.g. Chinese month
+    names. This function removes this part of the file header to avoid this problem.
+
+    Args:
+        filename (Path): Valid path to the .mat file
+    """
     with open(filename, "rb") as f:
         data = f.read()
 

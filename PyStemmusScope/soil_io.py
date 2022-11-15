@@ -227,4 +227,4 @@ def prepare_soil_data(config):
     hdf5storage.savemat(
         Path(config["InputPath"]) / "soil_parameters.mat", mdict=matfiledata, appendmat=False,
     )
-    utils.sanitize_mat_file(Path(config["InputPath"]) / "soil_parameters.mat")
+    utils.remove_dates_from_header(Path(config["InputPath"]) / "soil_parameters.mat")

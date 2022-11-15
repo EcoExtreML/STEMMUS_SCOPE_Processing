@@ -161,7 +161,7 @@ def prepare_global_variables(data, input_path, config):
     matfiledata['Dur_tot'] = float(total_duration) # Matlab expects a 'double'
 
     hdf5storage.savemat(input_path / "forcing_globals.mat", matfiledata, appendmat=False)
-    utils.sanitize_mat_file(input_path / "forcing_globals.mat")
+    utils.remove_dates_from_header(input_path / "forcing_globals.mat")
 
 
 def prepare_forcing(config):
