@@ -205,7 +205,7 @@ def _retrieve_latlon(file):
     return lat, lon
 
 
-def prepare_soil_data(config):
+def prepare_soil_data(config, forcing_filename):
     """Function that prepares the soil input data for the STEMMUS_SCOPE model. It parses
     the data for the input location, and writes a file that can be easily read in by
     Matlab.
@@ -214,10 +214,10 @@ def prepare_soil_data(config):
         config (dict): The PyStemmusScope configuration dictionary.
     """
 
-    forcing_file = Path(config["ForcingPath"]) / config["ForcingFileName"]
+    forcing_file = Path(config["ForcingPath"]) / forcing_filename
 
     # Data missing at ID-Pag site. See github.com/EcoExtreML/STEMMUS_SCOPE/issues/77
-    if config["ForcingFileName"].startswith("ID"):
+    if forcing_filename.startswith("ID"):
         lat, lon = -1., 112.
     else:
         lat, lon = _retrieve_latlon(forcing_file)

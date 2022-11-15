@@ -2,6 +2,7 @@ from pathlib import Path
 import hdf5storage
 import numpy as np
 import xarray as xr
+from . import utils
 from . import variable_conversion as vc
 
 
@@ -162,7 +163,7 @@ def prepare_global_variables(data, input_path, config):
     hdf5storage.savemat(input_path / 'forcing_globals.mat', matfiledata, appendmat=False)
 
 
-def prepare_forcing(config):
+def prepare_forcing(config, forcing_filename):
     """Function to prepare the forcing files required by STEMMUS_SCOPE. The input
         directory should be taken from the model configuration file.
 
@@ -173,8 +174,11 @@ def prepare_forcing(config):
     input_path = Path(config["InputPath"])
 
     # Read the required data from the forcing file into a dictionary
-    forcing_file = Path(config["ForcingPath"]) / config["ForcingFileName"]
+    forcing_file = Path(config["ForcingPath"]) / forcing_filename
     data = read_forcing_data(forcing_file)
+
+    # check if time range is covered by forcing
+    utils.check_time_range_forcing(config["StartTime"],config["EndTime"])
 
     # Write the single-column ascii '.dat' files to the input directory
     write_dat_files(data, input_path)

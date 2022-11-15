@@ -2,7 +2,7 @@
 
 import logging
 import os
-import pandas as pd
+
 import subprocess
 from typing import Dict
 from . import config_io
@@ -75,25 +75,24 @@ class StemmusScope():
             self._configs["EndTime"] = EndTime
 
         # check time
-        if pd.Timestamp(StartTime) > pd.Timestamp(EndTime):
-            raise ValueError("Invalid time range. StartTime must be earlier than EndTime.")
+        utils.check_time_fmt(StartTime, EndTime)
 
         # get forcing files from location
-        forcing_file_name = utils.get_forcing_file(self._configs)
+        forcing_filename = utils.get_forcing_file(self._configs)
 
         # create customized config file and input/output directories for model run
         _, _, self.cfg_file = config_io.create_io_dir(
-            forcing_file_name, self._configs
+            forcing_filename, self._configs
             )
 
         # read the run config file
         self._configs = config_io.read_config(self.cfg_file)
 
         # prepare forcing data
-        forcing_io.prepare_forcing(self._configs)
+        forcing_io.prepare_forcing(self._configs, forcing_filename)
 
         # prepare soil data
-        soil_io.prepare_soil_data(self._configs)
+        soil_io.prepare_soil_data(self._configs, forcing_filename)
 
         # set matlab log dir
         os.environ['MATLAB_LOG_DIR'] = str(self._configs["InputPath"])
