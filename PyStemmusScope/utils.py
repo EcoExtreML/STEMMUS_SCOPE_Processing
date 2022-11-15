@@ -67,3 +67,23 @@ def to_absolute_path(
         must_exist = os_name() == 'nt'
 
     return pathlike.expanduser().resolve(strict=must_exist)
+
+
+def sanitize_mat_file(filename):
+    with open(filename, "rb") as f:
+        data = f.read()
+
+    # Get locations of date string in header
+    start_datestring = data[:128].find(b"Created on:") + 12
+    end_datestring = data[:128].find(b"HDF5") - 1
+
+    # Rebuild the data, with the dates in the header removed
+    sanitized_data = (
+        data[:start_datestring] +
+        b' '*len(data[start_datestring:end_datestring]) +
+        data[end_datestring:]
+        )
+
+    # Overwrite the old file
+    with open(filename, 'wb') as file:
+        file.write(sanitized_data)
