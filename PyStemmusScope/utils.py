@@ -1,6 +1,7 @@
 import ast
 import os
 import re
+from datetime import datetime
 from itertools import product
 from pathlib import Path
 import numpy as np
@@ -71,6 +72,7 @@ def to_absolute_path(
 
     return pathlike.expanduser().resolve(strict=must_exist)
 
+
 def get_forcing_file(config):
     """Get forcing file from the location.
     """
@@ -93,6 +95,7 @@ def get_forcing_file(config):
         raise NotImplementedError
 
     return forcing_file
+
 
 def check_location_fmt(loc):
     """Check the format of location.
@@ -135,11 +138,17 @@ def check_location_fmt(loc):
     
     return location, fmt
 
+
 def check_time_fmt(start_time, end_time):
     """Check the format of time."""
-    raise NotImplementedError
+    # check if start/end time can be converted to the iso format
+    start_time = datetime.strptime(start_time,'%Y-%m-%dT%H:%M')
+    end_time = datetime.strptime(end_time,'%Y-%m-%dT%H:%M')
+
+    if start_time > end_time:
+        raise ValueError("Invalid time range. StartTime must be earlier than EndTime.")
+
 
 def check_lat_lon(coordinates):
     """Check if the coordinates exists."""
     raise NotImplementedError
-

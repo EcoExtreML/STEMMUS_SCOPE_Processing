@@ -1,8 +1,8 @@
+from datetime import datetime
 from pathlib import Path
 import hdf5storage
 import numpy as np
 import xarray as xr
-from . import utils
 from . import variable_conversion as vc
 
 
@@ -22,7 +22,7 @@ def _write_matlab_ascii(fname, data, ncols):
     np.savetxt(fname, data, multi_fmt)
 
 
-def read_forcing_data(forcing_file):
+def read_forcing_data(forcing_file, start_time, end_time):
     """Reads the forcing data from the provided netCDF file, and applies the required
     unit conversions before returning the read data.
 
@@ -33,10 +33,18 @@ def read_forcing_data(forcing_file):
         dict: Dictionary containing the different variables required by STEMMUS_SCOPE
             for the different forcing files.
     """
-    ds_forcing = xr.open_dataset(forcing_file)
+    ds_forcing = xr.open_dataset(forcing_file)    
 
     # remove the x and y coordinates from the data variables to make the numpy arrays 1D
     ds_forcing = ds_forcing.squeeze(['x', 'y'])
+
+    # check if time range is covered by forcing
+    # if so, return a subset of forcing matching the given time range
+    ds_forcing = _slice_forcing_file(
+        ds_forcing,
+        start_time,
+        end_time,
+        )
 
     data = {}
 
@@ -164,21 +172,22 @@ def prepare_global_variables(data, input_path, config):
 
 
 def prepare_forcing(config, forcing_filename):
-    """Function to prepare the forcing files required by STEMMUS_SCOPE. The input
-        directory should be taken from the model configuration file.
+    """Function to prepare the forcing files required by STEMMUS_SCOPE.
+
+    The input directory should be taken from the model configuration file.
+    A subset of forcing file will be generated if the time range is covered
+    by the time of existing forcing file.
 
     Args:
         config (dict): The PyStemmusScope configuration dictionary.
+        forcing_filename (str): Forcing file name.
     """
 
     input_path = Path(config["InputPath"])
 
     # Read the required data from the forcing file into a dictionary
     forcing_file = Path(config["ForcingPath"]) / forcing_filename
-    data = read_forcing_data(forcing_file)
-
-    # check if time range is covered by forcing
-    utils.check_time_range_forcing(config["StartTime"],config["EndTime"])
+    data = read_forcing_data(forcing_file, config["StartTime"], config["EndTime"])
 
     # Write the single-column ascii '.dat' files to the input directory
     write_dat_files(data, input_path)
@@ -192,3 +201,29 @@ def prepare_forcing(config, forcing_filename):
     # Write the remaining variables (without time dependency) to the matlab v7.3
     #  file 'forcing_globals.mat'
     prepare_global_variables(data, input_path, config)
+
+
+def _slice_forcing_file(ds_forcing, start_time, end_time):
+    """Get the subset of forcing file based on time range in config
+
+    Also check if the desired time range is covered by forcing file.
+
+    Args:
+        ds_forcing (xr.Dataset): Dataset of forcing file.
+        start_time (str): Start time of time range.
+        end_time (str): Start time of time range.
+    """
+    start_time = np.datetime64(start_time)
+    end_time = np.datetime64(end_time)
+    # time range in forcing file
+    start_time_forcing = ds_forcing.coords["time"].values[0]
+    end_time_forcing = ds_forcing.coords["time"].values[-1]
+    # check if the time range in config is covered by the forcing file
+    if start_time_forcing <= start_time and end_time_forcing >= end_time:
+        # slice forcing file and save a temp copy
+        forcing_file_subset = ds_forcing.sel(time = slice(start_time, end_time))
+    else:
+        raise ValueError(f"Given time range (from {start_time} to {end_time}) cannot be covered by" + 
+            f"the time range of forcing file (from {start_time_forcing} to {end_time_forcing}).")
+    
+    return forcing_file_subset
