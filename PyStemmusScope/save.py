@@ -64,24 +64,6 @@ def _select_forcing_variables(forcing_dict: Dict, forcing_var: str, alma_var: st
     return data_array
 
 
-def _shorten_data_array(data: Union[xr.DataArray, xr.Dataset], time_steps: str)-> Union[xr.DataArray, xr.Dataset]:
-    """Shorten data based on time_steps.
-
-    Args:
-        data(xr.DataArray or xr.Dataset): data to be shortend.
-        time_steps(str): number of time steps to shorten.
-
-    Returns:
-        xr.DataArray or xr.Dataset: subset of data with the lenght of time equal to time_steps.
-    """
-
-    if time_steps != "NA":
-        time_length = int(time_steps)
-        data = data.isel(time=np.arange(0, time_length))
-
-    return data
-
-
 def _prepare_soil_data(file_name: str, var_name: str, time: List) -> xr.DataArray:
     """Return simulated soil temperature and soil moisture as `xr.DataArray`.
 
@@ -281,16 +263,13 @@ def to_netcdf(config_file: str, forcing_filename:str, cf_filename: str) -> str:
 
     # read forcing file into a dict
     forcing_dict = forcing_io.read_forcing_data(
-        Path(config["ForcingPath"]) / forcing_filename
+        Path(config["ForcingPath"]) / forcing_filename,
+        config["StartTime"],
+        config["EndTime"],
     )
 
-    # calculate Number of time steps
-    start_time = datetime.strptime(config["StartTime"],'%Y-%m-%dT%H:%M')
-    end_time = datetime.strptime(config["EndTime"],'%Y-%m-%dT%H:%M')
-    number_steps = (end_time - start_time) // datetime.timedelta(minutes=30)
-
     # get time info
-    time = _shorten_data_array(forcing_dict["time"], number_steps)
+    time = forcing_dict["time"].values
 
     # read convention file
     conventions = pd.read_csv(cf_filename)
@@ -304,14 +283,13 @@ def to_netcdf(config_file: str, forcing_filename:str, cf_filename: str) -> str:
         if alma_name in var_names:
             # select data
             data_array = _select_forcing_variables(forcing_dict, var_names[alma_name], alma_name)
-            data_array = _shorten_data_array(data_array, number_steps)
 
         # create data array
         elif alma_name in {"SoilTemp", "SoilMoist"}:
-            data_array = _prepare_soil_data(file_name, alma_name, time.values)
+            data_array = _prepare_soil_data(file_name, alma_name, time)
         else:
             data_array = _prepare_simulated_data(
-                file_name, df["short_name_STEMMUS-SCOPE"], alma_name, time.values
+                file_name, df["short_name_STEMMUS-SCOPE"], alma_name, time
                 )
 
         # update attributes of array
