@@ -12,7 +12,7 @@ class TestConfigIO:
             'WorkDir': 'tests/test_data/directories/',
             'SoilPropertyPath': 'tests/test_data/directories/model_parameters/soil_property/',
             'ForcingPath': 'tests/test_data/directories/forcing/plumber2_data/',
-            'ForcingFileName': 'XX-dummy_forcing_file.nc',
+            'Location': 'XX-Xxx',
             'directional': 'tests/test_data/directories/model_parameters/vegetation_property/directional/',
             'fluspect_parameters': 'tests/test_data/directories/model_parameters/vegetation_property/fluspect_parameters/',
             'leafangles': 'tests/test_data/directories/model_parameters/vegetation_property/leafangles/',
@@ -20,9 +20,10 @@ class TestConfigIO:
             'soil_spectrum': 'tests/test_data/directories/model_parameters/vegetation_property/soil_spectrum/',
             'input_data': 'tests/test_data/directories/model_parameters/vegetation_property/dummy_data.xlsx',
             'InitialConditionPath': 'tests/test_data/directories/model_parameters/soil_initialcondition/',
-            'NumberOfTimeSteps': '17520',
-            'InputPath': 'tests/test_data/directories/input/',
-            'OutputPath': 'tests/test_data/directories/output/'
+            'StartTime': '1996-01-01T00:00',
+            'EndTime': '1996-01-01T02:00',
+            'InputPath': '',
+            'OutputPath': '',
         }
         return dummy_config
 
@@ -34,7 +35,7 @@ class TestConfigIO:
         assert config == expected_config
 
     def test_create_io_dir(dummy_config):
-        nc_file = "XX-dummy_forcing_file.nc"
+        nc_file = "XX-Xxx_dummy_forcing_file.nc"
         path_to_config_file = data_folder / "config_file_test.txt"
         config = config_io.read_config(path_to_config_file)
         input_dir, output_dir, config_path = config_io.create_io_dir(nc_file, config)

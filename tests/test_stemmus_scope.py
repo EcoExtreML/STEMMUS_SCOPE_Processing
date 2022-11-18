@@ -55,22 +55,22 @@ class TestWithDefaults:
         with open(exe_file, "x", encoding="utf8") as dummy_file:
             dummy_file.close()
 
-        yield StemmusScope(config_file, model_src_path=exe_file)
+        yield StemmusScope(config_file=config_file, model_src_path=exe_file)
 
     @pytest.fixture
     def model_with_setup(self, model):
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-07-11-1200"
 
-            cfg_file = model.setup()
+            cfg_file, _ = model.setup()
             return model, cfg_file
 
     def test_setup(self, model_with_setup):
         model, cfg_file = model_with_setup
 
-        actual_input_dir = data_folder / "directories" / "input" / "XX-dummy_2022-07-11-1200"
-        actual_output_dir = data_folder / "directories" / "output" / "XX-dummy_2022-07-11-1200"
-        actual_cfg_file = str(actual_input_dir / "XX-dummy_2022-07-11-1200_config.txt")
+        actual_input_dir = data_folder / "directories" / "input" / "XX-Xxx_2022-07-11-1200"
+        actual_output_dir = data_folder / "directories" / "output" / "XX-Xxx_2022-07-11-1200"
+        actual_cfg_file = str(actual_input_dir / "XX-Xxx_2022-07-11-1200_config.txt")
 
         assert actual_input_dir == Path(model.config["InputPath"])
         assert actual_output_dir == Path(model.config["OutputPath"])
@@ -79,7 +79,7 @@ class TestWithDefaults:
     @patch("subprocess.Popen")
     def test_run_exe_file(self, mocked_popen, model_with_setup):
 
-        actual_cfg_file = data_folder / "directories" / "input" / "XX-dummy_2022-07-11-1200" / "XX-dummy_2022-07-11-1200_config.txt"
+        actual_cfg_file = data_folder / "directories" / "input" / "XX-Xxx_2022-07-11-1200" / "XX-Xxx_2022-07-11-1200_config.txt"
         actual_log = (
             f"b'Reading config from {actual_cfg_file}\n\n "
             "The calculations start now \r\n The calculations end now \r'"
@@ -122,24 +122,26 @@ class TestWithCustomSetup:
     def model_with_setup(self, model, tmp_path):
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-07-11-1200"
-            cfg_file = model.setup(
+            cfg_file, _ = model.setup(
                 WorkDir = str(tmp_path),
-                ForcingFileName = "dummy_forcing_file.nc",
-                NumberOfTimeSteps = "5",
+                Location="XX-Xxx",
+                StartTime="1996-01-01T00:00",
+                EndTime="1996-01-01T02:00",
             )
         return model, cfg_file
 
     def test_setup(self, model_with_setup, tmp_path):
         model, cfg_file = model_with_setup
 
-        actual_input_dir = tmp_path / "input" / "dummy_2022-07-11-1200"
-        actual_output_dir = tmp_path / "output" / "dummy_2022-07-11-1200"
-        actual_cfg_file = str(actual_input_dir / "dummy_2022-07-11-1200_config.txt")
+        actual_input_dir = tmp_path / "input" / "XX-Xxx_2022-07-11-1200"
+        actual_output_dir = tmp_path / "output" / "XX-Xxx_2022-07-11-1200"
+        actual_cfg_file = str(actual_input_dir / "XX-Xxx_2022-07-11-1200_config.txt")
 
         assert actual_input_dir == Path(model.config["InputPath"])
         assert actual_output_dir == Path(model.config["OutputPath"])
         assert actual_cfg_file == cfg_file
-        assert model.config["NumberOfTimeSteps"] == "5"
+        assert model.config["StartTime"] == "1996-01-01T00:00"
+        assert model.config["EndTime"] == "1996-01-01T02:00"
 
     def test_config(self, model_with_setup):
         model, cfg_file = model_with_setup
@@ -149,7 +151,7 @@ class TestWithCustomSetup:
     @patch("subprocess.Popen")
     def test_run_exe_file(self, mocked_popen, model_with_setup, tmp_path):
 
-        actual_cfg_file = tmp_path / "input" / "dummy_2022-07-11-1200" / "dummy_2022-07-11-1200_config.txt"
+        actual_cfg_file = tmp_path / "input" / "XX-Xxx_2022-07-11-1200" / "XX-Xxx_2022-07-11-1200_config.txt"
         actual_log = (
             f"b'Reading config from {actual_cfg_file}\n\n "
             "The calculations start now \r\n The calculations end now \r'"
@@ -189,13 +191,13 @@ class TestWithMatlab:
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-07-11-1200"
 
-            cfg_file = model.setup()
+            cfg_file, _ = model.setup()
             return model, cfg_file
 
     @patch("subprocess.Popen")
     def test_run_matlab(self, mocked_popen, model_with_setup, tmp_path):
 
-        actual_cfg_file = data_folder / "directories" / "input" / "XX-dummy_2022-07-11-1200" / "XX-dummy_2022-07-11-1200_config.txt"
+        actual_cfg_file = data_folder / "directories" / "input" / "XX-Xxx_2022-07-11-1200" / "XX-Xxx_2022-07-11-1200_config.txt"
         actual_log = (
             "b'MATLAB is selecting SOFTWARE OPENGL rendering.\n..."
             f"\nReading config from {actual_cfg_file}\n"
@@ -241,13 +243,13 @@ class TestWithOctave:
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-07-11-1200"
 
-            cfg_file = model.setup()
+            cfg_file, _ = model.setup()
             return model, cfg_file
 
     @patch("subprocess.Popen")
     def test_run_matlab(self, mocked_popen, model_with_setup, tmp_path):
 
-        actual_cfg_file = data_folder / "directories" / "input" / "XX-dummy_2022-07-11-1200" / "XX-dummy_2022-07-11-1200_config.txt"
+        actual_cfg_file = data_folder / "directories" / "input" / "XX-Xxx_2022-07-11-1200" / "XX-Xxx_2022-07-11-1200_config.txt"
         actual_log = (
             f"b'Reading config from {actual_cfg_file}\n"
             "The calculations start now\n The calculations end now \n'"
