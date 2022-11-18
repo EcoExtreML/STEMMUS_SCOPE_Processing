@@ -15,9 +15,16 @@ soil-plant-atmosphere continuum model based on the models
 `STEMMUS <https://blog.utwente.nl/stemmus/introduction/>`_, and models
 canopy photosynthesis, fluorescence, and the transfer of energy, mass, and momentum.
 
-For a guide on how to setup and run the model, see the :doc:`user guide <readme_link>`.
+For a guide on how to setup and run the model, see the :doc:`User guide <readme_link>`.
 If you are interested in contributing to the PyStemmusScope code, see the
-:doc:`contributing guide <contributing_link>`.
+:doc:`Contributing guide <contributing_link>`.
+
+Credits
+-------
+
+This package was created with
+`Cookiecutter <https://github.com/audreyr/cookiecutter>`_ and the
+`NLeSC/python-template <https://github.com/NLeSC/python-template>`_.
 
 .. toctree::
   :maxdepth: 0

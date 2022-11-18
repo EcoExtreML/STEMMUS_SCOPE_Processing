@@ -3,6 +3,7 @@ from pathlib import Path
 import hdf5storage
 import numpy as np
 import xarray as xr
+from . import utils
 from . import variable_conversion as vc
 
 
@@ -165,7 +166,8 @@ def prepare_global_variables(data, input_path):
 
     matfiledata['Dur_tot'] = float(total_duration) # Matlab expects a 'double'
 
-    hdf5storage.savemat(input_path / 'forcing_globals.mat', matfiledata, appendmat=False)
+    hdf5storage.savemat(input_path / "forcing_globals.mat", matfiledata, appendmat=False)
+    utils.remove_dates_from_header(input_path / "forcing_globals.mat")
 
 
 def prepare_forcing(config, forcing_filename):

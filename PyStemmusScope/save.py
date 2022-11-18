@@ -239,7 +239,7 @@ def to_netcdf(config_file: str, forcing_filename:str, cf_filename: str) -> str:
 
     Args:
         config_file(str): Path to the config file.
-        forcing_filename(str): Name of forcing file.
+        forcing_filename(str): Forcing file.
         cf_filename(str): Path to a csv file for ALMA conventions.
 
     Returns:

@@ -153,3 +153,31 @@ def check_time_fmt(config):
 def check_lat_lon(coordinates):
     """Check if the coordinates exists."""
     raise NotImplementedError
+
+
+def remove_dates_from_header(filename):
+    """Removes the datetime string from the .mat file header.
+
+    MATLAB raises an error when some characters are non-UTF-8 (?), e.g. Chinese month
+    names. This function removes this part of the file header to avoid this problem.
+
+    Args:
+        filename (Path): Valid path to the .mat file
+    """
+    with open(filename, "rb") as f:
+        data = f.read()
+
+    # Get locations of date string in header
+    start_datestring = data[:128].find(b"Created on:") + 12
+    end_datestring = data[:128].find(b"HDF5") - 1
+
+    # Rebuild the data, with the dates in the header removed
+    sanitized_data = (
+        data[:start_datestring] +
+        b' '*len(data[start_datestring:end_datestring]) +
+        data[end_datestring:]
+        )
+
+    # Overwrite the old file
+    with open(filename, 'wb') as file:
+        file.write(sanitized_data)
