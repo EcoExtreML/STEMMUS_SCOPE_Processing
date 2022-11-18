@@ -85,7 +85,8 @@ def get_forcing_file(config):
         if not forcing_file:
             raise ValueError(f"Forcing file does not exist for the given site {location}.")
         elif len(forcing_file) > 1:
-            raise ValueError(f"Multiple forcing files exist for the given site {location}.")
+            raise ValueError(f"Multiple forcing files exist for the given site {location}." +
+                "Please check your focing files and remove the redundant files.")
         else:
             forcing_file = forcing_file[0]
         
@@ -139,11 +140,11 @@ def check_location_fmt(loc):
     return location, fmt
 
 
-def check_time_fmt(start_time, end_time):
+def check_time_fmt(config):
     """Check the format of time."""
     # check if start/end time can be converted to the iso format
-    start_time = datetime.strptime(start_time,'%Y-%m-%dT%H:%M')
-    end_time = datetime.strptime(end_time,'%Y-%m-%dT%H:%M')
+    start_time = datetime.strptime(config["StartTime"],'%Y-%m-%dT%H:%M')
+    end_time = datetime.strptime(config["EndTime"],'%Y-%m-%dT%H:%M')
 
     if start_time > end_time:
         raise ValueError("Invalid time range. StartTime must be earlier than EndTime.")

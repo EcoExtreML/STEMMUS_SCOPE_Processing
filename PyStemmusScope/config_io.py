@@ -60,7 +60,7 @@ def create_io_dir(forcing_filename, config):
     logger.info("%s", message)
 
     # update config file for ForcingFileName and InputPath
-    config_file_path = _update_config_file(forcing_filename, input_dir, output_dir,
+    config_file_path = _update_config_file(input_dir, output_dir,
         config, station_name, timestamp)
 
     return str(input_dir), str(output_dir), config_file_path
@@ -83,7 +83,7 @@ def _copy_data(input_dir, config):
     # copy input_data.xlsx
     shutil.copy(str(config["input_data"]), str(input_dir))
 
-def _update_config_file(nc_file, input_dir, output_dir, config, station_name, timestamp): #pylint: disable=too-many-arguments
+def _update_config_file(input_dir, output_dir, config, station_name, timestamp): #pylint: disable=too-many-arguments
     """Update config file for each station.
 
     Create config file for each forcing/station under the work directory.
@@ -102,8 +102,8 @@ def _update_config_file(nc_file, input_dir, output_dir, config, station_name, ti
     config_file_path = input_dir / f"{station_name}_{timestamp}_config.txt"
     with open(config_file_path, 'w', encoding="utf8") as f:
         for key, value in config.items():
-            if key == "ForcingFileName":
-                update_entry = f"{key}={nc_file}\n"
+            if key == "Location":
+                update_entry = f"{key}={station_name}\n"
             elif key == "InputPath":
                 update_entry = f"{key}={str(input_dir)}/\n"
             elif key == "OutputPath":

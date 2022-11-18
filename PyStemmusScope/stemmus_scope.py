@@ -55,8 +55,8 @@ class StemmusScope():
         Args:
             WorkDir: path to a directory where input/output directories should be created.
             ForcingFileName: forcing file name. Forcing file should be in netcdf format.
-            NumberOfTimeSteps: total number of time steps in which model runs. It can be
-                `NA` or a number. Example `10` runs the model for 10 time steps.
+            StartTime: Start time of the model run. It must be in ISO format (e.g. 2007-01-01T00:00).
+            EndTime: End time of the model run. It must be in ISO format (e.g. 2007-01-01T00:00).
 
         Returns:
             Paths to config file and input/output directories
@@ -75,7 +75,7 @@ class StemmusScope():
             self._configs["EndTime"] = EndTime
 
         # check time
-        utils.check_time_fmt(StartTime, EndTime)
+        utils.check_time_fmt(self._configs)
 
         # get forcing files from location
         forcing_filename = utils.get_forcing_file(self._configs)
@@ -119,7 +119,6 @@ class StemmusScope():
         logger.info("%s", stdout)
 
         return stdout
-
 
     @property
     def config(self) -> Dict:

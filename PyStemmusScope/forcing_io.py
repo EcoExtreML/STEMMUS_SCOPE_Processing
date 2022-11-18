@@ -146,7 +146,7 @@ def write_meteo_file(data, fname):
     _write_matlab_ascii(fname, meteo_file_data, ncols=len(meteo_data_vars))
 
 
-def prepare_global_variables(data, input_path, config):
+def prepare_global_variables(data, input_path):
     """Function to read and calculate global variables for STEMMUS_SCOPE from the
     forcing data. Data will be written to a Matlab binary file (v7.3), under the name
     'forcing_globals.mat' in the specified input directory.
@@ -157,10 +157,7 @@ def prepare_global_variables(data, input_path, config):
         input_path (Path): Path to which the file should be written to.
         config (dict): The PyStemmusScope configuration dictionary.
     """
-    if config['NumberOfTimeSteps'] != 'NA':
-        total_duration = min(int(config['NumberOfTimeSteps']), data['total_timesteps'])
-    else:
-        total_duration = data['total_timesteps']
+    total_duration = data['total_timesteps']
 
     matfile_vars = ['latitude', 'longitude', 'elevation', 'IGBP_veg_long',
                     'reference_height', 'canopy_height', 'DELT', 'sitename']
@@ -200,7 +197,7 @@ def prepare_forcing(config, forcing_filename):
 
     # Write the remaining variables (without time dependency) to the matlab v7.3
     #  file 'forcing_globals.mat'
-    prepare_global_variables(data, input_path, config)
+    prepare_global_variables(data, input_path)
 
 
 def _slice_forcing_file(ds_forcing, start_time, end_time):
