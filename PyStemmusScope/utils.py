@@ -82,6 +82,7 @@ def get_forcing_file(config):
         # get forcing file list
         forcing_filenames_list = [file.name for file in Path(config["ForcingPath"]).iterdir()]
         forcing_file = [filename for filename in forcing_filenames_list if location in filename]
+        #pylint: disable=no-else-raise
         if not forcing_file:
             raise ValueError(f"Forcing file does not exist for the given site {location}.")
         elif len(forcing_file) > 1:
@@ -89,7 +90,7 @@ def get_forcing_file(config):
                 "Please check your focing files and remove the redundant files.")
         else:
             forcing_file = forcing_file[0]
-        
+
     elif fmt == "latlon":
         raise NotImplementedError
     elif fmt == "bbox":
@@ -117,13 +118,13 @@ def check_location_fmt(loc):
     if re.fullmatch("[A-Z]{2}-[A-Z][a-z]{2}", loc):
         location = loc
         fmt = "site"
-    elif re.fullmatch("\(\d*[.,]?\d*,\d*[.,]?\d*\)", loc):
+    elif re.fullmatch(r"\(\d*[.,]?\d*,\d*[.,]?\d*\)", loc):
         # turn string into tuples
         location = ast.literal_eval(loc)
         # check if the coordinate is valid
         check_lat_lon(location)
         fmt = "latlon"
-    elif re.fullmatch("(\[\d*[.,]?\d*,\d*[.,]?\d*\][,]?){2}", loc):
+    elif re.fullmatch(r"(\[\d*[.,]?\d*,\d*[.,]?\d*\][,]?){2}", loc):
         # find items between brackets
         bbox = re.findall(r"\[.*?\]", loc)
         # turn string into list
@@ -135,8 +136,8 @@ def check_location_fmt(loc):
     else:
         raise ValueError(
             f"Location '{loc}' in the config file does not match expected format."
-        )        
-    
+        )
+
     return location, fmt
 
 

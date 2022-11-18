@@ -1,4 +1,3 @@
-from datetime import datetime
 from pathlib import Path
 import hdf5storage
 import numpy as np
