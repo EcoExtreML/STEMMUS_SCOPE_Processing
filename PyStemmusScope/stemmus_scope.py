@@ -97,7 +97,7 @@ class StemmusScope():
         # set matlab log dir
         os.environ['MATLAB_LOG_DIR'] = str(self._configs["InputPath"])
 
-        return str(self.cfg_file)
+        return str(self.cfg_file), forcing_filename
 
     def run(self) -> str:
         """Run model using executable.
