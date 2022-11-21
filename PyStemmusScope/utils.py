@@ -122,7 +122,7 @@ def check_location_fmt(loc):
         # turn string into tuples
         location = ast.literal_eval(loc)
         # check if the coordinate is valid
-        check_lat_lon(location)
+        #_check_lat_lon(location)
         fmt = "latlon"
     elif re.fullmatch(r"(\[\d*[.,]?\d*,\d*[.,]?\d*\][,]?){2}", loc):
         # find items between brackets
@@ -130,8 +130,8 @@ def check_location_fmt(loc):
         # turn string into list
         bbox = [ast.literal_eval(i) for i in bbox]
         location = [list(coordinate) for coordinate in product(bbox[0], bbox[1])]
-        for coordinates in location:
-            check_lat_lon(coordinates)
+        #for coordinates in location:
+        #    _check_lat_lon(coordinates)
         fmt = "bbox"
     else:
         raise ValueError(
@@ -139,6 +139,11 @@ def check_location_fmt(loc):
         )
 
     return location, fmt
+
+
+def _check_lat_lon(coordinates):
+    """Check if the coordinates exists."""
+    raise NotImplementedError
 
 
 def check_time_fmt(config):
@@ -149,11 +154,6 @@ def check_time_fmt(config):
 
     if start_time > end_time:
         raise ValueError("Invalid time range. StartTime must be earlier than EndTime.")
-
-
-def check_lat_lon(coordinates):
-    """Check if the coordinates exists."""
-    raise NotImplementedError
 
 
 def remove_dates_from_header(filename):
