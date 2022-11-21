@@ -28,6 +28,8 @@ def read_forcing_data(forcing_file, start_time, end_time):
 
     Args:
         forcing_file (Path): Path to the netCDF file containing the forcing data
+        start_time (str): Start time of time range.
+        end_time (str): Start time of time range.
 
     Returns:
         dict: Dictionary containing the different variables required by STEMMUS_SCOPE
