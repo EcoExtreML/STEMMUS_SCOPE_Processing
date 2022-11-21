@@ -135,13 +135,20 @@ class TestTime:
         with pytest.raises(ValueError):
             utils.check_time_fmt(config)
 
-
     def test_time_fmt_error_timerange(self, config_file):
         config = config_file
         config["StartTime"] = "2026-01-01T00:00"
         config["EndTime"] = "1926-01-01T00:00"
         with pytest.raises(ValueError):
             utils.check_time_fmt(config_file)
+
+    def test_time_fmt_error_invalid_mins(self, config_file):
+        config = config_file
+        config["StartTime"] = "1996-01-01T00:10"
+        config["EndTime"] = "1996-01-02T00:00"
+        with pytest.raises(ValueError):
+            utils.check_time_fmt(config_file)
+
 
 class TestGetForcingFile():
     @pytest.fixture
