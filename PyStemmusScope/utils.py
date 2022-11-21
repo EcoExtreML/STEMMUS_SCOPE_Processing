@@ -153,7 +153,7 @@ def check_time_fmt(config):
     end_time = datetime.strptime(config["EndTime"],'%Y-%m-%dT%H:%M')
 
     for time in [start_time, end_time]:
-        if not (time.minute == 30 or time.minute == 0):
+        if time.minute not in [0, 30]:
             raise ValueError("Invalid time values. Due to the resolution of forcing file," +
                 " the input time should be either 0 or 30 minutes.")
 
