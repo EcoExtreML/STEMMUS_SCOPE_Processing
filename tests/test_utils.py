@@ -116,6 +116,11 @@ class TestLocation:
         with pytest.raises(ValueError):
             utils.check_location_fmt(test_location)
 
+    def _check_lat_lon(self):
+        coordinates = [[19.5, 125.5], [19.5, 130.0], [20.5, 125.5], [20.5, 130.0]]
+        with pytest.raises(NotImplementedError):
+            utils.check_location_fmt(coordinates)
+
 
 class TestTime:
     @pytest.fixture
@@ -137,3 +142,35 @@ class TestTime:
         config["EndTime"] = "1926-01-01T00:00"
         with pytest.raises(ValueError):
             utils.check_time_fmt(config_file)
+
+class TestGetForcingFile():
+    @pytest.fixture
+    def config_file(self):
+        config_file = str(data_folder / "config_file_test.txt")
+        config_ditc = config_io.read_config(config_file)
+        return config_ditc
+
+    def test_get_forcing_file_site(self, config_file):
+        config = config_file
+        config["Location"] = "FI-Hyy"
+        forcing_file = utils.get_forcing_file(config_file)
+        
+        assert forcing_file == "FI-Hyy_1996-2014_FLUXNET2015_Met.nc"
+
+    def test_get_forcing_file_site_not_found(self, config_file):
+        config = config_file
+        config["Location"] = "AA-Aaa"
+        with pytest.raises(ValueError):
+            utils.get_forcing_file(config_file)
+
+    def test_get_forcing_file_latlon(self, config_file):
+        config = config_file
+        config["Location"] = "(56.4, 112.0)"
+        with pytest.raises(NotImplementedError):
+            utils.get_forcing_file(config_file)
+
+    def test_get_forcing_file_bbox(self, config_file):
+        config = config_file
+        config["Location"] = "[19.5,20.5], [125.5,130.0]"
+        with pytest.raises(NotImplementedError):
+            utils.get_forcing_file(config_file)
