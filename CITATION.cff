@@ -4,12 +4,23 @@ cff-version: "1.1.0"
 title: "PyStemmusScope"
 authors:
   -
+    affiliation: "Netherlands eScience Center"
     family-names: Alidoost
     given-names: Sarah
     orcid: "https://orcid.org/0000-0000-0000-0000"
-date-released: 20??-MM-DD
+  -
+    affiliation: "Netherlands eScience Center"
+    family-names: Schilperoort
+    given-names: Bart
+    orcid: "https://orcid.org/0000-0003-4487-9822"
+  -
+    affiliation: "Netherlands eScience Center"
+    family-names: Liu
+    given-names: Yang
+    orcid: "https://orcid.org/0000-0002-1966-8460"
+date-released: 2022-11-24
 doi: <insert your DOI here>
-version: "0.1.0"
+version: "0.1.1"
 repository-code: "https://github.com/EcoExtreML/stemmus_scope_processing"
 keywords:
   - STEMMUS SCOPE Processing
