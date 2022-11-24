@@ -9,7 +9,7 @@ authors:
     orcid: "https://orcid.org/0000-0000-0000-0000"
 date-released: 20??-MM-DD
 doi: <insert your DOI here>
-version: "0.1.0"
+version: "0.1.1"
 repository-code: "https://github.com/EcoExtreML/stemmus_scope_processing"
 keywords:
   - STEMMUS SCOPE Processing
