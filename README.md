@@ -75,8 +75,7 @@ Run the commands below in a terminal (On Windows, use `python` instead of
 `python3`):
 
 ```sh
-# will be replaced by `pip install pystemmusscope`
-python3 -m pip install git+https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing.git@main
+python3 -m pip install pystemmusscope
 ```
 
 or
@@ -84,7 +83,7 @@ or
 Open a jupyter notebook and run the code below in a cell:
 
 ```python
-!pip install git+https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing.git@main
+!pip install pystemmusscope
 ```
 
 ### Install jupyterlab
