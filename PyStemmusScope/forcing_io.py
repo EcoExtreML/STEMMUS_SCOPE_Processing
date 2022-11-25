@@ -35,7 +35,7 @@ def read_forcing_data(forcing_file, start_time, end_time):
         dict: Dictionary containing the different variables required by STEMMUS_SCOPE
             for the different forcing files.
     """
-    ds_forcing = xr.open_dataset(forcing_file)    
+    ds_forcing = xr.open_dataset(forcing_file)
 
     # remove the x and y coordinates from the data variables to make the numpy arrays 1D
     ds_forcing = ds_forcing.squeeze(['x', 'y'])
