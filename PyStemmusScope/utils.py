@@ -84,18 +84,15 @@ def get_forcing_file(config):
         forcing_file = [filename for filename in forcing_filenames_list if location in filename]
         if not forcing_file:
             raise ValueError(f"Forcing file does not exist for the given site {location}.")
-        elif len(forcing_file) > 1:
+        if len(forcing_file) > 1:
             raise ValueError(f"Multiple forcing files exist for the given site {location}." +
                 "Please check your focing files and remove the redundant files.")
-        else:
-            forcing_file = forcing_file[0]
+        forcing_file = forcing_file[0]
 
     elif fmt == "latlon":
         raise NotImplementedError
     elif fmt == "bbox":
         raise NotImplementedError
-    else:
-        raise TypeError(f"Location format {fmt} not recognized.")
 
     return forcing_file
 

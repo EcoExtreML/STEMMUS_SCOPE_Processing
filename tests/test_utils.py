@@ -95,16 +95,16 @@ class TestLocation:
         ("(19.5, 125.5), (19.5, 130.0)"),
     ]    
 
-    @pytest.mark.parametrize("input, expected_loc, expected_fmt", valid_input)
-    def test_check_location_fmt(self, input, expected_loc, expected_fmt):
-        test_location = input
+    @pytest.mark.parametrize("input_loc, expected_loc, expected_fmt", valid_input)
+    def test_check_location_fmt(self, input_loc, expected_loc, expected_fmt):
+        test_location = input_loc
         location, fmt = utils.check_location_fmt(test_location)
         assert location == expected_loc
         assert fmt == expected_fmt
 
-    @pytest.mark.parametrize("input", invalid_input)
-    def test_check_location_invalid_fmt(self, input):
-        test_location = input
+    @pytest.mark.parametrize("input_loc", invalid_input)
+    def test_check_location_invalid_fmt(self, input_loc):
+        test_location = input_loc
         with pytest.raises(ValueError):
             utils.check_location_fmt(test_location)
 
