@@ -75,44 +75,36 @@ def test_to_absolute_path_with_absolute_input_and_nonrelative_parent(tmp_path):
 
 
 class TestLocation:
-    def test_check_location_fmt_site(self):
-        test_location = "DE-Kli"
+    valid_input = [
+        # input, expected_loc, expected_fmt
+        ("DE-Kli", "DE-Kli", "site"),
+        ("AU-ASM", "AU-ASM", "site"),
+        ("AU-GWW", "AU-GWW", "site"),
+        ("CA-SF1", "CA-SF1", "site"),
+        ("(56.4, 112.0)", (56.4, 112.0), "latlon"),
+        ("[19.5, 20.5], [125.5, 130.0]",
+         [[19.5, 125.5], [19.5, 130.0], [20.5, 125.5], [20.5, 130.0]],
+         "bbox"),
+    ]
+
+    invalid_input = [
+        ("FI-Hyy_1996-2014_FLUXNET2015_Met.nc"),
+        ("FI-Hy"),
+        ("[56.4, 112.0]"),
+        ("[19.5, 125.5], [19.5, 130.0], [20.5, 125.5], [20.5, 130.0]"),
+        ("(19.5, 125.5), (19.5, 130.0)"),
+    ]    
+
+    @pytest.mark.parametrize("input, expected_loc, expected_fmt", valid_input)
+    def test_check_location_fmt(self, input, expected_loc, expected_fmt):
+        test_location = input
         location, fmt = utils.check_location_fmt(test_location)
-        assert location == "DE-Kli"
-        assert fmt == "site"
+        assert location == expected_loc
+        assert fmt == expected_fmt
 
-    def test_check_location_fmt_latlon(self):
-        test_location = "(56.4, 112.0)"
-        location, fmt = utils.check_location_fmt(test_location)
-        assert location == (56.4, 112.0)
-        assert fmt == "latlon"
-
-    def test_check_location_fmt_bbox(self):
-        test_location = "[19.5,20.5], [125.5,130.0]"
-        location, fmt = utils.check_location_fmt(test_location)
-        assert location == [[19.5, 125.5], [19.5, 130.0], [20.5, 125.5], [20.5, 130.0]]
-        assert fmt == "bbox"
-
-    def test_check_location_fmt_site_wrongfmt(self):
-        test_location = "FI-Hyy_1996-2014_FLUXNET2015_Met.nc"
-        with pytest.raises(ValueError):
-            utils.check_location_fmt(test_location)
-   
-        test_location = "FI-Hy"
-        with pytest.raises(ValueError):
-            utils.check_location_fmt(test_location)
-
-    def test_check_location_fmt_latlon_wrongfmt(self):
-        test_location = "[56.4, 112.0]"
-        with pytest.raises(ValueError):
-            utils.check_location_fmt(test_location)
-
-    def test_check_location_fmt_bbox_wrongfmt(self):
-        test_location = "[19.5, 125.5], [19.5, 130.0], [20.5, 125.5], [20.5, 130.0]"
-        with pytest.raises(ValueError):
-            utils.check_location_fmt(test_location)
-
-        test_location = "(19.5, 125.5), (19.5, 130.0)"
+    @pytest.mark.parametrize("input", invalid_input)
+    def test_check_location_invalid_fmt(self, input):
+        test_location = input
         with pytest.raises(ValueError):
             utils.check_location_fmt(test_location)
 
