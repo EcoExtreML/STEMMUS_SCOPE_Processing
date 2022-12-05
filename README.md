@@ -3,11 +3,12 @@
 
 
 [![github repo badge](https://img.shields.io/badge/github-repo-000.svg?logo=github&labelColor=gray&color=blue)](https://github.com/EcoExtreML/stemmus_scope_processing)
+[![PyPI version](https://badge.fury.io/py/PyStemmusScope.svg)](https://badge.fury.io/py/PyStemmusScope)
 [![build](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/build.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/build.yml)
+[![Documentation Status](https://readthedocs.org/projects/pystemmusscope/badge/?version=latest)](https://pystemmusscope.readthedocs.io/en/latest/?badge=latest)
 [![fair-software badge](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu)
 [![sonarcloud](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/sonarcloud.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/sonarcloud.yml)
 [![github license badge](https://img.shields.io/github/license/EcoExtreML/stemmus_scope_processing)](https://github.com/EcoExtreML/stemmus_scope_processing)
-[![Documentation Status](https://readthedocs.org/projects/pystemmusscope/badge/?version=latest)](https://pystemmusscope.readthedocs.io/en/latest/?badge=latest)
 
 <!-- [![RSD](https://img.shields.io/badge/rsd-pystemmusscope-00a3e3.svg)](https://www.research-software.nl/software/pystemmusscope)
 [![workflow pypi badge](https://img.shields.io/pypi/v/pystemmusscope.svg?colorB=blue)](https://pypi.python.org/project/pystemmusscope/)
@@ -60,7 +61,7 @@ conda environment before submitting the the bash script. See
 ### On CRIB
 
 [CRIB](https://crib.utwente.nl/) is the ITC Geospatial Computing Platform. You
-can run the model using `Matlab` or `Octave`. Currently, running the 
+can run the model using `Matlab` or `Octave`. Currently, running the
 exceutable file on CRIB is not supported because MATLAB Runtime can not be
 installed there. See [Install PyStemmusScope](#install-pystemmusscope).
 
@@ -74,8 +75,7 @@ Run the commands below in a terminal (On Windows, use `python` instead of
 `python3`):
 
 ```sh
-# will be replaced by `pip install pystemmusscope`
-python3 -m pip install git+https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing.git@main
+python3 -m pip install pystemmusscope
 ```
 
 or
@@ -83,7 +83,7 @@ or
 Open a jupyter notebook and run the code below in a cell:
 
 ```python
-!pip install git+https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing.git@main
+!pip install pystemmusscope
 ```
 
 ### Install jupyterlab
