@@ -1,13 +1,12 @@
-import ast
 import os
 import re
 from datetime import datetime
-from itertools import product
+from typing import Tuple
 from pathlib import Path
 import numpy as np
 
 
-def convert_to_lsm_coordinates(lat, lon):
+def convert_to_lsm_coordinates(lat: float, lon: float) -> Tuple[int, int]:
     """Converts latitude in degrees North to NCAR's LSM coordinate system: Grid with lat
     values ranging from 0 -- 360, where 0 is the South Pole, and lon values ranging
     from 0 -- 720, where 0 is the prime meridian. Both representing a 0.5 degree
@@ -98,47 +97,54 @@ def get_forcing_file(config):
 
 
 def check_location_fmt(loc):
-    """Check the format of location.
+    """Check the format of the model location.
 
     Three types of format are supported:
-    - Site name (e.g. "DE-Kli")
-    - Latitude and longitude (e.g. "(56.4, 112.0)")
-    - Bounding box (lat_min, lat_max), (lon_min, lon_max) (e.g. "[19.5,20.5], [125.5,130.0]")
+    - Site name, e.g., "DE-Kli"
+    - Latitude and longitude, e.g. "(56.4, 112.0)"
+    - A rectangular bounding box, described with two opposing corners:
+        [[lat1, lon1], [lat2, lon2]], e.g., "[[19.5, 125.5], [20.5, 130.0]]".
 
     Args:
-        loc: String of location extracted from config file.
+        loc (str): Location extracted from the config file.
 
     Returns:
-        Location name (string) or location (tuple) lat,lon pair and its format
+        Site name (string), location (tuple), or bounding box (tuple of tuples),
+        Location format (string)
     """
-    if re.fullmatch(r"[A-Z]{2}-([a-zA-Z]|\d){3}", loc):
-        location = loc
-        fmt = "site"
-    elif re.fullmatch(r"\([+-]?\d*[\.]?\d*,\s?[+-]?\d*[\.]?\d*\)", loc):
-        # turn string into tuples
-        location = ast.literal_eval(loc)
-        # check if the coordinate is valid
-        #_check_lat_lon(location)
-        fmt = "latlon"
-    elif re.fullmatch(r"(\[[+-]?\d*[\.]?\d*,\s?[+-]?\d*[\.]?\d*\][,]?\s?){2}", loc):
-        # find items between brackets
-        bbox = re.findall(r"\[.*?\]", loc)
-        # turn string into list
-        bbox = [ast.literal_eval(i) for i in bbox]
-        location = [list(coordinate) for coordinate in product(bbox[0], bbox[1])]
-        #for coordinates in location:
-        #    _check_lat_lon(coordinates)
-        fmt = "bbox"
-    else:
-        raise ValueError(
-            f"Location '{loc}' in the config file does not match expected format."
-        )
+    # Matches a floating-point like number. I.e., 5.23 or -2.0
+    flstr = r"[+-]?\d*[\.]?\d*"
 
-    return location, fmt
+    site_pattern = r"[A-Z]{2}-([a-zA-Z]|\d){3}"
+    latlon_pattern = rf"\(({flstr}),\s?({flstr})\)"
+    bbox_pattern = rf"\[\[({flstr}),\s?({flstr})\],\s?\[({flstr}),\s?({flstr})\]\]"
+
+    if re.fullmatch(site_pattern, loc):
+        return loc, "site"
+
+    latlon = re.findall(latlon_pattern, loc)
+    if len(latlon) == 1:
+        # TODO: add check if lat/lon are valid
+        return tuple(float(x) for x in latlon[0]), "latlon"
+
+    bbox = re.findall(bbox_pattern, loc)
+    if len(bbox) == 1:
+        bbox = [float(x) for x in bbox[0]]
+        # TODO: add check if bbox values are valid
+        return ((bbox[0], bbox[1]), (bbox[2], bbox[3])), "bbox"
+
+    raise ValueError(
+        f"Location '{loc}' in the config file does not match expected format."
+    )
 
 
 def _check_lat_lon(coordinates):
     """Check if the coordinates exists."""
+    raise NotImplementedError
+
+
+def _check_bbox(coordinates):
+    """Check if the bounding box input is valid"""
     raise NotImplementedError
 
 

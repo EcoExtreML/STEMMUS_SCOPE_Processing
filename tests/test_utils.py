@@ -82,9 +82,9 @@ class TestLocation:
         ("AU-GWW", "AU-GWW", "site"),
         ("CA-SF1", "CA-SF1", "site"),
         ("(56.4, 112.0)", (56.4, 112.0), "latlon"),
-        ("[19.5, 20.5], [125.5, 130.0]",
-         [[19.5, 125.5], [19.5, 130.0], [20.5, 125.5], [20.5, 130.0]],
-         "bbox"),
+        ("(+56.4, -10)", (56.4, -10), "latlon"),
+        ("[[19.5, 125.5], [20.5, 130.0]]", ((19.5, 125.5), (20.5, 130.0)), "bbox"),
+        ("[[19.5, -125.5], [20.5, -120.0]]", ((19.5, -125.5), (20.5, -120.0)), "bbox"),
     ]
 
     invalid_input = [
@@ -93,7 +93,8 @@ class TestLocation:
         ("[56.4, 112.0]"),
         ("[19.5, 125.5], [19.5, 130.0], [20.5, 125.5], [20.5, 130.0]"),
         ("(19.5, 125.5), (19.5, 130.0)"),
-    ]    
+        ("(19.5, 125.5), (19.5, 130.0), (20.5, 125.5), (20.5, 130.0)"),
+    ]
 
     @pytest.mark.parametrize("input_loc, expected_loc, expected_fmt", valid_input)
     def test_check_location_fmt(self, input_loc, expected_loc, expected_fmt):
@@ -153,7 +154,7 @@ class TestGetForcingFile():
         config = config_file
         config["Location"] = "FI-Hyy"
         forcing_file = utils.get_forcing_file(config_file)
-        
+
         assert forcing_file == "FI-Hyy_1996-2014_FLUXNET2015_Met.nc"
 
     def test_get_forcing_file_site_not_found(self, config_file):
@@ -170,6 +171,6 @@ class TestGetForcingFile():
 
     def test_get_forcing_file_bbox(self, config_file):
         config = config_file
-        config["Location"] = "[19.5,20.5], [125.5,130.0]"
+        config["Location"] = "[[19.5,125.5], [20.5,130.0]]"
         with pytest.raises(NotImplementedError):
             utils.get_forcing_file(config_file)
