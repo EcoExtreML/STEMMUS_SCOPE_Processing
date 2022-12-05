@@ -151,15 +151,21 @@ def _check_bbox(coordinates):
 def check_time_fmt(config):
     """Check the format of time."""
     # check if start/end time can be converted to the iso format
-    start_time = datetime.strptime(config["StartTime"],'%Y-%m-%dT%H:%M')
-    end_time = datetime.strptime(config["EndTime"],'%Y-%m-%dT%H:%M')
+    if config["StartTime"] == "NA":
+        start_time = None
+    else:
+        start_time = datetime.strptime(config["StartTime"],'%Y-%m-%dT%H:%M')
+    if config["EndTime"] == "NA":
+        end_time = None
+    else:
+        end_time = datetime.strptime(config["EndTime"],'%Y-%m-%dT%H:%M')
 
     for time in [start_time, end_time]:
-        if time.minute not in [0, 30]:
+        if time is not None and time.minute not in [0, 30]:
             raise ValueError("Invalid time values. Due to the resolution of forcing file," +
                 " the input time should be either 0 or 30 minutes.")
 
-    if start_time > end_time:
+    if (start_time and end_time) and start_time > end_time:
         raise ValueError("Invalid time range. StartTime must be earlier than EndTime.")
 
 

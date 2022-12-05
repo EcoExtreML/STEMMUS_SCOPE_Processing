@@ -117,6 +117,12 @@ def test_dat_file_format(dat_files):
             eval_str(f.read())
 
 
+def test_forcing_slice_NA():
+    forcing_file = (forcing_data_folder /
+                    "FI-Hyy_1996-2014_FLUXNET2015_Met.nc")
+    return forcing_io.read_forcing_data(forcing_file, "NA", "NA")
+
+
 def test_full_routine(tmp_path, dat_files):
     # create dummy config
     cfg_file = data_folder / "config_file_test.txt"

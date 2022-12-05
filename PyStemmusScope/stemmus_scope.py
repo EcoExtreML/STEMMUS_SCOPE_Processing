@@ -134,6 +134,7 @@ class StemmusScope():
             self._config["WorkDir"] = WorkDir
 
         if Location:
+            _ = utils.check_location_fmt(Location)
             self._config["Location"] = Location
 
         if StartTime:
@@ -142,7 +143,6 @@ class StemmusScope():
         if EndTime:
             self._config["EndTime"] = EndTime
 
-        # check time
         utils.check_time_fmt(self._config)
 
         # get forcing files from location

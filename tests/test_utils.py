@@ -122,6 +122,12 @@ class TestTime:
         config_ditc = config_io.read_config(config_file)
         return config_ditc
 
+    def test_time_fmt_NA(self, config_file):
+        config = config_file
+        config["StartTime"] = "NA"
+        config["StartTime"] = "NA"
+        utils.check_time_fmt(config)
+
     def test_time_fmt_not_iso(self, config_file):
         config = config_file
         config["StartTime"] = "03/02/1978 12:35"

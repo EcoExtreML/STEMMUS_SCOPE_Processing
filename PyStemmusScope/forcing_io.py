@@ -210,20 +210,26 @@ def _slice_forcing_file(ds_forcing, start_time, end_time):
 
     Args:
         ds_forcing (xr.Dataset): Dataset of forcing file.
-        start_time (str): Start time of time range.
-        end_time (str): Start time of time range.
+        start_time (str): Start time of time range. If "NA", start time will be the
+            first timestamp of the forcing input data.
+        end_time (str): Start time of time range. If "NA", end time will be the
+            last timestamp of the forcing input data.
+
+    Returns:
+        Forcing dataset, sliced with the start and end time.
     """
-    start_time = np.datetime64(start_time)
-    end_time = np.datetime64(end_time)
-    # time range in forcing file
+    start_time = None if start_time == "NA" else np.datetime64(start_time)
+    end_time = None if end_time == "NA" else np.datetime64(end_time)
+
     start_time_forcing = ds_forcing.coords["time"].values[0]
     end_time_forcing = ds_forcing.coords["time"].values[-1]
-    # check if the time range in config is covered by the forcing file
-    if start_time_forcing <= start_time and end_time_forcing >= end_time:
-        # slice forcing file and save a temp copy
-        forcing_file_subset = ds_forcing.sel(time = slice(start_time, end_time))
-    else:
-        raise ValueError(f"Given time range (from {start_time} to {end_time}) cannot be covered by" + 
-            f"the time range of forcing file (from {start_time_forcing} to {end_time_forcing}).")
-    
-    return forcing_file_subset
+
+    start_time_valid = start_time >= start_time_forcing if start_time else True
+    end_time_valid = end_time <= end_time_forcing if end_time else True
+    if not (start_time_valid and end_time_valid):
+        raise ValueError(
+            f"Given time range (from {start_time} to {end_time}) cannot be covered by"
+            f"the time range of forcing file (from {start_time_forcing} to "
+            f"{end_time_forcing}).")
+
+    return ds_forcing.sel(time=slice(start_time, end_time))
