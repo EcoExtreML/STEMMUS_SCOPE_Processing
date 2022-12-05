@@ -6,6 +6,7 @@ import shlex
 import subprocess
 from pathlib import Path
 from typing import Dict
+from typing import Tuple
 from . import config_io
 from . import forcing_io
 from . import soil_io
@@ -114,7 +115,7 @@ class StemmusScope():
         Location: str = None,
         StartTime: str = None,
         EndTime: str = None,
-    ) -> str:
+    ) -> Tuple[str, str]:
         """Configure model run.
 
         1. Creates config file and input/output directories based on the config template.
@@ -127,7 +128,8 @@ class StemmusScope():
             EndTime: End time of the model run. It must be in ISO format (e.g. 2007-01-01T00:00).
 
         Returns:
-            Paths to config file and input/output directories
+            Path to the config file
+            Forcing filename
         """
         # update config template if needed
         if WorkDir:

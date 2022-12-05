@@ -1,8 +1,8 @@
 import os
 import re
 from datetime import datetime
-from typing import Tuple
 from pathlib import Path
+from typing import Tuple
 import numpy as np
 
 
@@ -115,7 +115,7 @@ def check_location_fmt(loc):
     # Matches a floating-point like number. I.e., 5.23 or -2.0
     flstr = r"[+-]?\d*[\.]?\d*"
 
-    site_pattern = r"[A-Z]{2}-([a-zA-Z]|\d){3}"
+    site_pattern = r"[A-Z]{2}-([A-z]|\d){3}"
     latlon_pattern = rf"\(({flstr}),\s?({flstr})\)"
     bbox_pattern = rf"\[\[({flstr}),\s?({flstr})\],\s?\[({flstr}),\s?({flstr})\]\]"
 

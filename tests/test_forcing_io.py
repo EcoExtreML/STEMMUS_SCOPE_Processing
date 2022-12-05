@@ -2,8 +2,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
-from PyStemmusScope import forcing_io
 from PyStemmusScope import config_io
+from PyStemmusScope import forcing_io
 from . import data_folder
 
 

@@ -1,9 +1,10 @@
 from pathlib import Path
 import numpy as np
 import pytest
-from PyStemmusScope import soil_io
 from PyStemmusScope import config_io
+from PyStemmusScope import soil_io
 from . import data_folder
+
 
 soil_data_folder = data_folder / "directories"/ "model_parameters"/ "soil_property"
 

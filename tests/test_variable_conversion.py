@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 from PyStemmusScope import variable_conversion as vc
 
+
 def test_calculate_ea():
 
     t_air_celcius = np.array([-0.82, 42.16])
