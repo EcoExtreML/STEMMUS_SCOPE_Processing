@@ -28,8 +28,8 @@ def read_forcing_data(forcing_file, start_time, end_time):
 
     Args:
         forcing_file (Path): Path to the netCDF file containing the forcing data
-        start_time (str): Start time of time range.
-        end_time (str): Start time of time range.
+        start_time (str): Start of time range in ISO format string e.g. 'YYYY-MM-DDTHH:MM:SS'.
+        end_time (str): End of time range in ISO format string e.g. 'YYYY-MM-DDTHH:MM:SS'.
 
     Returns:
         dict: Dictionary containing the different variables required by STEMMUS_SCOPE
@@ -210,9 +210,9 @@ def _slice_forcing_file(ds_forcing, start_time, end_time):
 
     Args:
         ds_forcing (xr.Dataset): Dataset of forcing file.
-        start_time (str): Start time of time range. If "NA", start time will be the
+        start_time (str): Start of time range in ISO format string e.g. 'YYYY-MM-DDTHH:MM:SS'. If "NA", start time will be the
             first timestamp of the forcing input data.
-        end_time (str): Start time of time range. If "NA", end time will be the
+        end_time (str): End of time range in ISO format string e.g. 'YYYY-MM-DDTHH:MM:SS'. If "NA", end time will be the
             last timestamp of the forcing input data.
 
     Returns:

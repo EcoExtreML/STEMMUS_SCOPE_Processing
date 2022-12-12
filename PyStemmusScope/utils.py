@@ -148,17 +148,17 @@ def _check_bbox(coordinates):
     raise NotImplementedError
 
 
-def check_time_fmt(config):
+def check_time_fmt(start, end):
     """Check the format of time."""
     # check if start/end time can be converted to the iso format
-    if config["StartTime"] == "NA":
+    if start == "NA":
         start_time = None
     else:
-        start_time = datetime.strptime(config["StartTime"],'%Y-%m-%dT%H:%M')
-    if config["EndTime"] == "NA":
+        start_time = datetime.strptime(start,'%Y-%m-%dT%H:%M')
+    if end== "NA":
         end_time = None
     else:
-        end_time = datetime.strptime(config["EndTime"],'%Y-%m-%dT%H:%M')
+        end_time = datetime.strptime(end,'%Y-%m-%dT%H:%M')
 
     for time in [start_time, end_time]:
         if time is not None and time.minute not in [0, 30]:
