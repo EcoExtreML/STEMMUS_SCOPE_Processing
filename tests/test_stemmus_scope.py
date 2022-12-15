@@ -62,7 +62,7 @@ class TestWithDefaults:
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-07-11-1200"
 
-            cfg_file, _ = model.setup()
+            cfg_file = model.setup()
             return model, cfg_file
 
     def test_setup(self, model_with_setup):
@@ -122,7 +122,7 @@ class TestWithCustomSetup:
     def model_with_setup(self, model, tmp_path):
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-07-11-1200"
-            cfg_file, _ = model.setup(
+            cfg_file = model.setup(
                 WorkDir = str(tmp_path),
                 Location="XX-Xxx",
                 StartTime="1996-01-01T00:00",
@@ -191,7 +191,7 @@ class TestWithMatlab:
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-07-11-1200"
 
-            cfg_file, _ = model.setup()
+            cfg_file = model.setup()
             return model, cfg_file
 
     @patch("subprocess.Popen")
@@ -243,7 +243,7 @@ class TestWithOctave:
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-07-11-1200"
 
-            cfg_file, _ = model.setup()
+            cfg_file = model.setup()
             return model, cfg_file
 
     @patch("subprocess.Popen")

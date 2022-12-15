@@ -129,14 +129,12 @@ class StemmusScope():
 
         Returns:
             Path to the config file
-            Forcing filename
         """
         # update config template if needed
         if WorkDir:
             self._config["WorkDir"] = WorkDir
 
         if Location:
-            _ = utils.check_location_fmt(Location)
             self._config["Location"] = Location
 
         if StartTime:
@@ -145,26 +143,18 @@ class StemmusScope():
         if EndTime:
             self._config["EndTime"] = EndTime
 
-        utils.check_time_fmt(self._config)
-
-        # get forcing files from location
-        forcing_filename = utils.get_forcing_file(self._config)
+        # validate config *before* directory creation
+        config_io.validate_config(self._config)
 
         # create customized config file and input/output directories for model run
-        _, _, self.cfg_file = config_io.create_io_dir(
-            forcing_filename, self._config
-            )
+        _, _, self.cfg_file = config_io.create_io_dir(self._config)
 
-        # read the run config file
         self._config = config_io.read_config(self.cfg_file)
 
-        # prepare forcing data
-        forcing_io.prepare_forcing(self._config, forcing_filename)
+        forcing_io.prepare_forcing(self._config)
+        soil_io.prepare_soil_data(self._config)
 
-        # prepare soil data
-        soil_io.prepare_soil_data(self._config, forcing_filename)
-
-        return str(self.cfg_file), forcing_filename
+        return str(self.cfg_file)
 
     def run(self) -> str:
         """Run model using executable.

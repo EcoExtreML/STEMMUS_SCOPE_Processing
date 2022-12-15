@@ -85,8 +85,8 @@ def get_forcing_file(config):
             raise ValueError(f"Forcing file does not exist for the given site {location}.")
         if len(forcing_file) > 1:
             raise ValueError(f"Multiple forcing files exist for the given site {location}." +
-                "Please check your focing files and remove the redundant files.")
-        forcing_file = forcing_file[0]
+                "Please check your forcing files and remove the redundant files.")
+        forcing_file = Path(config["ForcingPath"]) / forcing_file[0]
 
     elif fmt == "latlon":
         raise NotImplementedError

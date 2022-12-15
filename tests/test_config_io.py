@@ -34,11 +34,10 @@ class TestConfigIO:
 
         assert config == expected_config
 
-    def test_create_io_dir(dummy_config):
-        nc_file = "XX-Xxx_dummy_forcing_file.nc"
+    def test_create_io_dir(self):
         path_to_config_file = data_folder / "config_file_test.txt"
         config = config_io.read_config(path_to_config_file)
-        input_dir, output_dir, config_path = config_io.create_io_dir(nc_file, config)
+        input_dir, output_dir, config_path = config_io.create_io_dir(config)
         assert Path(input_dir).is_dir()
         assert Path(output_dir).is_dir()
         assert Path(config_path).exists()

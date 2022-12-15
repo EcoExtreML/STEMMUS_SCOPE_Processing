@@ -63,10 +63,9 @@ def test_full_routine(tmp_path):
     cfg_file = data_folder / "config_file_test.txt"
     config = config_io.read_config(cfg_file)
     config['InputPath'] = str(tmp_path)
-    forcing_filename = "XX-Xxx_dummy_forcing_file.nc"
 
     matfile_path = Path(tmp_path) / 'soil_parameters.mat'
-    soil_io.prepare_soil_data(config, forcing_filename)
+    soil_io.prepare_soil_data(config)
 
     assert matfile_path.exists()
 

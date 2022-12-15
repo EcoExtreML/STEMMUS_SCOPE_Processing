@@ -129,9 +129,8 @@ def test_full_routine(tmp_path, dat_files):
     config = config_io.read_config(cfg_file)
     config['Location'] =  "FI-Hyy"
     config['InputPath'] = str(tmp_path)
-    forcing_filename = "FI-Hyy_1996-2014_FLUXNET2015_Met.nc"
 
-    forcing_io.prepare_forcing(config, forcing_filename)
+    forcing_io.prepare_forcing(config)
     fnames, _ = dat_files
     expected_files = fnames + ['LAI_.dat', 'Mdata.txt', 'forcing_globals.mat']
     for file in expected_files:

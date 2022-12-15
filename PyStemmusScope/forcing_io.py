@@ -171,7 +171,7 @@ def prepare_global_variables(data, input_path):
     utils.remove_dates_from_header(input_path / "forcing_globals.mat")
 
 
-def prepare_forcing(config, forcing_filename):
+def prepare_forcing(config):
     """Function to prepare the forcing files required by STEMMUS_SCOPE.
 
     The input directory should be taken from the model configuration file.
@@ -180,13 +180,12 @@ def prepare_forcing(config, forcing_filename):
 
     Args:
         config (dict): The PyStemmusScope configuration dictionary.
-        forcing_filename (str): Forcing file name.
     """
 
     input_path = Path(config["InputPath"])
 
     # Read the required data from the forcing file into a dictionary
-    forcing_file = Path(config["ForcingPath"]) / forcing_filename
+    forcing_file = utils.get_forcing_file(config)
     data = read_forcing_data(forcing_file, config["StartTime"], config["EndTime"])
 
     # Write the single-column ascii '.dat' files to the input directory

@@ -127,27 +127,27 @@ class TestTime:
         config = config_file
         config["StartTime"] = "NA"
         config["StartTime"] = "NA"
-        utils.check_time_fmt(config)
+        utils.check_time_fmt(config["StartTime"], config["EndTime"])
 
     def test_time_fmt_not_iso(self, config_file):
         config = config_file
         config["StartTime"] = "03/02/1978 12:35"
         with pytest.raises(ValueError):
-            utils.check_time_fmt(config)
+            utils.check_time_fmt(config["StartTime"], config["EndTime"])
 
     def test_time_fmt_error_timerange(self, config_file):
         config = config_file
         config["StartTime"] = "2026-01-01T00:00"
         config["EndTime"] = "1926-01-01T00:00"
         with pytest.raises(ValueError):
-            utils.check_time_fmt(config_file)
+            utils.check_time_fmt(config["StartTime"], config["EndTime"])
 
     def test_time_fmt_error_invalid_mins(self, config_file):
         config = config_file
         config["StartTime"] = "1996-01-01T00:10"
         config["EndTime"] = "1996-01-02T00:00"
         with pytest.raises(ValueError):
-            utils.check_time_fmt(config_file)
+            utils.check_time_fmt(config["StartTime"], config["EndTime"])
 
 
 class TestGetForcingFile():
@@ -162,7 +162,7 @@ class TestGetForcingFile():
         config["Location"] = "FI-Hyy"
         forcing_file = utils.get_forcing_file(config_file)
 
-        assert forcing_file == "FI-Hyy_1996-2014_FLUXNET2015_Met.nc"
+        assert forcing_file.name == "FI-Hyy_1996-2014_FLUXNET2015_Met.nc"
 
     def test_get_forcing_file_site_not_found(self, config_file):
         config = config_file
