@@ -7,9 +7,9 @@ import logging
 import os
 import shutil
 import time
-from . import utils
 from pathlib import Path
 from typing import Union
+from . import utils
 
 
 logger = logging.getLogger(__name__)
@@ -126,9 +126,7 @@ def _update_config_file(input_dir, output_dir, config, station_name, timestamp):
     config_file_path = input_dir / f"{station_name}_{timestamp}_config.txt"
     with open(config_file_path, 'w', encoding="utf8") as f:
         for key, value in config.items():
-            if key == "Location":
-                update_entry = f"{key}={station_name}\n"
-            elif key == "InputPath":
+            if key == "InputPath":
                 update_entry = f"{key}={str(input_dir)}/\n"
             elif key == "OutputPath":
                 update_entry = f"{key}={str(output_dir)}/\n"

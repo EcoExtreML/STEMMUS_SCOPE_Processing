@@ -84,8 +84,8 @@ class TestLocation:
         ("CA-SF1", "CA-SF1", "site"),
         ("(56.4, 112.0)", (56.4, 112.0), "latlon"),
         ("(+56.4, -10)", (56.4, -10), "latlon"),
-        ("[[19.5, 125.5], [20.5, 130.0]]", ((19.5, 125.5), (20.5, 130.0)), "bbox"),
-        ("[[19.5, -125.5], [20.5, -120.0]]", ((19.5, -125.5), (20.5, -120.0)), "bbox"),
+        ("((19.5, 125.5), (20.5, 130.0))", ((19.5, 125.5), (20.5, 130.0)), "bbox"),
+        ("((19.5, -125.5), (20.5, -120.0))", ((19.5, -125.5), (20.5, -120.0)), "bbox"),
     ]
 
     invalid_input = [
@@ -111,7 +111,7 @@ class TestLocation:
             utils.check_location_fmt(test_location)
 
     def _check_lat_lon(self):
-        coordinates = [[19.5, 125.5], [19.5, 130.0], [20.5, 125.5], [20.5, 130.0]]
+        coordinates = ((19.5, 125.5), (19.5, 130.0), (20.5, 125.5), (20.5, 130.0))
         with pytest.raises(NotImplementedError):
             utils.check_location_fmt(coordinates)
 
@@ -178,6 +178,6 @@ class TestGetForcingFile():
 
     def test_get_forcing_file_bbox(self, config_file):
         config = config_file
-        config["Location"] = "[[19.5,125.5], [20.5,130.0]]"
+        config["Location"] = "((19.5,125.5), (20.5,130.0))"
         with pytest.raises(NotImplementedError):
             utils.get_forcing_file(config_file)

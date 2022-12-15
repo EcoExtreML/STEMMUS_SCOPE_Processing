@@ -103,7 +103,7 @@ def check_location_fmt(loc):
     - Site name, e.g., "DE-Kli"
     - Latitude and longitude, e.g. "(56.4, 112.0)"
     - A rectangular bounding box, described with two opposing corners:
-        [[lat1, lon1], [lat2, lon2]], e.g., "[[19.5, 125.5], [20.5, 130.0]]".
+        ((lat1, lon1), (lat2, lon2)), e.g., "((19.5, 125.5), (20.5, 130.0))".
 
     Args:
         loc (str): Location extracted from the config file.
@@ -117,7 +117,7 @@ def check_location_fmt(loc):
 
     site_pattern = r"[A-Z]{2}-([A-z]|\d){3}"
     latlon_pattern = rf"\(({flstr}),\s?({flstr})\)"
-    bbox_pattern = rf"\[\[({flstr}),\s?({flstr})\],\s?\[({flstr}),\s?({flstr})\]\]"
+    bbox_pattern = rf"\(\(({flstr}),\s?({flstr})\),\s?\(({flstr}),\s?({flstr})\)\)"
 
     if re.fullmatch(site_pattern, loc):
         return loc, "site"

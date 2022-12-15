@@ -71,7 +71,6 @@ class TestSaveForcingData:
 
         config = config_io.read_config(config_path)
         forcing_file = utils.get_forcing_file(config)
-        print(forcing_file)
         forcing_data = forcing_io.read_forcing_data(
             forcing_file, model.config["StartTime"], model.config["EndTime"],
         )
