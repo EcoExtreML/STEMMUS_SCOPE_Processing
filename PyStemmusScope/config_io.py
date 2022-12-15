@@ -8,6 +8,8 @@ import os
 import shutil
 import time
 from . import utils
+from pathlib import Path
+from typing import Union
 
 
 logger = logging.getLogger(__name__)
@@ -29,9 +31,24 @@ def read_config(path_to_config_file):
             (key, val) = line.split("=")
             config[key] = val.rstrip('\n')
 
+    validate_config(config)
+
     return config
 
-def create_io_dir(forcing_filename, config):
+
+def validate_config(config: Union[Path, dict]):
+    if isinstance(config, Path):
+        config = read_config(config)
+    elif not isinstance(config, dict):
+        raise ValueError("The input to validate_config should be either a Path or dict"
+                         f" object, but a {type(config)} object was passed.")
+
+    # TODO: add check if the input data directories/file exist, and return clear error to user.
+    _ = utils.check_location_fmt(config["Location"])
+    utils.check_time_fmt(config["StartTime"], config["EndTime"])
+
+
+def create_io_dir(config):
     """Create input directory and copy required files.
 
     Work flow executor to create work directory and all sub-directories.
@@ -41,7 +58,12 @@ def create_io_dir(forcing_filename, config):
     """
     # get start time with the format Y-M-D-HM
     timestamp = time.strftime('%Y-%m-%d-%H%M')
-    station_name = forcing_filename.split('_')[0]
+
+    loc, fmt = utils.check_location_fmt(config["Location"])
+    if fmt == "site":
+        station_name = loc
+    else:
+        raise NotImplementedError()
 
     # create input directory
     work_dir = utils.to_absolute_path(config['WorkDir'])
@@ -65,6 +87,7 @@ def create_io_dir(forcing_filename, config):
 
     return str(input_dir), str(output_dir), config_file_path
 
+
 def _copy_data(input_dir, config):
     """Copy required data to the work directory.
 
@@ -82,6 +105,7 @@ def _copy_data(input_dir, config):
 
     # copy input_data.xlsx
     shutil.copy(str(config["input_data"]), str(input_dir))
+
 
 def _update_config_file(input_dir, output_dir, config, station_name, timestamp):
     """Update config file for each station.
