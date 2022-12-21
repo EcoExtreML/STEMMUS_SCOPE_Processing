@@ -209,10 +209,10 @@ def _slice_forcing_file(ds_forcing, start_time, end_time):
 
     Args:
         ds_forcing (xr.Dataset): Dataset of forcing file.
-        start_time (str): Start of time range in ISO format string e.g. 'YYYY-MM-DDTHH:MM:SS'. If "NA", start time will be the
-            first timestamp of the forcing input data.
-        end_time (str): End of time range in ISO format string e.g. 'YYYY-MM-DDTHH:MM:SS'. If "NA", end time will be the
-            last timestamp of the forcing input data.
+        start_time (str): Start of time range in ISO format string e.g. 'YYYY-MM-DDTHH:MM:SS'. 
+            If "NA", start time will be the first timestamp of the forcing input data.
+        end_time (str): End of time range in ISO format string e.g. 'YYYY-MM-DDTHH:MM:SS'. 
+            If "NA", end time will be the last timestamp of the forcing input data.
 
     Returns:
         Forcing dataset, sliced with the start and end time.

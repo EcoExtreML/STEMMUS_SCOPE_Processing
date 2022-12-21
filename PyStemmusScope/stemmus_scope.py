@@ -124,7 +124,8 @@ class StemmusScope():
         Args:
             WorkDir: path to a directory where input/output directories should be created.
             ForcingFileName: forcing file name. Forcing file should be in netcdf format.
-            StartTime: Start time of the model run. It must be in ISO format (e.g. 2007-01-01T00:00).
+            StartTime: Start time of the model run. It must be in 
+                ISO format (e.g. 2007-01-01T00:00).
             EndTime: End time of the model run. It must be in ISO format (e.g. 2007-01-01T00:00).
 
         Returns:
