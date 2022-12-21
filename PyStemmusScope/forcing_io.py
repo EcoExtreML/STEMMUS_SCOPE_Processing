@@ -22,12 +22,14 @@ def _write_matlab_ascii(fname, data, ncols):
     np.savetxt(fname, data, multi_fmt)
 
 
-def read_forcing_data(forcing_file):
+def read_forcing_data(forcing_file, start_time, end_time):
     """Reads the forcing data from the provided netCDF file, and applies the required
     unit conversions before returning the read data.
 
     Args:
         forcing_file (Path): Path to the netCDF file containing the forcing data
+        start_time (str): Start of time range in ISO format string e.g. 'YYYY-MM-DDTHH:MM:SS'.
+        end_time (str): End of time range in ISO format string e.g. 'YYYY-MM-DDTHH:MM:SS'.
 
     Returns:
         dict: Dictionary containing the different variables required by STEMMUS_SCOPE
@@ -37,6 +39,14 @@ def read_forcing_data(forcing_file):
 
     # remove the x and y coordinates from the data variables to make the numpy arrays 1D
     ds_forcing = ds_forcing.squeeze(['x', 'y'])
+
+    # check if time range is covered by forcing
+    # if so, return a subset of forcing matching the given time range
+    ds_forcing = _slice_forcing_file(
+        ds_forcing,
+        start_time,
+        end_time,
+        )
 
     data = {}
 
@@ -138,7 +148,7 @@ def write_meteo_file(data, fname):
     _write_matlab_ascii(fname, meteo_file_data, ncols=len(meteo_data_vars))
 
 
-def prepare_global_variables(data, input_path, config):
+def prepare_global_variables(data, input_path):
     """Function to read and calculate global variables for STEMMUS_SCOPE from the
     forcing data. Data will be written to a Matlab binary file (v7.3), under the name
     'forcing_globals.mat' in the specified input directory.
@@ -149,10 +159,7 @@ def prepare_global_variables(data, input_path, config):
         input_path (Path): Path to which the file should be written to.
         config (dict): The PyStemmusScope configuration dictionary.
     """
-    if config['NumberOfTimeSteps'] != 'NA':
-        total_duration = min(int(config['NumberOfTimeSteps']), data['total_timesteps'])
-    else:
-        total_duration = data['total_timesteps']
+    total_duration = data['total_timesteps']
 
     matfile_vars = ['latitude', 'longitude', 'elevation', 'IGBP_veg_long',
                     'reference_height', 'canopy_height', 'DELT', 'sitename']
@@ -165,8 +172,11 @@ def prepare_global_variables(data, input_path, config):
 
 
 def prepare_forcing(config):
-    """Function to prepare the forcing files required by STEMMUS_SCOPE. The input
-        directory should be taken from the model configuration file.
+    """Function to prepare the forcing files required by STEMMUS_SCOPE.
+
+    The input directory should be taken from the model configuration file.
+    A subset of forcing file will be generated if the time range is covered
+    by the time of existing forcing file.
 
     Args:
         config (dict): The PyStemmusScope configuration dictionary.
@@ -175,8 +185,8 @@ def prepare_forcing(config):
     input_path = Path(config["InputPath"])
 
     # Read the required data from the forcing file into a dictionary
-    forcing_file = Path(config["ForcingPath"]) / config["ForcingFileName"]
-    data = read_forcing_data(forcing_file)
+    forcing_file = utils.get_forcing_file(config)
+    data = read_forcing_data(forcing_file, config["StartTime"], config["EndTime"])
 
     # Write the single-column ascii '.dat' files to the input directory
     write_dat_files(data, input_path)
@@ -189,4 +199,36 @@ def prepare_forcing(config):
 
     # Write the remaining variables (without time dependency) to the matlab v7.3
     #  file 'forcing_globals.mat'
-    prepare_global_variables(data, input_path, config)
+    prepare_global_variables(data, input_path)
+
+
+def _slice_forcing_file(ds_forcing, start_time, end_time):
+    """Get the subset of forcing file based on time range in config
+
+    Also check if the desired time range is covered by forcing file.
+
+    Args:
+        ds_forcing (xr.Dataset): Dataset of forcing file.
+        start_time (str): Start of time range in ISO format string e.g. 'YYYY-MM-DDTHH:MM:SS'. 
+            If "NA", start time will be the first timestamp of the forcing input data.
+        end_time (str): End of time range in ISO format string e.g. 'YYYY-MM-DDTHH:MM:SS'. 
+            If "NA", end time will be the last timestamp of the forcing input data.
+
+    Returns:
+        Forcing dataset, sliced with the start and end time.
+    """
+    start_time = None if start_time == "NA" else np.datetime64(start_time)
+    end_time = None if end_time == "NA" else np.datetime64(end_time)
+
+    start_time_forcing = ds_forcing.coords["time"].values[0]
+    end_time_forcing = ds_forcing.coords["time"].values[-1]
+
+    start_time_valid = start_time >= start_time_forcing if start_time else True
+    end_time_valid = end_time <= end_time_forcing if end_time else True
+    if not (start_time_valid and end_time_valid):
+        raise ValueError(
+            f"Given time range (from {start_time} to {end_time}) cannot be covered by"
+            f"the time range of forcing file (from {start_time_forcing} to "
+            f"{end_time_forcing}).")
+
+    return ds_forcing.sel(time=slice(start_time, end_time))

@@ -2,8 +2,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
-from PyStemmusScope import forcing_io
 from PyStemmusScope import config_io
+from PyStemmusScope import forcing_io
 from . import data_folder
 
 
@@ -33,7 +33,7 @@ def eval_str(fdata):
 def forcing_data():
     forcing_file = (forcing_data_folder /
                     "FI-Hyy_1996-2014_FLUXNET2015_Met.nc")
-    return forcing_io.read_forcing_data(forcing_file)
+    return forcing_io.read_forcing_data(forcing_file, "1996-01-01T00:00", "1996-01-01T02:00")
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -117,12 +117,17 @@ def test_dat_file_format(dat_files):
             eval_str(f.read())
 
 
+def test_forcing_slice_NA():
+    forcing_file = (forcing_data_folder /
+                    "FI-Hyy_1996-2014_FLUXNET2015_Met.nc")
+    return forcing_io.read_forcing_data(forcing_file, "NA", "NA")
+
+
 def test_full_routine(tmp_path, dat_files):
     # create dummy config
     cfg_file = data_folder / "config_file_test.txt"
     config = config_io.read_config(cfg_file)
-    config['ForcingFileName'] =  "FI-Hyy_1996-2014_FLUXNET2015_Met.nc"
-    config['NumberOfTimeSteps'] = 5
+    config['Location'] =  "FI-Hyy"
     config['InputPath'] = str(tmp_path)
 
     forcing_io.prepare_forcing(config)
