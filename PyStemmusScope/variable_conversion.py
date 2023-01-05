@@ -1,18 +1,21 @@
 import numpy as np
+import xarray as xr
 
 
 def calculate_ea(t_air_celcius, rh):
-    """Function that calculates the actual vapour pressure (kPa) from the
-    air temperature (degree Celcius) and relative humidity (%)
+    """Calculate the actual vapor pressure.
+
+    Calculate the actual vapor pressure (kPa) from the air temperature (degree Celcius)
+    and relative humidity (%).
 
     Args:
-        t_air_celcius: numpy array containing the air temperature in degrees C.
+        t_air_celcius: the air temperature in degrees C.
 
-        rh: numpy array of same shape as t_air_celcius, containing the relative humidity
-            as a percentage (e.g. ranging from 0 - 100).
+        rh: the relative humidity (same shape as t_air_celcius) as a percentage
+            (e.g. ranging from 0 - 100).
 
     Returns:
-        numpy array with the calculated actual vapor pressure
+        the actual vapor pressure
     """
     # Teten O. Über einige meteorologische Begriffe. Z. Geophys., 1930; 6. 297-309.
     # Murray FW. On the computation of saturation vapor pressure,
@@ -26,8 +29,23 @@ def calculate_ea(t_air_celcius, rh):
     if rh.shape != t_air_celcius.shape:
         raise ValueError("input arrays should have the same shape (size).")
 
-    es = 0.61078 * 10 ** (t_air_celcius * 7.5 / (237.3 + t_air_celcius))
-    return es * rh / 100
+    return calculate_es(t_air_celcius) * rh / 100
+
+
+def calculate_es(t_celcius):
+    """Calculate the saturation vapor pressure (kPa) from temperature (deg C).
+
+    Args:
+        t_celcius: the temperature in degrees C.
+
+    Returns:
+        saturation vapor pressure
+    """
+    # Teten O. Über einige meteorologische Begriffe. Z. Geophys., 1930; 6. 297-309.
+    # Murray FW. On the computation of saturation vapor pressure,
+    #   J. Appl. Meteorol., 1967; 6, 203-204
+
+    return 0.61078 * 10 ** (t_celcius * 7.5 / (237.3 + t_celcius))
 
 
 def co2_molar_fraction_to_kg_per_m3(molar_fraction):
@@ -48,6 +66,30 @@ def co2_molar_fraction_to_kg_per_m3(molar_fraction):
     avg_molar_mass_air = 28.9647 # [kg/mol]
     molar_density_air = avg_molar_mass_air / avg_density_air # [m3/mol]
     return molar_fraction * molecular_weight_co2 / molar_density_air
+
+
+def deaccumulate_era5land(era5_dataarray: xr.DataArray) -> xr.DataArray:
+    """Deaccumulates and differentiates era5-land accumulated variables.
+
+    Note: the assumption is that that the time resolution is 1 hour, and that first
+    time index is midnight.
+
+    Args:
+        era5_dataarray: Accumulated variable
+
+    Returns:
+        Deaccumulated and differentiated variable
+    """
+    SECONDS_PER_TIMESTEP = 3600
+
+    vals = era5_dataarray.values
+    midnights = vals[::24]
+    midnights[0] = 0
+    midnights[1::] -= vals[24::24]
+    vals = np.insert(np.diff(vals, 1), 0, 0)
+    vals[::24] = midnights
+
+    return era5_dataarray.where(False, vals) / SECONDS_PER_TIMESTEP
 
 
 def mask_data(data, min_value=None, max_value=None):
