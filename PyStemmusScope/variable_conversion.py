@@ -48,6 +48,23 @@ def calculate_es(t_celcius):
     return 0.61078 * 10 ** (t_celcius * 7.5 / (237.3 + t_celcius))
 
 
+def specific_humidity(e_a, p_air):
+    """Calculate the humidity [kg water / m3 air] using e_a and the air pressure
+
+    See: Pal Arya, S.: Introduction to Micrometeorology, Academic Press,
+        San Diego, California, 1988.
+
+    Args:
+        e_a: Actual vapor pressure
+        p_air: Air pressure (same units as e_a)
+
+    Returns:
+        Specific humidity [kg water / m3 air]
+    """
+    EPSILON = 0.622 # ratio of molecular mass of water vapour to dry air
+    return EPSILON * e_a / p_air
+
+
 def co2_molar_fraction_to_kg_per_m3(molar_fraction):
     """Function to convert CO2 molar fraction [mol cO2/mol air] to CO2
     concentration in [kg CO2 / m3 air]
