@@ -67,7 +67,7 @@ class TestSaveForcingData:
         dataset = xr.open_dataset(saved_nc_file)
 
         forcing_file = Path(model.config["ForcingPath"]) / model.config["ForcingFileName"]
-        forcing_data = forcing_io.read_forcing_data(forcing_file)
+        forcing_data = forcing_io.read_forcing_data_plumber2(forcing_file)
 
         # check data values
         expected = forcing_data["lw_down"].values[:3]
@@ -148,7 +148,7 @@ class TestSaveSimulatedData:
         dataset = xr.open_dataset(saved_nc_file)
 
         forcing_file = Path(model.config["ForcingPath"]) / model.config["ForcingFileName"]
-        forcing_data = forcing_io.read_forcing_data(forcing_file)
+        forcing_data = forcing_io.read_forcing_data_plumber2(forcing_file)
 
         # check data values
         LWnet = np.array([-45.79605, -44.41207, -41.13654, -43.51004, -42.69192])
@@ -231,7 +231,7 @@ class TestSoilData:
         dataset = xr.open_dataset(saved_nc_file)
 
         forcing_file = Path(model.config["ForcingPath"]) / model.config["ForcingFileName"]
-        forcing_data = forcing_io.read_forcing_data(forcing_file)
+        forcing_data = forcing_io.read_forcing_data_plumber2(forcing_file)
         # check data values
         SoilMoist = np.array([2.21277, 2.236381, 2.256538, 4.571108])
         np.testing.assert_allclose(
@@ -332,7 +332,7 @@ class TestSaveToNetcdf:
         dataset = xr.open_dataset(saved_nc_file)
 
         forcing_file = Path(model.config["ForcingPath"]) / model.config["ForcingFileName"]
-        forcing_data = forcing_io.read_forcing_data(forcing_file)
+        forcing_data = forcing_io.read_forcing_data_plumber2(forcing_file)
 
         # check size of time dimension
         assert dataset["time"].shape[0] == forcing_data["time"].shape[0]

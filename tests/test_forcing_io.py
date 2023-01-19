@@ -33,7 +33,7 @@ def eval_str(fdata):
 def forcing_data():
     forcing_file = (forcing_data_folder /
                     "FI-Hyy_1996-2014_FLUXNET2015_Met.nc")
-    return forcing_io.read_forcing_data(forcing_file)
+    return forcing_io.read_forcing_data_plumber2(forcing_file)
 
 
 @pytest.fixture(scope='session', autouse=True)

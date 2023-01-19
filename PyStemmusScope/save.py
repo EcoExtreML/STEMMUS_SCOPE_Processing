@@ -279,7 +279,7 @@ def to_netcdf(config_file: str, cf_filename: str) -> str:
     }
 
     # read forcing file into a dict
-    forcing_dict = forcing_io.read_forcing_data(
+    forcing_dict = forcing_io.read_forcing_data_plumber2(
         Path(config["ForcingPath"]) / config["ForcingFileName"]
     )
 
