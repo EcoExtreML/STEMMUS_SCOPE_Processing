@@ -38,6 +38,12 @@ Table of contents
     API reference <autoapi/index.rst>
 
 .. toctree::
+    :caption: Quick links
+
+    PyStemmusScope on Github <https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing>
+    STEMMUS_SCOPE on Github <https://github.com/EcoExtreML/STEMMUS_SCOPE>
+
+.. toctree::
     :maxdepth: 0
     :hidden:
 
