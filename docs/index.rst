@@ -19,16 +19,37 @@ For a guide on how to setup and run the model, see the :doc:`User guide <readme_
 If you are interested in contributing to the PyStemmusScope code, see the
 :doc:`Contributing guide <contributing_link>`.
 
+Table of contents
+*****************
+
+.. toctree::
+    :caption: Getting started
+    :maxdepth: 2
+
+    User guide <readme_link>
+    _notebooks/run_model_in_notebook.ipynb
+
+.. toctree::
+    :caption: PyStemmusScope
+    :maxdepth: 2
+
+    Contributing guide <contributing_link>
+    Changelog <CHANGELOG.md>
+    API reference <autoapi/index.rst>
+
+.. toctree::
+    :maxdepth: 0
+    :hidden:
+
+    Project Setup <project_setup.md>
+    _notebooks/verify_model_modifications.ipynb
+    Code of Conduct <CODE_OF_CONDUCT.md>
+    Developer Readme <README.dev.md>
+
+
 Credits
 -------
 
 This package was created with
 `Cookiecutter <https://github.com/audreyr/cookiecutter>`_ and the
 `NLeSC/python-template <https://github.com/NLeSC/python-template>`_.
-
-.. toctree::
-  :maxdepth: 0
-  :hidden:
-
-  User guide <readme_link>
-  Contributing guide <contributing_link>

@@ -46,6 +46,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "autoapi.extension",
     "myst_parser",
+    'nbsphinx',
 ]
 
 source_suffix = {
@@ -54,6 +55,8 @@ source_suffix = {
     '.md': 'markdown',
 }
 myst_heading_anchors = 3
+
+html_sourcelink_suffix = ''  # Allows downloading ipynb source files
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -81,7 +84,22 @@ html_theme = "sphinx_rtd_theme"
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'display_version': True,
+    'prev_next_buttons_location': 'bottom',
+    'style_external_links': False,
+    'vcs_pageview_mode': '',
+    # Toc options
+    'collapse_navigation': True,
+    'sticky_navigation': True,
+    'navigation_depth': 4,
+    'includehidden': False,
+    'titles_only': False
+}
+
+#master_doc = "contents"
+
+html_logo = "./ecoextreml_logo.png"
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -108,3 +126,7 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
                        # 'scikit-learn': ('https://scikit-learn.org/stable/', None),
                        # 'matplotlib': ('https://matplotlib.org/stable/', None),
                        }
+
+print("Copy the instruction notebooks into docs/_notebooks")
+import shutil
+shutil.copytree("../notebooks", "./_notebooks", dirs_exist_ok=True)
