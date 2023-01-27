@@ -1,5 +1,9 @@
 import numpy as np
 import xarray as xr
+from typing import Union
+
+
+AVG_DENSITY_AIR = 1.292 # [kg/m3]
 
 
 def calculate_ea(t_air_celcius, rh):
@@ -65,9 +69,10 @@ def specific_humidity(e_a, p_air):
     return EPSILON * e_a / p_air
 
 
-def co2_molar_fraction_to_kg_per_m3(molar_fraction):
-    """Function to convert CO2 molar fraction [mol cO2/mol air] to CO2
-    concentration in [kg CO2 / m3 air]
+def co2_molar_fraction_to_kg_per_m3(
+    molar_fraction: Union[float, np.array, xr.DataArray]
+    ):
+    """Convert CO2 molar fraction [mol cO2/mol air] to concentration in [kg CO2/m3 air].
 
     Note: the density of air [kg/m3] used for the calculation is assumed to be constant
     here, but will vary depending on the air pressure and air temperature.
@@ -79,10 +84,26 @@ def co2_molar_fraction_to_kg_per_m3(molar_fraction):
         Same as input: CO2 concentration in [kg CO2 / m3 air]
     """
     molecular_weight_co2 = 44.01 # [kg/mol]
-    avg_density_air = 1.292 # [kg/m3]
     avg_molar_mass_air = 28.9647 # [kg/mol]
-    molar_density_air = avg_molar_mass_air / avg_density_air # [m3/mol]
+    molar_density_air = avg_molar_mass_air / AVG_DENSITY_AIR # [m3/mol]
     return molar_fraction * molecular_weight_co2 / molar_density_air
+
+
+def co2_mass_fraction_to_kg_per_m3(
+    mass_fraction: Union[float, np.array, xr.DataArray]
+    ):
+    """Convert CO2 mass fraction [kg cO2/kg air] to concentration in [kg CO2/m3 air].
+
+    Note: the density of air [kg/m3] used for the calculation is assumed to be constant
+    here, but will vary depending on the air pressure and air temperature.
+
+    Args:
+        molar_fraction: CO2 concentration as mass fraction
+
+    Returns:
+        Same as input: CO2 concentration in [kg CO2 / m3 air]
+    """
+    return mass_fraction * AVG_DENSITY_AIR
 
 
 def deaccumulate_era5land(era5_dataarray: xr.DataArray) -> xr.DataArray:

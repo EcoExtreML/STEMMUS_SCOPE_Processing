@@ -104,10 +104,10 @@ def extract_era5_data(  # pylint: disable=too-many-arguments
 
     Args:
         files_era5: List of era5 files.
-        lat: Latitude of the site
-        lon: Longitude of the site
-        start_time: Start time of the model run
-        end_time: End time of the model run
+        lat: Latitude of the site.
+        lon: Longitude of the site.
+        start_time: Start time of the model run.
+        end_time: End time of the model run.
 
     Returns:
         Dictionary containing the variables extracted from era5.
