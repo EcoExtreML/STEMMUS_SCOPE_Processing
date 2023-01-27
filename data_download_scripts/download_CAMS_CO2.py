@@ -4,7 +4,7 @@ import urllib3
 from pathlib import Path
 
 # UID+api key is read here:
-with open(Path.home() / ".adsloginrc") as f:
+with open(Path.home() / ".adsloginrc", encoding="utf8") as f:
     uid = f.readline().strip()
     api_key = f.readline().strip()
 
@@ -21,7 +21,7 @@ c = cdsapi.Client(
 
 names = ("NE", "SE", "NW", "SW")
 area_blocks = (
-   #   N,    W,    S,    E
+    #   N,    W,    S,    E
     [ 90,    0,    0,  180],
     [-0.1,   0,  -90,  180],
     [ 90,  -180,   0, -0.1],

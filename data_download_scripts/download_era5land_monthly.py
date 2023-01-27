@@ -9,7 +9,7 @@ http = urllib3.PoolManager(
     ca_certs=certifi.where()
 )
 
-with open(Path.home() / ".cdsloginrc") as f:
+with open(Path.home() / ".cdsloginrc", encoding="utf8") as f:
     uid = f.readline().strip()
     api_key = f.readline().strip()
 
@@ -20,7 +20,7 @@ c = cdsapi.Client(
 )
 
 variables = ["2m_dewpoint_temperature", "2m_temperature"]
-years = [2016]
+years = [2014]
 months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
 
 for var, year, month in itertools.product(variables, years, months):
@@ -54,8 +54,8 @@ for var, year, month in itertools.product(variables, years, months):
                 "21:00", "22:00", "23:00",
             ],
             "area": [
-                53, 4, 51,
-                6,
+                65, 20, 60,
+                24,
             ],
             "format": "netcdf",
         },

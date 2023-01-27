@@ -8,7 +8,7 @@ http = urllib3.PoolManager(
     ca_certs=certifi.where()
 )
 
-with open(Path.home() / ".cdsloginrc") as f:
+with open(Path.home() / ".cdsloginrc", encoding="utf8") as f:
     uid = f.readline().strip()
     api_key = f.readline().strip()
 
@@ -18,7 +18,7 @@ c = cdsapi.Client(
     verify=True,
 )
 
-years = [2016]
+years = [2014]
 
 for year in years:
     c.retrieve(

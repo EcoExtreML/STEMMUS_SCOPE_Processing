@@ -20,7 +20,7 @@ era5 variables:
  - 10m_v_component_of_wind
 
 ```
-era5cli hourly --variables 10m_u_component_of_wind 10m_v_component_of_wind mean_total_precipitation_rate surface_pressure surface_thermal_radiation_downwards surface_solar_radiation_downwards --startyear 2016 --endyear 2016 --levels surface --area 54 3 50 8
+era5cli hourly --variables 10m_u_component_of_wind 10m_v_component_of_wind mean_total_precipitation_rate surface_pressure surface_thermal_radiation_downwards surface_solar_radiation_downwards --startyear 2016 --endyear 2016 --levels surface --area 65 20 60 24
 ```
 
 ----
