@@ -58,6 +58,12 @@ myst_heading_anchors = 3
 
 html_sourcelink_suffix = ''  # Allows downloading ipynb source files
 
+html_context = {
+    "display_github": False, # Add 'Edit on Github' link instead of 'View page source'
+    "last_updated": True,
+    "commit": False,
+}
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
