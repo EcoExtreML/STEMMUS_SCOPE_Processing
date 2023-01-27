@@ -214,10 +214,10 @@ def prepare_soil_data(config):
         config (dict): The PyStemmusScope configuration dictionary.
     """
 
-    forcing_file = Path(config["ForcingPath"]) / config["ForcingFileName"]
+    forcing_file = utils.get_forcing_file(config)
 
     # Data missing at ID-Pag site. See github.com/EcoExtreML/STEMMUS_SCOPE/issues/77
-    if config["ForcingFileName"].startswith("ID"):
+    if config["Location"].startswith("ID"):
         lat, lon = -1., 112.
     else:
         lat, lon = _retrieve_latlon(forcing_file)

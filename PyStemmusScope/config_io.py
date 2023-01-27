@@ -7,6 +7,8 @@ import logging
 import os
 import shutil
 import time
+from pathlib import Path
+from typing import Union
 from . import utils
 
 
@@ -29,9 +31,24 @@ def read_config(path_to_config_file):
             (key, val) = line.split("=")
             config[key] = val.rstrip('\n')
 
+    validate_config(config)
+
     return config
 
-def create_io_dir(forcing_filename, config):
+
+def validate_config(config: Union[Path, dict]):
+    if isinstance(config, Path):
+        config = read_config(config)
+    elif not isinstance(config, dict):
+        raise ValueError("The input to validate_config should be either a Path or dict"
+                         f" object, but a {type(config)} object was passed.")
+
+    # TODO: add check if the input data directories/file exist, and return clear error to user.
+    _ = utils.check_location_fmt(config["Location"])
+    utils.check_time_fmt(config["StartTime"], config["EndTime"])
+
+
+def create_io_dir(config):
     """Create input directory and copy required files.
 
     Work flow executor to create work directory and all sub-directories.
@@ -41,7 +58,12 @@ def create_io_dir(forcing_filename, config):
     """
     # get start time with the format Y-M-D-HM
     timestamp = time.strftime('%Y-%m-%d-%H%M')
-    station_name = forcing_filename.split('_')[0]
+
+    loc, fmt = utils.check_location_fmt(config["Location"])
+    if fmt == "site":
+        station_name = loc
+    else:
+        raise NotImplementedError()
 
     # create input directory
     work_dir = utils.to_absolute_path(config['WorkDir'])
@@ -60,10 +82,11 @@ def create_io_dir(forcing_filename, config):
     logger.info("%s", message)
 
     # update config file for ForcingFileName and InputPath
-    config_file_path = _update_config_file(forcing_filename, input_dir, output_dir,
+    config_file_path = _update_config_file(input_dir, output_dir,
         config, station_name, timestamp)
 
     return str(input_dir), str(output_dir), config_file_path
+
 
 def _copy_data(input_dir, config):
     """Copy required data to the work directory.
@@ -83,7 +106,8 @@ def _copy_data(input_dir, config):
     # copy input_data.xlsx
     shutil.copy(str(config["input_data"]), str(input_dir))
 
-def _update_config_file(nc_file, input_dir, output_dir, config, station_name, timestamp): #pylint: disable=too-many-arguments
+
+def _update_config_file(input_dir, output_dir, config, station_name, timestamp):
     """Update config file for each station.
 
     Create config file for each forcing/station under the work directory.
@@ -102,9 +126,7 @@ def _update_config_file(nc_file, input_dir, output_dir, config, station_name, ti
     config_file_path = input_dir / f"{station_name}_{timestamp}_config.txt"
     with open(config_file_path, 'w', encoding="utf8") as f:
         for key, value in config.items():
-            if key == "ForcingFileName":
-                update_entry = f"{key}={nc_file}\n"
-            elif key == "InputPath":
+            if key == "InputPath":
                 update_entry = f"{key}={str(input_dir)}/\n"
             elif key == "OutputPath":
                 update_entry = f"{key}={str(output_dir)}/\n"

@@ -1,9 +1,10 @@
 from pathlib import Path
 import numpy as np
 import pytest
-from PyStemmusScope import soil_io
 from PyStemmusScope import config_io
+from PyStemmusScope import soil_io
 from . import data_folder
+
 
 soil_data_folder = data_folder / "directories"/ "model_parameters"/ "soil_property"
 
@@ -61,7 +62,6 @@ def test_full_routine(tmp_path):
     # create dummy config
     cfg_file = data_folder / "config_file_test.txt"
     config = config_io.read_config(cfg_file)
-    config['ForcingFileName'] = "dummy_forcing_file.nc"
     config['InputPath'] = str(tmp_path)
 
     matfile_path = Path(tmp_path) / 'soil_parameters.mat'

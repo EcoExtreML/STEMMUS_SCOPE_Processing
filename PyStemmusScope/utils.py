@@ -1,5 +1,8 @@
 import os
+import re
+from datetime import datetime
 from pathlib import Path
+from typing import Tuple
 import numpy as np
 
 
@@ -21,7 +24,7 @@ def find_nearest_non_nan(da, x, y, xdim="x", ydim="y"):
     return da.isel(distance.argmin(dim=[xdim,ydim]))
 
 
-def convert_to_lsm_coordinates(lat, lon):
+def convert_to_lsm_coordinates(lat: float, lon: float) -> Tuple[int, int]:
     """Converts latitude in degrees North to NCAR's LSM coordinate system: Grid with lat
     values ranging from 0 -- 360, where 0 is the South Pole, and lon values ranging
     from 0 -- 720, where 0 is the prime meridian. Both representing a 0.5 degree
@@ -85,6 +88,103 @@ def to_absolute_path(
         must_exist = os_name() == 'nt'
 
     return pathlike.expanduser().resolve(strict=must_exist)
+
+
+def get_forcing_file(config):
+    """Get forcing file from the location.
+    """
+    location, fmt = check_location_fmt(config["Location"])
+    # check if the forcing file exists for the given locaiton(s)
+    if fmt == "site":
+        # get forcing file list
+        forcing_filenames_list = [file.name for file in Path(config["ForcingPath"]).iterdir()]
+        forcing_file = [filename for filename in forcing_filenames_list if location in filename]
+        if not forcing_file:
+            raise ValueError(f"Forcing file does not exist for the given site {location}.")
+        if len(forcing_file) > 1:
+            raise ValueError(f"Multiple forcing files exist for the given site {location}." +
+                "Please check your forcing files and remove the redundant files.")
+        forcing_file = Path(config["ForcingPath"]) / forcing_file[0]
+
+    elif fmt == "latlon":
+        raise NotImplementedError
+    elif fmt == "bbox":
+        raise NotImplementedError
+
+    return forcing_file
+
+
+def check_location_fmt(loc):
+    """Check the format of the model location.
+
+    Three types of format are supported:
+    - Site name, e.g., "DE-Kli"
+    - Latitude and longitude, e.g. "(56.4, 112.0)"
+    - A rectangular bounding box, described with two opposing corners:
+        ((lat1, lon1), (lat2, lon2)), e.g., "((19.5, 125.5), (20.5, 130.0))".
+
+    Args:
+        loc (str): Location extracted from the config file.
+
+    Returns:
+        Site name (string), location (tuple), or bounding box (tuple of tuples),
+        Location format (string)
+    """
+    # Matches a floating-point like number. I.e., 5.23 or -2.0
+    flstr = r"[+-]?\d*[\.]?\d*"
+
+    site_pattern = r"[A-Z]{2}-([A-z]|\d){3}"
+    latlon_pattern = rf"\(({flstr}),\s?({flstr})\)"
+    bbox_pattern = rf"\(\(({flstr}),\s?({flstr})\),\s?\(({flstr}),\s?({flstr})\)\)"
+
+    if re.fullmatch(site_pattern, loc):
+        return loc, "site"
+
+    latlon = re.findall(latlon_pattern, loc)
+    if len(latlon) == 1:
+        # TODO: add check if lat/lon are valid
+        return tuple(float(x) for x in latlon[0]), "latlon"
+
+    bbox = re.findall(bbox_pattern, loc)
+    if len(bbox) == 1:
+        bbox = [float(x) for x in bbox[0]]
+        # TODO: add check if bbox values are valid
+        return ((bbox[0], bbox[1]), (bbox[2], bbox[3])), "bbox"
+
+    raise ValueError(
+        f"Location '{loc}' in the config file does not match expected format."
+    )
+
+
+def _check_lat_lon(coordinates):
+    """Check if the coordinates exists."""
+    raise NotImplementedError
+
+
+def _check_bbox(coordinates):
+    """Check if the bounding box input is valid"""
+    raise NotImplementedError
+
+
+def check_time_fmt(start, end):
+    """Check the format of time."""
+    # check if start/end time can be converted to the iso format
+    if start == "NA":
+        start_time = None
+    else:
+        start_time = datetime.strptime(start,'%Y-%m-%dT%H:%M')
+    if end== "NA":
+        end_time = None
+    else:
+        end_time = datetime.strptime(end,'%Y-%m-%dT%H:%M')
+
+    for time in [start_time, end_time]:
+        if time is not None and time.minute not in [0, 30]:
+            raise ValueError("Invalid time values. Due to the resolution of forcing file," +
+                " the input time should be either 0 or 30 minutes.")
+
+    if (start_time and end_time) and start_time > end_time:
+        raise ValueError("Invalid time range. StartTime must be earlier than EndTime.")
 
 
 def remove_dates_from_header(filename):

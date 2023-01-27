@@ -6,6 +6,7 @@ import shlex
 import subprocess
 from pathlib import Path
 from typing import Dict
+from typing import Tuple
 from . import config_io
 from . import forcing_io
 from . import soil_io
@@ -111,9 +112,10 @@ class StemmusScope():
     def setup(
         self,
         WorkDir: str = None,
-        ForcingFileName: str = None,
-        NumberOfTimeSteps: str = None,
-    ) -> str:
+        Location: str = None,
+        StartTime: str = None,
+        EndTime: str = None,
+    ) -> Tuple[str, str]:
         """Configure model run.
 
         1. Creates config file and input/output directories based on the config template.
@@ -122,34 +124,35 @@ class StemmusScope():
         Args:
             WorkDir: path to a directory where input/output directories should be created.
             ForcingFileName: forcing file name. Forcing file should be in netcdf format.
-            NumberOfTimeSteps: total number of time steps in which model runs. It can be
-                `NA` or a number. Example `10` runs the model for 10 time steps.
+            StartTime: Start time of the model run. It must be in 
+                ISO format (e.g. 2007-01-01T00:00).
+            EndTime: End time of the model run. It must be in ISO format (e.g. 2007-01-01T00:00).
 
         Returns:
-            Paths to config file and input/output directories
+            Path to the config file
         """
         # update config template if needed
         if WorkDir:
             self._config["WorkDir"] = WorkDir
 
-        if ForcingFileName:
-            self._config["ForcingFileName"] = ForcingFileName
+        if Location:
+            self._config["Location"] = Location
 
-        if NumberOfTimeSteps:
-            self._config["NumberOfTimeSteps"] = NumberOfTimeSteps
+        if StartTime:
+            self._config["StartTime"] = StartTime
+
+        if EndTime:
+            self._config["EndTime"] = EndTime
+
+        # validate config *before* directory creation
+        config_io.validate_config(self._config)
 
         # create customized config file and input/output directories for model run
-        _, _, self.cfg_file = config_io.create_io_dir(
-            self._config["ForcingFileName"], self._config
-            )
+        _, _, self.cfg_file = config_io.create_io_dir(self._config)
 
-        # read the run config file
         self._config = config_io.read_config(self.cfg_file)
 
-        # prepare forcing data
         forcing_io.prepare_forcing(self._config)
-
-        # prepare soil data
         soil_io.prepare_soil_data(self._config)
 
         return str(self.cfg_file)
@@ -191,7 +194,6 @@ class StemmusScope():
                 args = shlex.join(args)
             result = _run_sub_process(args, self.model_src)
         return result
-
 
     @property
     def config(self) -> Dict:
