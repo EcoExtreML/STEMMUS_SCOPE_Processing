@@ -11,9 +11,7 @@ The model source code, executable file and utility files are available in the
 [STEMMUS_SCOPE repository](https://github.com/EcoExtreML/STEMMUS_SCOPE).
 
 The input datasets are available on Snellius and CRIB. First, make sure you have
-right access to the repository and data. Then, see the notebook
-[run_model_in_notebook.ipynb](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/docs/notebooks/run_model_in_notebook.ipynb)
-which provides different options to run the model, and the section below.
+right access to the repository and data.
 
 ## Running the model
 

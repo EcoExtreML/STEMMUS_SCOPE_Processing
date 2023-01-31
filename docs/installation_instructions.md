@@ -23,7 +23,7 @@ installed there. See [Install PyStemmusScope](#install-pystemmusscope).
 
 ## On your own machine
 
-Choose how do you want to run the model, see [Run the model](#run-the-model).
+Choose how do you want to run the model, see [Run the model](notebooks/run_model_in_notebook.ipynb).
 
 ## Install PyStemmusScope
 
