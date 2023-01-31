@@ -83,10 +83,11 @@ def co2_molar_fraction_to_kg_per_m3(
     Returns:
         Same as input: CO2 concentration in [kg CO2 / m3 air]
     """
-    molecular_weight_co2 = 44.01 # [kg/mol]
-    avg_molar_mass_air = 28.9647 # [kg/mol]
-    molar_density_air = avg_molar_mass_air / AVG_DENSITY_AIR # [m3/mol]
-    return molar_fraction * molecular_weight_co2 / molar_density_air
+    molecular_weight_co2 = 44.01  # [kg/mol]
+    avg_molar_mass_air = 28.9647  # [kg/mol]
+    molar_density_air = AVG_DENSITY_AIR / avg_molar_mass_air  # [mol/m3]
+    #   [mol cO2/mol air] * [kg CO2/mol CO2]     * [mol air / m3]    = [kg CO2/m3 air]
+    return molar_fraction * molecular_weight_co2 * molar_density_air
 
 
 def co2_mass_fraction_to_kg_per_m3(
