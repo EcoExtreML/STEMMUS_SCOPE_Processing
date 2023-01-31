@@ -70,7 +70,9 @@ def read_forcing_data_plumber2(forcing_file, start_time, end_time):
 
     data['t_air_celcius'] = ds_forcing['Tair'] - 273.15 # conversion from K to degC.
     data['psurf_hpa'] = ds_forcing['Psurf'] / 100 # conversion from Pa to hPa
-    data['co2_conv'] = vc.co2_molar_fraction_to_kg_per_m3(ds_forcing['CO2air'])
+    data['co2_conv'] = vc.co2_molar_fraction_to_kg_per_m3(
+        ds_forcing['CO2air'] * 1e-6  # ppm -> molar fraction
+    )
     data['precip_conv'] = ds_forcing['Precip'] / 10 # conversion from mm/s to cm/s
     data['lw_down'] = ds_forcing['LWdown']
     data['sw_down'] = ds_forcing['SWdown']
@@ -144,13 +146,13 @@ def read_forcing_data_global(
     data = {**data, **era5_data}
 
     data["co2_conv"] = vc.co2_mass_fraction_to_kg_per_m3(
-        gds.extract_cams_data(files_cams, lat, lon, start_time, end_time)
+        gds.extract_cams_data(files_cams, lat, lon, start_time, end_time) * 1e6
     )
 
-    # data["lai"] = vc.mask_data(
-    #     gds.extract_lai_data(files_lai, lat, lon, start_time, end_time),
-    #     min_value=0.01
-    # )
+    data["lai"] = vc.mask_data(
+        gds.extract_lai_data(files_lai, lat, lon, start_time, end_time),
+        min_value=0.01
+    )
 
     data["elevation"] = gds.extract_prism_dem_data(file_dem, lat, lon)
 
