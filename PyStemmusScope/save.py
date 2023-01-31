@@ -47,7 +47,9 @@ def _select_forcing_variables(forcing_dict: Dict, forcing_var: str, alma_var: st
     """Select the variable needed by ALMA convention.
 
     Args:
-        forcing_dict(dict): a dictionary returned by `PyStemmusScope.forcing_io.read_forcing_data()`.
+        forcing_dict(dict): a dictionary returned by
+            `PyStemmusScope.forcing_io.read_forcing_data_plumber2()` or
+            `read_forcing_data_global()`
         forcing_var(str): variable name in forcing dataset.
         alma_var(str): variable name in ALMA convention.
 
