@@ -208,6 +208,7 @@ def extract_canopy_height_data(
     return canopy_height.values[0]
 
 
+# pylint: disable=unused-argument
 def extract_lai_data(
     files_lai: List,
     lat: Union[int, float],
@@ -215,7 +216,7 @@ def extract_lai_data(
     start_time: np.datetime64,
     end_time: np.datetime64,
     ) -> xr.DataArray:
-    """Extracts the LAI from the FAPAR dataset.
+    """Generates LAI values, until a dataset is chosen.
 
     Args:
         files_lai: List of paths to the *.nc files.
@@ -227,10 +228,9 @@ def extract_lai_data(
     Returns:
         DataArray containing the LAI of the specified site for the given timeframe.
     """
-    ds = xr.open_mfdataset(files_lai)
-
-    pad = 0.2  # Add padding around the data before trying to find nearest non-nan
-    ds = ds.sel(lat=slice(lat + pad, lat - pad), lon=slice(lon - pad, lon + pad))
-    ds = ds.resample(time=TIMESTEP).interpolate('linear')
-    ds = ds.sel(time=slice(start_time, end_time)).compute()
-    return utils.find_nearest_non_nan(ds["LAI"], x=lon, y=lat, xdim="lon", ydim="lat")
+    timeseries = xr.date_range(start=start_time, end=end_time, freq=TIMESTEP)
+    return xr.DataArray(
+        data=np.ones(len(timeseries)) * 4,
+        dims=["time"],
+        coords={"time": timeseries},
+    )
