@@ -1,8 +1,9 @@
+import itertools
+from pathlib import Path
 import cdsapi
 import certifi
 import urllib3
-from pathlib import Path
-import itertools
+
 
 http = urllib3.PoolManager(
     cert_reqs="CERT_REQUIRED",

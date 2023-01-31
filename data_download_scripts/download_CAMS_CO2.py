@@ -1,7 +1,8 @@
+from pathlib import Path
 import cdsapi
 import certifi
 import urllib3
-from pathlib import Path
+
 
 # UID+api key is read here:
 with open(Path.home() / ".adsloginrc", encoding="utf8") as f:
