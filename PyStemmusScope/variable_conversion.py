@@ -1,9 +1,9 @@
+from typing import Union
 import numpy as np
 import xarray as xr
-from typing import Union
 
 
-AVG_DENSITY_AIR = 1.292 # [kg/m3]
+AVG_DENSITY_AIR = 1.292  # [kg/m3]
 
 
 def calculate_ea(t_air_celcius, rh):
@@ -27,7 +27,9 @@ def calculate_ea(t_air_celcius, rh):
 
     # check rh values
     if rh.min() < 0.0 or rh.max() > 100.0:
-        raise ValueError("relative humidity should be in percentage ranging from 0 - 100")
+        raise ValueError(
+            "relative humidity should be in percentage ranging from 0 - 100"
+        )
 
     # check lengths
     if rh.shape != t_air_celcius.shape:
@@ -65,13 +67,13 @@ def specific_humidity(e_a, p_air):
     Returns:
         Specific humidity [kg water / m3 air]
     """
-    EPSILON = 0.622 # ratio of molecular mass of water vapour to dry air
+    EPSILON = 0.622  # ratio of molecular mass of water vapour to dry air
     return EPSILON * e_a / p_air
 
 
 def co2_molar_fraction_to_kg_per_m3(
     molar_fraction: Union[float, np.array, xr.DataArray]
-    ):
+):
     """Convert CO2 molar fraction [mol cO2/mol air] to concentration in [kg CO2/m3 air].
 
     Note: the density of air [kg/m3] used for the calculation is assumed to be constant
@@ -90,9 +92,7 @@ def co2_molar_fraction_to_kg_per_m3(
     return molar_fraction * molecular_weight_co2 * molar_density_air
 
 
-def co2_mass_fraction_to_kg_per_m3(
-    mass_fraction: Union[float, np.array, xr.DataArray]
-    ):
+def co2_mass_fraction_to_kg_per_m3(mass_fraction: Union[float, np.array, xr.DataArray]):
     """Convert CO2 mass fraction [kg cO2/kg air] to concentration in [kg CO2/m3 air].
 
     Note: the density of air [kg/m3] used for the calculation is assumed to be constant
@@ -164,16 +164,16 @@ def field_moisture_content(theta_r, theta_s, alpha, coef_n):
     Returns:
         float or np.array: Field moisture content
     """
-    phi_fc = 341.9 # soil water potential at field capacity (cm)
+    phi_fc = 341.9  # soil water potential at field capacity (cm)
 
-    field_moisture_content = theta_r + (theta_s - theta_r)/(
-        1 + (alpha * phi_fc)**coef_n
-        )**(1 -1/coef_n)
+    field_moisture_content = theta_r + (theta_s - theta_r) / (
+        1 + (alpha * phi_fc) ** coef_n
+    ) ** (1 - 1 / coef_n)
 
     return field_moisture_content
 
 
-def soil_moisture(volumetric_water_content:np.array, thickness:np.array) -> np.array:
+def soil_moisture(volumetric_water_content: np.array, thickness: np.array) -> np.array:
     """Calculates the soil moisture (kg/m2) from volumetric water content(m3/m3), based on SM =
         VolumetricWaterContent * Density * Thickness.
 
@@ -189,4 +189,4 @@ def soil_moisture(volumetric_water_content:np.array, thickness:np.array) -> np.a
         raise ValueError("input arrays should have the same shape (size).")
 
     # Density: constant (water_density = 1000 kg per m3)
-    return  (1000.0 * volumetric_water_content * thickness)
+    return 1000.0 * volumetric_water_content * thickness

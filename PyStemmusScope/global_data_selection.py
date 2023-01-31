@@ -1,12 +1,12 @@
 from pathlib import Path
+from typing import Dict
+from typing import List
+from typing import Tuple
+from typing import Union
 import numpy as np
 import xarray as xr
 from . import utils
 from . import variable_conversion as vc
-from typing import Union
-from typing import Tuple
-from typing import Dict
-from typing import List
 
 
 TIMESTEP = "1800S"
@@ -33,8 +33,8 @@ def make_lat_lon_strings(
     if lon > 180 or lon < -180:
         raise ValueError("Longitude out of bounds (-180, 180)")
 
-    lat = int(lat//step * step)
-    lon = int(lon//step * step)
+    lat = int(lat // step * step)
+    lon = int(lon // step * step)
 
     latstr = str(lat).rjust(2, "0")
     lonstr = str(lon).rjust(3, "0")
@@ -44,10 +44,7 @@ def make_lat_lon_strings(
     return latstr, lonstr
 
 
-def get_filename_canopy_height(
-    lat: Union[int, float],
-    lon: Union[int, float]
-    ) -> str:
+def get_filename_canopy_height(lat: Union[int, float], lon: Union[int, float]) -> str:
     """Get the right filename for the ETH canopy height dataset.
 
     The dataset is split up in 3 degree ^2 files. This makes the output filename, for
@@ -68,10 +65,7 @@ def get_filename_canopy_height(
     return f"ETH_GlobalCanopyHeight_10m_2020_{latstr}{lonstr}_Map.tif"
 
 
-def get_filename_dem(
-    lat: Union[int, float],
-    lon: Union[int, float]
-    ) -> str:
+def get_filename_dem(lat: Union[int, float], lon: Union[int, float]) -> str:
     """Get the right filename for the Copernicus prism DEM dataset.
 
     The dataset is split up in 1 degree ^2 files. This makes the output filename, for
@@ -99,7 +93,7 @@ def extract_era5_data(  # pylint: disable=too-many-arguments
     lon: Union[int, float],
     start_time: np.datetime64,
     end_time: np.datetime64,
-    ) -> Dict:
+) -> Dict:
     """Extracts and converts the required variables from the era5 data.
 
     Args:
@@ -115,10 +109,10 @@ def extract_era5_data(  # pylint: disable=too-many-arguments
     datasets = []
     for files in (files_era5, files_era5_land):
         ds = xr.open_mfdataset(files)
-        ds = ds.sel(latitude=lat, longitude=lon, method='nearest').compute()
-        ds = ds.resample(time=TIMESTEP).interpolate('linear')
+        ds = ds.sel(latitude=lat, longitude=lon, method="nearest").compute()
+        ds = ds.resample(time=TIMESTEP).interpolate("linear")
         ds = ds.sel(time=slice(start_time, end_time))
-        ds = ds.drop(['latitude', 'longitude'])
+        ds = ds.drop(["latitude", "longitude"])
         datasets.append(ds)
     ds = xr.merge(datasets)
 
@@ -144,7 +138,7 @@ def extract_cams_data(
     lon: Union[int, float],
     start_time: np.datetime64,
     end_time: np.datetime64,
-    ) -> xr.DataArray:
+) -> xr.DataArray:
     """Extracts and converts the required variables from the CAMS CO2 dataset.
 
     Args:
@@ -158,9 +152,9 @@ def extract_cams_data(
         DataArray containing the CO2 concentration.
     """
     ds = xr.open_mfdataset(files_cams)
-    ds = ds.sel(latitude=lat, longitude=lon, method='nearest')
-    ds = ds.drop(['latitude', 'longitude'])
-    ds = ds.resample(time=TIMESTEP).interpolate('linear')
+    ds = ds.sel(latitude=lat, longitude=lon, method="nearest")
+    ds = ds.drop(["latitude", "longitude"])
+    ds = ds.resample(time=TIMESTEP).interpolate("linear")
     ds = ds.sel(time=slice(start_time, end_time))
     return ds.co2
 
@@ -169,7 +163,7 @@ def extract_prism_dem_data(
     file_dem: Path,
     lat: Union[int, float],
     lon: Union[int, float],
-    ) -> float:
+) -> float:
     """Extracts the elevation from the PRISM DEM dataset.
 
     Args:
@@ -189,7 +183,7 @@ def extract_canopy_height_data(
     file_canopy_height: Path,
     lat: Union[int, float],
     lon: Union[int, float],
-    ) -> float:
+) -> float:
     """Extracts the canopy height from the ETH global canopy height dataset.
 
     Args:
@@ -215,7 +209,7 @@ def extract_lai_data(
     lon: Union[int, float],
     start_time: np.datetime64,
     end_time: np.datetime64,
-    ) -> xr.DataArray:
+) -> xr.DataArray:
     """Generates LAI values, until a dataset is chosen.
 
     Args:
