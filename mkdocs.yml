@@ -1,0 +1,54 @@
+site_name: PyStemmusScope documentation
+repo_url: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing
+repo_name: PyStemmusScope
+
+nav:
+  - Getting started: index.md
+  - Installation: installation_instructions.md
+  - Notebook page: notebooks/run_model_in_notebook.ipynb
+  - Contributing guide: CONTRIBUTING.md
+  - API reference: reference.md
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  logo: ecoextreml_logo.png
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.tabs.sticky
+  icon:
+    repo: fontawesome/brands/github-alt
+
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+      primary: light green
+      accent: green
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+      primary: blue grey
+      accent: teal
+
+plugins:
+- mkdocs-jupyter:
+      include_source: True
+- search
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          docstring_style: google
+          docstring_options:
+            ignore_init_summary: no
+          merge_init_into_class: yes
+          show_submodules: no
+extra:
+  generator: false
