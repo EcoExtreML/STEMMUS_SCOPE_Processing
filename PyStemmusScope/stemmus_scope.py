@@ -124,7 +124,7 @@ class StemmusScope():
         Args:
             WorkDir: path to a directory where input/output directories should be created.
             ForcingFileName: forcing file name. Forcing file should be in netcdf format.
-            StartTime: Start time of the model run. It must be in 
+            StartTime: Start time of the model run. It must be in
                 ISO format (e.g. 2007-01-01T00:00).
             EndTime: End time of the model run. It must be in ISO format (e.g. 2007-01-01T00:00).
 
@@ -154,6 +154,7 @@ class StemmusScope():
 
         forcing_io.prepare_forcing(self._config)
         soil_io.prepare_soil_data(self._config)
+        soil_io.prepare_soil_init(self._config)
 
         return str(self.cfg_file)
 

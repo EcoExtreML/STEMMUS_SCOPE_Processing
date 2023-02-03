@@ -2,6 +2,7 @@ from pathlib import Path
 import hdf5storage
 import numpy as np
 import xarray as xr
+from typing import Dict
 from . import utils
 from . import variable_conversion as vc
 
@@ -213,14 +214,21 @@ def prepare_soil_data(config):
     Args:
         config (dict): The PyStemmusScope configuration dictionary.
     """
+    loc, fmt = utils.check_location_fmt(config["Location"])
 
-    forcing_file = utils.get_forcing_file(config)
+    if fmt == "site":
+        forcing_file = utils.get_forcing_file(config)
+        # Data missing at ID-Pag site. See github.com/EcoExtreML/STEMMUS_SCOPE/issues/77
+        if config["Location"].startswith("ID"):
+            lat, lon = -1., 112.
+        else:
+            lat, lon = _retrieve_latlon(forcing_file)
 
-    # Data missing at ID-Pag site. See github.com/EcoExtreML/STEMMUS_SCOPE/issues/77
-    if config["Location"].startswith("ID"):
-        lat, lon = -1., 112.
+    elif fmt == "latlon":
+        lat, lon = _retrieve_latlon("C:/STEMMUS_SCOPE_data/forcing/plumber2_data/FI-Hyy_1996-2014_FLUXNET2015_Met.nc")
+
     else:
-        lat, lon = _retrieve_latlon(forcing_file)
+        raise NotImplementedError
 
     matfiledata = _collect_soil_data(Path(config['SoilPropertyPath']), lat, lon)
 
@@ -228,3 +236,109 @@ def prepare_soil_data(config):
         Path(config["InputPath"]) / "soil_parameters.mat", mdict=matfiledata, appendmat=False,
     )
     utils.remove_dates_from_header(Path(config["InputPath"]) / "soil_parameters.mat")
+
+
+def prepare_soil_init(config):
+    """Function that prepares the soil inital conditions data for the STEMMUS_SCOPE
+    model. It parses the data for the input location, and writes a file that can be
+    easily read in by Matlab.
+
+    Args:
+        config (dict): The PyStemmusScope configuration dictionary.
+    """
+    loc, fmt = utils.check_location_fmt(config["Location"])
+
+    if fmt == "site":
+        matfiledata = _read_soil_initial_conditions_plumber2(
+            soil_init_path=Path(config['InitialConditionPath']),
+            sitename=loc,
+        )
+    elif fmt == "latlon":
+        matfiledata = _read_soil_initial_conditions_global(
+            global_path=Path(config['GlobalDataPath']),
+            lat=loc[0],
+            lon=loc[1],
+            start_time=config["StartTime"],
+        )
+    else:
+        raise NotImplementedError
+
+    hdf5storage.savemat(
+        Path(config["InputPath"]) / "soil_init.mat", mdict=matfiledata, appendmat=False,
+    )
+    utils.remove_dates_from_header(Path(config["InputPath"]) / "soil_init.mat")
+
+
+def _extract_soil_initial_variables(soil_init_ds: xr.Dataset):
+    """Extracts the soil intial variables from the soil init dataset.
+
+    Args:
+        soil_init_ds (xr.Dataset): Dataset containing the following era5-land variables;
+            skin_temperature,
+            soil_temperature_level_1, soil_temperature_level_2,
+            soil_temperature_level_3, soil_temperature_level_4,
+            volumetric_soil_water_layer_1, volumetric_soil_water_layer_2,
+            volumetric_soil_water_layer_3, volumetric_soil_water_layer_4
+
+    Returns:
+        Dictionary containing the STEMMUS_SCOPE variable names (keys) and their intial
+            soil condition values.
+    """
+    return {
+        "Tss":  float(soil_init_ds["skt"].values) - 273.15,
+        "InitT0": float(soil_init_ds["skt"].values) - 273.15,
+        "InitT1": float(soil_init_ds["stl1"].values) - 273.15,
+        "InitT2": float(soil_init_ds["stl2"].values) - 273.15,
+        "InitT3": float(soil_init_ds["stl3"].values) - 273.15,
+        "InitT4": float(soil_init_ds["stl4"].values) - 273.15,
+        "InitT5": float(soil_init_ds["stl4"].values) - 273.15,
+        "InitT6": float(soil_init_ds["stl4"].values) - 273.15,
+        "InitX0": float(soil_init_ds["swvl1"].values),
+        "InitX1": float(soil_init_ds["swvl1"].values),
+        "InitX2": float(soil_init_ds["swvl2"].values),
+        "InitX3": float(soil_init_ds["swvl3"].values),
+        "InitX4": float(soil_init_ds["swvl4"].values),
+        "InitX5": float(soil_init_ds["swvl4"].values),
+        "InitX6": float(soil_init_ds["swvl4"].values),
+        "BtmX": float(soil_init_ds["swvl4"].values),
+    }
+
+
+def _read_soil_initial_conditions_plumber2(
+    soil_init_path: Path,
+    sitename: str,
+) -> Dict[str, float]:
+    ds = xr.open_mfdataset(soil_init_path / f"{sitename}*.nc")
+    ds = ds.squeeze()  # Remove lat, lon, time dims.
+    ds.compute()
+
+    return _extract_soil_initial_variables(ds)
+
+
+def _read_soil_initial_conditions_global(
+    global_path: Path,
+    lat: float,
+    lon: float,
+    start_time: np.datetime64,
+) -> Dict[str, float]:
+    """Read soil initial conditions from era5-land data
+
+    Args:
+        global_path (Path): Path to the global data directory. This directory requires
+            a folder called "soil_initial".
+        lat (float): Latitude of the location of interest.
+        lon (float): Longitude of the location of interest.
+        start_time (np.datetime64): Start time of the model.
+
+    Returns:
+        Dictionary containing the STEMMUS_SCOPE variable names (keys) and their intial
+            soil condition values.
+    """
+
+    initial_condition_dir = global_path / "soil_initial"
+    ds = xr.open_mfdataset(initial_condition_dir / "*.nc")
+    ds = ds.sel(latitude=lat, longitude=lon, method="nearest")
+    ds = ds.sel(time=start_time, method="nearest")
+    ds.compute()
+
+    return _extract_soil_initial_variables(ds)
