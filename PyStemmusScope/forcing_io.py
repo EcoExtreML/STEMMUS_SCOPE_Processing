@@ -297,11 +297,24 @@ def prepare_forcing(config):
 
     input_path = Path(config["InputPath"])
 
-    # Read the required data from the forcing file into a dictionary
-    forcing_file = utils.get_forcing_file(config)
-    data = read_forcing_data_plumber2(
-        forcing_file, config["StartTime"], config["EndTime"]
-    )
+    loc, fmt = utils.check_location_fmt(config["Location"])
+
+    if fmt == "site":
+        forcing_file = utils.get_forcing_file(config)
+        data = read_forcing_data_plumber2(
+            forcing_file, config["StartTime"], config["EndTime"]
+        )
+
+    elif fmt == "latlon":
+        data = read_forcing_data_global(
+            global_data_dir=Path(config["GlobalDataPath"]),
+            lat=loc[0],
+            lon=loc[1],
+            start_time=config["StartTime"],
+            end_time=config["EndTime"],
+            )
+    else:
+        raise NotImplementedError
 
     # Write the single-column ascii '.dat' files to the input directory
     write_dat_files(data, input_path)

@@ -308,7 +308,7 @@ def _read_soil_initial_conditions_plumber2(
     soil_init_path: Path,
     sitename: str,
 ) -> Dict[str, float]:
-    ds = xr.open_mfdataset(soil_init_path / f"{sitename}*.nc")
+    ds = xr.open_mfdataset(str(soil_init_path / f"{sitename}*.nc"))
     ds = ds.squeeze()  # Remove lat, lon, time dims.
     ds.compute()
 
@@ -336,7 +336,7 @@ def _read_soil_initial_conditions_global(
     """
 
     initial_condition_dir = global_path / "soil_initial"
-    ds = xr.open_mfdataset(initial_condition_dir / "*.nc")
+    ds = xr.open_mfdataset(str(initial_condition_dir / "*.nc"))
     ds = ds.sel(latitude=lat, longitude=lon, method="nearest")
     ds = ds.sel(time=start_time, method="nearest")
     ds.compute()

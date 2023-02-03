@@ -61,29 +61,37 @@ def create_io_dir(config):
 
     loc, fmt = utils.check_location_fmt(config["Location"])
     if fmt == "site":
-        station_name = loc
+        site_name = loc
+        input_dir_name = f"{loc}_{timestamp}"
+    elif fmt == "latlon":
+        site_name = "global"
+        latstr = f"{loc[0]:.3f}".replace(".", "-")
+        lonstr = f"{loc[1]:.3f}".replace(".", "-")
+        latstr = f"N{latstr}" if loc[0] >= 0 else f"S{abs(latstr)}"
+        lonstr = f"E{lonstr}" if loc[0] >= 0 else f"W{abs(lonstr)}"
+        input_dir_name = f"global_{latstr}_{lonstr}_{timestamp}"
     else:
         raise NotImplementedError()
 
     # create input directory
     work_dir = utils.to_absolute_path(config['WorkDir'])
-    input_dir = work_dir / "input" / f"{station_name}_{timestamp}"
+    input_dir = work_dir / "input" / input_dir_name
     input_dir.mkdir(parents=True, exist_ok=True)
-    message = f"Prepare work directory {input_dir} for the station: {station_name}"
+    message = f"Prepare work directory {input_dir} for the location: {loc}"
     logger.info("%s", message)
 
     # copy model parameters to work directory
     _copy_data(input_dir, config)
 
     # create output directory
-    output_dir = work_dir / "output" / f"{station_name}_{timestamp}"
+    output_dir = work_dir / "output" / input_dir_name
     output_dir.mkdir(parents=True, exist_ok=True)
-    message = f"Prepare work directory {output_dir} for the station: {station_name}"
+    message = f"Prepare work directory {output_dir} for the location: {loc}"
     logger.info("%s", message)
 
     # update config file for ForcingFileName and InputPath
     config_file_path = _update_config_file(input_dir, output_dir,
-        config, station_name, timestamp)
+        config, site_name, timestamp)
 
     return str(input_dir), str(output_dir), config_file_path
 
@@ -107,7 +115,7 @@ def _copy_data(input_dir, config):
     shutil.copy(str(config["input_data"]), str(input_dir))
 
 
-def _update_config_file(input_dir, output_dir, config, station_name, timestamp):
+def _update_config_file(input_dir, output_dir, config, site_name, timestamp):
     """Update config file for each station.
 
     Create config file for each forcing/station under the work directory.
@@ -117,13 +125,13 @@ def _update_config_file(input_dir, output_dir, config, station_name, timestamp):
         input_dir: Path to the input directory.
         output_dir: Path to the output directory.
         config: Dictionary containing all the paths.
-        station_name: Station name inferred from forcing file.
+        site_name: Either inferred from forcing file, or 'latlon' for global data.
         timestamp: Timestamp when creating the config file.
 
     Returns:
         Path to updated config file.
     """
-    config_file_path = input_dir / f"{station_name}_{timestamp}_config.txt"
+    config_file_path = input_dir / f"{site_name}_{timestamp}_config.txt"
     with open(config_file_path, 'w', encoding="utf8") as f:
         for key, value in config.items():
             if key == "InputPath":

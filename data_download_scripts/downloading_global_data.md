@@ -35,6 +35,9 @@ CO2 data is available in the CAMS dataset. An ADS script that can download the d
 
 A simple check for the parsing of the data is in `parse_CO2_data.ipynb`.
 
+**era5-land soil initial conditions**
+era5cli hourly --startyear 2014 --endyear 2014 --hours 0 --land --levels surface --area 65 20 60 24 --variables skin_temperature soil_temperature_level_1 soil_temperature_level_2 soil_temperature_level_3 soil_temperature_level_4 volumetric_soil_water_layer_1 volumetric_soil_water_layer_2 volumetric_soil_water_layer_3 volumetric_soil_water_layer_4
+
 ## Canopy height data
 The canopy height data is described in: https://langnico.github.io/globalcanopyheight/
 
