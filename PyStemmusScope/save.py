@@ -246,7 +246,7 @@ def to_netcdf(config_file: str, cf_filename: str) -> str:
         str: path to a csv file under the output directory.
     """
     config = config_io.read_config(config_file)
-    forcing_filename = utils.get_forcing_file(config)
+    loc, fmt = utils.check_location_fmt(config["Location"])
 
     # list of required forcing variables, Alma_short_name: forcing_io_name, # model_name
     var_names = {
@@ -260,12 +260,21 @@ def to_netcdf(config_file: str, cf_filename: str) -> str:
         "Precip": "precip_conv", # Pre
     }
 
-    # read forcing file into a dict
-    forcing_dict = forcing_io.read_forcing_data_plumber2(
-        forcing_filename,
-        config["StartTime"],
-        config["EndTime"],
-    )
+    if fmt == "site":
+        # read forcing file into a dict
+        forcing_dict = forcing_io.read_forcing_data_plumber2(
+            utils.get_forcing_file(config),
+            config["StartTime"],
+            config["EndTime"],
+        )
+    elif fmt == "latlon":
+        forcing_dict = forcing_io.read_forcing_data_global(
+            config["GlobalDataPath"],
+            lat=loc[0],
+            lon=loc[1],
+            start_time=config["StartTime"],
+            end_time=config["EndTime"],
+        )
 
     # get time info
     time = forcing_dict["time"].values
