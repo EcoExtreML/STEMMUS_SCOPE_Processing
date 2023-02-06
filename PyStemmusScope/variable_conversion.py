@@ -107,30 +107,6 @@ def co2_mass_fraction_to_kg_per_m3(mass_fraction: Union[float, np.array, xr.Data
     return mass_fraction * AVG_DENSITY_AIR
 
 
-def deaccumulate_era5land(era5_dataarray: xr.DataArray) -> xr.DataArray:
-    """Deaccumulates and differentiates era5-land accumulated variables.
-
-    Note: the assumption is that that the time resolution is 1 hour, and that first
-    time index is midnight.
-
-    Args:
-        era5_dataarray: Accumulated variable
-
-    Returns:
-        Deaccumulated and differentiated variable
-    """
-    SECONDS_PER_TIMESTEP = 3600
-
-    vals = era5_dataarray.values
-    midnights = vals[::24]
-    midnights[0] = 0
-    midnights[1::] -= vals[24::24]
-    vals = np.insert(np.diff(vals, 1), 0, 0)
-    vals[::24] = midnights
-
-    return era5_dataarray.where(False, vals) / SECONDS_PER_TIMESTEP
-
-
 def mask_data(data, min_value=None, max_value=None):
     """Function to apply a mask to data.
 
