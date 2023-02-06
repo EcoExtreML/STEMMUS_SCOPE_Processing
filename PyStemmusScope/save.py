@@ -269,7 +269,7 @@ def to_netcdf(config_file: str, cf_filename: str) -> str:
         )
     elif fmt == "latlon":
         forcing_dict = forcing_io.read_forcing_data_global(
-            config["GlobalDataPath"],
+            Path(config["GlobalDataPath"]),
             lat=loc[0],
             lon=loc[1],
             start_time=config["StartTime"],
