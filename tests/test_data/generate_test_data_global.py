@@ -1,8 +1,17 @@
+"""Generates test data for the 'global' model.
+
+To generate the test data, run this script from the main repo folder. I.e.:
+    STEMMUS_SCOPE_Processing > python ./tests/test_data/generate_test_data_global.py
+
+The required folders will automatically be generated, and subsequently filled with the
+test data. All the files are designed to mimic the real input data, except the values
+are all nonsense (to avoid any copyright or licensing issues).
+"""
+import os
+from pathlib import Path
+import numpy as np
 import rioxarray  # noqa
 import xarray as xr
-import numpy as np
-from pathlib import Path
-import os
 
 
 TEST_DATA_DIR = Path("./tests/test_data/directories/global")
@@ -21,7 +30,7 @@ for _dir in dirs:
 
 
 def generate_era5_file(
-    varname: str, test_value: float, resolution: float, time_res = "1H"
+    varname: str, test_value: float, resolution: float, time_res="1H"
 ) -> xr.Dataset:
     time_coords = xr.date_range(
         start=START_TIME, end=END_TIME, freq=time_res, closed="left"
@@ -44,7 +53,7 @@ def generate_era5_file(
             "longitude": lon_coords,
             "latitude": lat_coords,
             "time": time_coords,
-        }
+        },
     )
 
 
@@ -102,13 +111,13 @@ for var, test_value, var_fname in vars_names_soil_init:
 def generate_tiff_data(test_value: float, resolution: float) -> xr.Dataset:
     band_coords = np.array([1], dtype="int32")
     y_coords = np.arange(
-        start=TEST_LAT - 25*resolution,
-        stop=TEST_LAT + 25*resolution,
+        start=TEST_LAT - 25 * resolution,
+        stop=TEST_LAT + 25 * resolution,
         step=resolution,
     )
     x_coords = np.arange(
-        start=TEST_LON + 25*resolution,
-        stop=TEST_LON - 25*resolution,
+        start=TEST_LON + 25 * resolution,
+        stop=TEST_LON - 25 * resolution,
         step=-resolution,
     )
     data = np.zeros((len(band_coords), len(y_coords), len(x_coords))) + test_value
@@ -119,20 +128,18 @@ def generate_tiff_data(test_value: float, resolution: float) -> xr.Dataset:
             "band": band_coords,
             "y": y_coords,
             "x": x_coords,
-        }
+        },
     )
 
 
 # Canopy height
-da = generate_tiff_data(test_value=1., resolution=.000083)["band_data"]
+da = generate_tiff_data(test_value=1.0, resolution=0.000083)["band_data"]
 da = da.rio.write_crs("epsg:4326")
 da.rio.to_raster(
     TEST_DATA_DIR / "canopy_height" / "ETH_GlobalCanopyHeight_10m_2020_N60E024_Map.tif"
 )
 
 # DEM
-da = generate_tiff_data(test_value=111., resolution=.001667)["band_data"]
+da = generate_tiff_data(test_value=111.0, resolution=0.001667)["band_data"]
 da = da.rio.write_crs("epsg:4326")
-da.rio.to_raster(
-    TEST_DATA_DIR / "dem" / "Copernicus_DSM_30_N61_00_E024_00_DEM.tif"
-)
+da.rio.to_raster(TEST_DATA_DIR / "dem" / "Copernicus_DSM_30_N61_00_E024_00_DEM.tif")
