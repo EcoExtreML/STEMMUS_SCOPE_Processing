@@ -1,18 +1,19 @@
 """PyStemmusScope save module.
 
-Module designed to create a netcdf file following `ALMA
-convention <https://web.lmd.jussieu.fr/~polcher/ALMA/>`_ from csv files following
-`SCOPE format <https://scope-model.readthedocs.io/en/latest/outfiles.html>`_ in
-the output directory.
+Module designed to create a netcdf file following the
+[ALMA convention](https://web.lmd.jussieu.fr/~polcher/ALMA/)
+from csv files following the
+[SCOPE format](https://scope-model.readthedocs.io/en/latest/outfiles.html)
+in the output directory.
 
 The file
-`required_netcf_variables.csv <https://github.com/EcoExtreML/STEMMUS_SCOPE/blob/main/utils/csv_to_nc/required_netcf_variables.csv>`_
-lists required variable names and their attributes based on `ALMA+CF
-convention table <https://docs.google.com/spreadsheets/d/1CA3aTvI9piXqRqO-3MGrsH1vW-Sd87D8iZXHGrqK42o/edit#gid=2085475627>`_.
+[`required_netcf_variables.csv`](https://github.com/EcoExtreML/STEMMUS_SCOPE/blob/main/utils/csv_to_nc/required_netcf_variables.csv)
+lists required variable names and their attributes based on the
+[ALMA+CF convention table](https://docs.google.com/spreadsheets/d/1CA3aTvI9piXqRqO-3MGrsH1vW-Sd87D8iZXHGrqK42o/edit#gid=2085475627).
 
-Example:
-    See notebooks/run_model_in_notebook.ipynb in
-    `STEMMUS_SCOPE_Processing repository <https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing>`_
+Note:
+    See notebooks/run_model_in_notebook.ipynb in the
+    [STEMMUS_SCOPE_Processing repository](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing).
 
 """
 import logging
@@ -184,10 +185,10 @@ def _update_dataset_attrs_dims(dataset: xr.Dataset, forcing_dict: Dict) -> xr.Da
     """Update dimentions of a dataset according to ALMA conventions.
 
     Args:
-        dataset(xr.Dataset): a dataset with varaibles in ALMA conventions.
+        dataset: a dataset with varaibles in ALMA conventions.
 
     Returns:
-        xr.Dataset: the dataset with dimensions ("time", "x", "y").
+        The dataset with dimensions ("time", "x", "y").
     """
 
     # add x/y dims to the dataset
@@ -239,11 +240,11 @@ def to_netcdf(config_file: str, cf_filename: str) -> str:
         information provided by ALMA conventions.
 
     Args:
-        config_file(str): Path to the config file.
-        cf_filename(str): Path to a csv file for ALMA conventions.
+        config_file: Path to the config file.
+        cf_filename: Path to a csv file for ALMA conventions.
 
     Returns:
-        str: path to a csv file under the output directory.
+        Path to a csv file under the output directory.
     """
     config = config_io.read_config(config_file)
     loc, fmt = utils.check_location_fmt(config["Location"])

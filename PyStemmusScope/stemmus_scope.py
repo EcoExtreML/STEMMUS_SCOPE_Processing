@@ -73,22 +73,24 @@ def _run_sub_process(args: list, cwd):
 
 class StemmusScope():
     """PyStemmusScope wrapper around Stemmus_Scope model.
-    see https://gmd.copernicus.org/articles/14/1379/2021/
 
-   Configures the model and prepares forcing and soil data for the model run.
+    For a detailed model description, look at
+    [this publication](https://gmd.copernicus.org/articles/14/1379/2021/).
 
-    Args:
-        config_file(str): path to Stemmus_Scope configuration file. An example
-        config_file can be found in tests/test_data in `STEMMUS_SCOPE_Processing
-        repository <https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing>`_
-        model_src_path(str): path to Stemmus_Scope executable file or to a
-        directory containing model source codes.
-        interpreter(str, optional): use `Matlab` or `Octave`. Only required if
-        `model_src_path` is a path to model source codes.
+    Configures the model and prepares forcing and soil data for the model run.
+
+    Arguments:
+        config_file (str): Path to Stemmus_Scope configuration file. An example
+            config_file can be found in tests/test_data in [STEMMUS_SCOPE_Processing
+            repository](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing).
+        model_src_path (str): Path to Stemmus_Scope executable file or to a
+            directory containing model source codes.
+        interpreter (str, optional): Use `Matlab` or `Octave`. Only required if
+            `model_src_path` is a path to model source codes.
 
     Example:
-        See notebooks/run_model_in_notebook.ipynb in `STEMMUS_SCOPE_Processing
-        repository <https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing>`_
+        See notebooks/run_model_in_notebook.ipynb at the [STEMMUS_SCOPE_Processing
+        repository](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing)
     """
 
     def __init__(self, config_file: str, model_src_path: str, interpreter: str = None):
@@ -121,12 +123,13 @@ class StemmusScope():
         1. Creates config file and input/output directories based on the config template.
         2. Prepare forcing and soil data
 
-        Args:
+        Arguments:
             WorkDir: path to a directory where input/output directories should be created.
             ForcingFileName: forcing file name. Forcing file should be in netcdf format.
             StartTime: Start time of the model run. It must be in
                 ISO format (e.g. 2007-01-01T00:00).
-            EndTime: End time of the model run. It must be in ISO format (e.g. 2007-01-01T00:00).
+            EndTime: End time of the model run. It must be in ISO format
+                (e.g. 2007-01-01T00:00).
 
         Returns:
             Path to the config file
@@ -164,7 +167,7 @@ class StemmusScope():
         Args:
 
         Returns:
-            string, the model log
+            The model log.
         """
         if self.exe_file:
             # run using MCR

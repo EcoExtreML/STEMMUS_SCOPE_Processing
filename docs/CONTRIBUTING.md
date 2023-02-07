@@ -1,6 +1,8 @@
 # Contributing Guide
 
-This repository includes the python package `PyStemmusScope` for running the STEMMUS-SCOPE model.
+If you want to contribute to `PyStemmusScope`, you will need to set up your development
+environment the right way. The instructions below will guide you though the steps
+required.
 
 ## Configure the python package for development and testing
 
@@ -23,7 +25,7 @@ cd STEMMUS_SCOPE_Processing
 python3 -m install -e .[dev]
 ```
 
-### Run tests
+### Running tests
 
 The testing framework used here is [PyTest](https://pytest.org). You can run
 tests as (On Windows, use `python` instead of `python3`):
@@ -32,16 +34,18 @@ tests as (On Windows, use `python` instead of `python3`):
 python3 -m pytest
 ```
 
-### Build documentation
+### Building the documentation
 
-To build the documentation locally:
+To edit the documentation locally, do:
 
 ```sh
-cd docs/
-make html
+mkdocs serve
 ```
 
-Then open `_build/html/index.html` in a web broser to preview the documentation.
+Then open the local hyperlink displayed in the terminal, e.g.:
+```
+INFO     -  [13:23:44] Serving on http://127.0.0.1:8000/
+```
 
 ### Run formatting tools
 
