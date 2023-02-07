@@ -36,10 +36,10 @@ def make_lat_lon_strings(
     lat = int(lat // step * step)
     lon = int(lon // step * step)
 
-    latstr = str(lat).rjust(2, "0")
-    lonstr = str(lon).rjust(3, "0")
-    latstr = f"N{latstr}" if lat >= 0 else f"S{abs(latstr)}"
-    lonstr = f"E{lonstr}" if lon >= 0 else f"W{abs(lonstr)}"
+    latstr = str(abs(lat)).rjust(2, "0")
+    lonstr = str(abs(lon)).rjust(3, "0")
+    latstr = f"N{latstr}" if lat >= 0 else f"S{latstr}"
+    lonstr = f"E{lonstr}" if lon >= 0 else f"W{lonstr}"
 
     return latstr, lonstr
 
@@ -49,7 +49,7 @@ def get_filename_canopy_height(lat: Union[int, float], lon: Union[int, float]) -
 
     The dataset is split up in 3 degree ^2 files. This makes the output filename, for
     example with the coordinates (52N, 4E):
-        ETH_GlobalCanopyHeight_10m_2020_51N003E_Map.tif"
+        ETH_GlobalCanopyHeight_10m_2020_N51E003_Map.tif
 
     Note: There are no files when there is only oceans/seas in the gridcell. This
         function does not take that into account.
@@ -70,7 +70,7 @@ def get_filename_dem(lat: Union[int, float], lon: Union[int, float]) -> str:
 
     The dataset is split up in 1 degree ^2 files. This makes the output filename, for
     example with the coordinates (52N, 4E):
-        Copernicus_DSM_30_N52_00_E004_00_DEM.tif"
+        Copernicus_DSM_30_N52_00_E004_00_DEM.tif
 
     Note: There are no files when there is only oceans/seas in the gridcell. This
         function does not take that into account.
@@ -112,7 +112,7 @@ def extract_era5_data(  # pylint: disable=too-many-arguments
         ds = ds.sel(latitude=lat, longitude=lon, method="nearest").compute()
         ds = ds.resample(time=TIMESTEP).interpolate("linear")
         ds = ds.sel(time=slice(start_time, end_time))
-        ds = ds.drop(["latitude", "longitude"])
+        ds = ds.drop_vars(["latitude", "longitude"])
         datasets.append(ds)
     ds = xr.merge(datasets)
 
@@ -153,7 +153,7 @@ def extract_cams_data(
     """
     ds = xr.open_mfdataset(files_cams)
     ds = ds.sel(latitude=lat, longitude=lon, method="nearest")
-    ds = ds.drop(["latitude", "longitude"])
+    ds = ds.drop_vars(["latitude", "longitude"])
     ds = ds.resample(time=TIMESTEP).interpolate("linear")
     ds = ds.sel(time=slice(start_time, end_time))
     return ds.co2
@@ -195,9 +195,10 @@ def extract_canopy_height_data(
         Canopy height at the location.
     """
     da = xr.open_dataarray(file_canopy_height, engine="rasterio")
+    da = da.sortby("x", "y")
 
     pad = 0.05  # Add padding around the data before trying to find nearest non-nan
-    da = da.sel(y=slice(lat + pad, lat - pad), x=slice(lon - pad, lon + pad))
+    da = da.sel(y=slice(lat - pad, lat + pad), x=slice(lon - pad, lon + pad))
     canopy_height = utils.find_nearest_non_nan(da.compute(), x=lon, y=lat)
     return canopy_height.values[0]
 

@@ -42,10 +42,6 @@ def read_forcing_data_plumber2(forcing_file, start_time, end_time):
             for the different forcing files.
     """
     ds_forcing = xr.open_dataset(forcing_file)
-    ds_forcing = ds_forcing.sel(time=slice(start_time, end_time))
-
-    # remove the x and y coordinates from the data variables to make the numpy arrays 1D
-    ds_forcing = ds_forcing.squeeze(["x", "y"])
 
     # check if time range is covered by forcing
     # if so, return a subset of forcing matching the given time range
@@ -54,6 +50,9 @@ def read_forcing_data_plumber2(forcing_file, start_time, end_time):
         start_time,
         end_time,
     )
+
+    # remove the x and y coordinates from the data variables to make the numpy arrays 1D
+    ds_forcing = ds_forcing.squeeze(["x", "y"])
 
     data = {}
 
@@ -306,6 +305,12 @@ def prepare_forcing(config):
         )
 
     elif fmt == "latlon":
+        if config["StartTime"] == "NA" or config["EndTime"] == "NA":
+            raise ValueError(
+                "'NA' as start or end time is not supported in 'global' mode. Please "
+                "specify a start and end time."
+            )
+
         data = read_forcing_data_global(
             global_data_dir=Path(config["GlobalDataPath"]),
             lat=loc[0],

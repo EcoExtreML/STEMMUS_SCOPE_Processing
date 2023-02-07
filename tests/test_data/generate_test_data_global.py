@@ -16,10 +16,10 @@ import xarray as xr
 
 
 TEST_DATA_DIR = Path("./tests/test_data/directories/global")
-TEST_LAT = 61.8474  # FI_Hyy
-TEST_LON = 24.2948
-START_TIME = np.datetime64("2014-01-01T00:00")
-END_TIME = np.datetime64("2014-01-03T00:00")
+TEST_LAT = 37.933804  # Same as XX-Xxx
+TEST_LON = -107.807526
+START_TIME = np.datetime64("1996-01-01T00:00")
+END_TIME = np.datetime64("1996-01-03T00:00")
 
 
 # Generate directories
@@ -137,10 +137,10 @@ def generate_tiff_data(test_value: float, resolution: float) -> xr.Dataset:
 da = generate_tiff_data(test_value=1.0, resolution=0.000083)["band_data"]
 da = da.rio.write_crs("epsg:4326")
 da.rio.to_raster(
-    TEST_DATA_DIR / "canopy_height" / "ETH_GlobalCanopyHeight_10m_2020_N60E024_Map.tif"
+    TEST_DATA_DIR / "canopy_height" / "ETH_GlobalCanopyHeight_10m_2020_N36W108_Map.tif"
 )
 
 # DEM
 da = generate_tiff_data(test_value=111.0, resolution=0.001667)["band_data"]
 da = da.rio.write_crs("epsg:4326")
-da.rio.to_raster(TEST_DATA_DIR / "dem" / "Copernicus_DSM_30_N61_00_E024_00_DEM.tif")
+da.rio.to_raster(TEST_DATA_DIR / "dem" / "Copernicus_DSM_30_N37_00_W108_00_DEM.tif")

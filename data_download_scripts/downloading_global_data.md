@@ -56,7 +56,6 @@ All valid DEM urls are in `valid_dem_urls.csv`.
 
 A word doc for instructions is available [here](https://spacedata.copernicus.eu/documents/20123/121286/Copernicus+DEM+Open+HTTPS+Access.pdf/36c9adad-8488-f463-af43-573e68b7f481?t=1669283200177)
 
-
 ## LAI
 
 LAI data was retreived from the CDS. However, the `satellite-lai-fapar` dataset turned out

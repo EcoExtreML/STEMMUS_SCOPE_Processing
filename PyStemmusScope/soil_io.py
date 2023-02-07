@@ -225,7 +225,8 @@ def prepare_soil_data(config):
             lat, lon = _retrieve_latlon(forcing_file)
 
     elif fmt == "latlon":
-        lat, lon = _retrieve_latlon("C:/STEMMUS_SCOPE_data/forcing/plumber2_data/FI-Hyy_1996-2014_FLUXNET2015_Met.nc")
+        lat = loc[0]
+        lon = loc[1]
 
     else:
         raise NotImplementedError

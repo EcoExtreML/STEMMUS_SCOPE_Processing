@@ -282,3 +282,47 @@ class TestWithOctave:
             )
 
         assert result == expected_log
+
+
+class TestWithGlobalData:
+    @pytest.fixture
+    def model(self, tmp_path):
+        config_file = str(data_folder / "config_file_test.txt")
+        exe_file = Path(tmp_path) / "STEMMUS_SCOPE"
+
+        # create dummy exe file
+        with open(exe_file, "x", encoding="utf8") as dummy_file:
+            dummy_file.close()
+        yield StemmusScope(config_file, model_src_path=exe_file)
+
+    @pytest.fixture
+    def model_with_setup(self, model, tmp_path):
+        with patch("time.strftime") as mocked_time:
+            mocked_time.return_value = "2022-07-11-1200"
+            cfg_file = model.setup(
+                WorkDir = str(tmp_path),
+                Location="(37.933804, -107.807526)",
+                StartTime="1996-01-01T00:00",
+                EndTime="1996-01-01T02:00",
+            )
+        return model, cfg_file
+
+    def test_setup(self, model_with_setup, tmp_path):
+        model, cfg_file = model_with_setup
+        name = "global_N37-934_E-107-808_2022-07-11-1200"
+        actual_input_dir = tmp_path / "input" / name
+        actual_output_dir = tmp_path / "output" / name
+        actual_cfg_file = str(
+            actual_input_dir / "global_2022-07-11-1200_config.txt"
+        )
+
+        assert actual_input_dir == Path(model.config["InputPath"])
+        assert actual_output_dir == Path(model.config["OutputPath"])
+        assert actual_cfg_file == cfg_file
+        assert model.config["StartTime"] == "1996-01-01T00:00"
+        assert model.config["EndTime"] == "1996-01-01T02:00"
+
+    def test_config(self, model_with_setup):
+        model, cfg_file = model_with_setup
+        actual = config_io.read_config(cfg_file)
+        assert actual == model.config

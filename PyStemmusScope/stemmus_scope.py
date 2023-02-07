@@ -26,7 +26,7 @@ def _is_model_src_exe(model_src_path: Path):
     if model_src_path.is_file():
         msg = ("The model executable file can be used on a Unix system "
             "where MCR is installed, see the "
-            "`documentaion<https://pystemmusscope.readthedocs.io/>`_.")
+            "`documentation<https://pystemmusscope.readthedocs.io/>`_.")
         logger.info("%s", msg)
         return True
     if model_src_path.is_dir():
@@ -34,7 +34,7 @@ def _is_model_src_exe(model_src_path: Path):
     msg = (
         "Provide a valid path to an executable file or "
         "to a directory containing model source codes, "
-        "see the `documentaion<https://pystemmusscope.readthedocs.io/>`_.")
+        "see the `documentation<https://pystemmusscope.readthedocs.io/>`_.")
     raise ValueError(msg)
 
 
@@ -43,7 +43,7 @@ def _check_interpreter(interpreter: str):
         msg = (
             "Set `interpreter` as Octave or Matlab to run the model using source codes."
             "Otherwise set `model_src_path` to the model executable file, "
-            "see the `documentaion<https://pystemmusscope.readthedocs.io/>`_.")
+            "see the `documentation<https://pystemmusscope.readthedocs.io/>`_.")
         raise ValueError(msg)
 
 
