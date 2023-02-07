@@ -10,6 +10,7 @@ are all nonsense (to avoid any copyright or licensing issues).
 import os
 from pathlib import Path
 import numpy as np
+import pandas as pd
 import rioxarray  # noqa
 import xarray as xr
 
@@ -32,8 +33,8 @@ for _dir in dirs:
 def generate_era5_file(
     varname: str, test_value: float, resolution: float, time_res="1H"
 ) -> xr.Dataset:
-    time_coords = xr.date_range(
-        start=START_TIME, end=END_TIME, freq=time_res, closed="left"
+    time_coords = pd.date_range(
+        start=START_TIME, end=END_TIME, freq=time_res, inclusive="left"
     )
     lat_coords = np.arange(
         start=np.round(TEST_LAT - 1),
@@ -62,7 +63,7 @@ vars_names_era5 = [
     ("u10", 1, "era5_10m_u_component_of_wind"),
     ("v10", 2, "era5_10m_v_component_of_wind"),
     ("mtpr", 3, "era5_mean_total_precipitation_rate"),
-    ("sp", 4, "era5_surface_pressure"),
+    ("sp", 1e5, "era5_surface_pressure"),
     ("ssrd", 5, "era5_surface_solar_radiation_downwards"),
     ("strd", 6, "era5_surface_thermal_radiation_downwards"),
 ]
@@ -74,8 +75,8 @@ for var, test_value, var_fname in vars_names_era5:
 
 # ERA5-land data
 vars_names_era5 = [
-    ("d2m", 1, "era5-land_2m_dewpoint_temperature"),
-    ("t2m", 2, "era5-land_2m_temperature"),
+    ("d2m", 278.15, "era5-land_2m_dewpoint_temperature"),
+    ("t2m", 283.15, "era5-land_2m_temperature"),
 ]
 
 for var, test_value, var_fname in vars_names_era5:
