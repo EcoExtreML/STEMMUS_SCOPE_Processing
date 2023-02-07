@@ -1,8 +1,8 @@
 from pathlib import Path
 import numpy as np
 import pytest
-from PyStemmusScope import global_data_selection as gds
 from PyStemmusScope import forcing_io
+from PyStemmusScope import global_data_selection as gds
 from . import data_folder
 
 

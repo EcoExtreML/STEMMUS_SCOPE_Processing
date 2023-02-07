@@ -1,8 +1,8 @@
 from pathlib import Path
+from typing import Dict
 import hdf5storage
 import numpy as np
 import xarray as xr
-from typing import Dict
 from . import utils
 from . import variable_conversion as vc
 
