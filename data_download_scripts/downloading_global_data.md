@@ -1,5 +1,5 @@
 # Global data for STEMMUS_SCOPE
-This document outlines which, where and how we download the input data for the "global"
+This document outlines which, where and how we download the "global" input data for the 
 model.
 
 ## Data downloaded through era5cli
@@ -13,7 +13,7 @@ Many of the forcing-related data is available in the era5 reanalysis data.
  - 10m_u_component_of_wind
  - 10m_v_component_of_wind
 
-Command to download these:
+These can be downloaded using [era5cli](https://era5cli.readthedocs.io/) as:
 ```
 era5cli hourly --variables 10m_u_component_of_wind 10m_v_component_of_wind mean_total_precipitation_rate surface_pressure surface_thermal_radiation_downwards surface_solar_radiation_downwards --startyear 2016 --endyear 2016 --levels surface --area 65 20 60 24
 ```
@@ -29,14 +29,16 @@ era5cli hourly --variables 2m_temperature  2m_dewpoint_temperature  --startyear 
 However, currently this raises a too-many-requests error. Until that is fixed, we can use
 the cds. See `download_era5land_monthly.py`.
 
+**era5-land soil initial conditions**
+
+era5cli hourly --startyear 2014 --endyear 2014 --hours 0 --land --levels surface --area 65 20 60 24 --variables skin_temperature soil_temperature_level_1 soil_temperature_level_2 soil_temperature_level_3 soil_temperature_level_4 volumetric_soil_water_layer_1 volumetric_soil_water_layer_2 volumetric_soil_water_layer_3 volumetric_soil_water_layer_4
+
 ## CO2 data
 CO2 data is available in the CAMS dataset. An ADS script that can download the data is
  available at `download_CAMS_CO2.py`.
 
 A simple check for the parsing of the data is in `parse_CO2_data.ipynb`.
 
-**era5-land soil initial conditions**
-era5cli hourly --startyear 2014 --endyear 2014 --hours 0 --land --levels surface --area 65 20 60 24 --variables skin_temperature soil_temperature_level_1 soil_temperature_level_2 soil_temperature_level_3 soil_temperature_level_4 volumetric_soil_water_layer_1 volumetric_soil_water_layer_2 volumetric_soil_water_layer_3 volumetric_soil_water_layer_4
 
 ## Canopy height data
 The canopy height data is described in: https://langnico.github.io/globalcanopyheight/
