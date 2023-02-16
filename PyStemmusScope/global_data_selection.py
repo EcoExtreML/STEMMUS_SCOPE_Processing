@@ -200,7 +200,7 @@ def extract_canopy_height_data(
         Canopy height at the location.
     """
     da = xr.open_dataarray(file_canopy_height, engine="rasterio")
-    da = da.sortby("x", "y")
+    da = da.sortby(["x", "y"])
 
     pad = 0.05  # Add padding around the data before trying to find nearest non-nan
     da = da.sel(y=slice(lat - pad, lat + pad), x=slice(lon - pad, lon + pad))
