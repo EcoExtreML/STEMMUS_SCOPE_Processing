@@ -11,7 +11,7 @@ member-warnings: false
 
 ignore-paths:
   - docs
-  - data_download_scripts
+  - global_data
 
 pyroma:
     run: true
