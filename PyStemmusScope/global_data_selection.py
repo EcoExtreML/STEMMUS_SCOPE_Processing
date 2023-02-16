@@ -109,7 +109,8 @@ def extract_era5_data(
         Dictionary containing the variables extracted from ERA5.
     """
     def preproc(ds):
-        return ds.sel(latitude=lat, longitude=lon, method="nearest")
+        ds = ds.sel(latitude=lat, longitude=lon, method="nearest")
+        return ds.drop_vars(["latitude", "longitude"])
 
     datasets = []
     for files in (files_era5, files_era5_land):
@@ -117,7 +118,6 @@ def extract_era5_data(
         ds = ds.compute()
         ds = ds.resample(time=timestep).interpolate("linear")
         ds = ds.sel(time=slice(start_time, end_time))
-        ds = ds.drop_vars(["latitude", "longitude"])
         datasets.append(ds)
     ds = xr.merge(datasets)
 
