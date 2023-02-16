@@ -30,8 +30,8 @@ set -euo pipefail
 
 # Choose random port and print instructions to connect
 PORT=`shuf -i 5000-5999 -n 1`
-LOGIN_HOST_EXT=int3-pub.snellius.surf.nl
-LOGIN_HOST_INT=int3
+LOGIN_HOST_EXT=int4-pub.snellius.surf.nl
+LOGIN_HOST_INT=int4
 
 echo "Selected port is: " $PORT
 echo
