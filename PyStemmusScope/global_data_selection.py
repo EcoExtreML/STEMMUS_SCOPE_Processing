@@ -93,10 +93,11 @@ def extract_era5_data(
     end_time: np.datetime64,
     timestep: str,
 ) -> Dict:
-    """Extracts and converts the required variables from the era5 data.
+    """Extracts and converts the required variables from the ERA5 data.
 
     Args:
-        files_era5: List of era5 files.
+        files_era5: List of ERA5 files.
+        files_era5_land: List of ERA5-land files.
         lat: Latitude of the site.
         lon: Longitude of the site.
         start_time: Start time of the model run.
@@ -105,12 +106,15 @@ def extract_era5_data(
             In a pandas-timedelta compatible format. For example: "1800S"
 
     Returns:
-        Dictionary containing the variables extracted from era5.
+        Dictionary containing the variables extracted from ERA5.
     """
+    def preproc(ds):
+        return ds.sel(latitude=lat, longitude=lon, method="nearest")
+
     datasets = []
     for files in (files_era5, files_era5_land):
-        ds = xr.open_mfdataset(files)
-        ds = ds.sel(latitude=lat, longitude=lon, method="nearest").compute()
+        ds = xr.open_mfdataset(files, preprocess=preproc)
+        ds = ds.compute()
         ds = ds.resample(time=timestep).interpolate("linear")
         ds = ds.sel(time=slice(start_time, end_time))
         ds = ds.drop_vars(["latitude", "longitude"])
@@ -145,7 +149,7 @@ def extract_cams_data(
     """Extracts and converts the required variables from the CAMS CO2 dataset.
 
     Args:
-        files_cams: List of era5 files.
+        files_cams: List of CAMS files.
         lat: Latitude of the site.
         lon: Longitude of the site.
         start_time: Start time of the model run.
