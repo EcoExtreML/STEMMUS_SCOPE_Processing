@@ -256,7 +256,7 @@ def prepare_soil_init(config):
         )
     elif fmt == "latlon":
         matfiledata = _read_soil_initial_conditions_global(
-            global_path=Path(config['GlobalDataPath']),
+            soil_init_path=Path(config['InitialConditionPath']),
             lat=loc[0],
             lon=loc[1],
             start_time=config["StartTime"],
@@ -317,7 +317,7 @@ def _read_soil_initial_conditions_plumber2(
 
 
 def _read_soil_initial_conditions_global(
-    global_path: Path,
+    soil_init_path: Path,
     lat: float,
     lon: float,
     start_time: np.datetime64,
@@ -325,8 +325,7 @@ def _read_soil_initial_conditions_global(
     """Read soil initial conditions from era5-land data
 
     Args:
-        global_path (Path): Path to the global data directory. This directory requires
-            a folder called "soil_initial".
+        soil_init_path (Path): Path to the global soil init data directory.
         lat (float): Latitude of the location of interest.
         lon (float): Longitude of the location of interest.
         start_time (np.datetime64): Start time of the model.
@@ -335,9 +334,7 @@ def _read_soil_initial_conditions_global(
         Dictionary containing the STEMMUS_SCOPE variable names (keys) and their intial
             soil condition values.
     """
-
-    initial_condition_dir = global_path / "soil_initial"
-    ds = xr.open_mfdataset(str(initial_condition_dir / "*.nc"))
+    ds = xr.open_mfdataset(str(soil_init_path / "*.nc"))
     ds = ds.sel(latitude=lat, longitude=lon, method="nearest")
     ds = ds.sel(time=start_time, method="nearest")
     ds.compute()

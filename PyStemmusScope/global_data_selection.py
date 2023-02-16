@@ -9,9 +9,6 @@ from . import utils
 from . import variable_conversion as vc
 
 
-TIMESTEP = "1800S"
-
-
 def make_lat_lon_strings(
     lat: Union[int, float],
     lon: Union[int, float],
@@ -86,13 +83,15 @@ def get_filename_dem(lat: Union[int, float], lon: Union[int, float]) -> str:
     return f"Copernicus_DSM_30_{latstr}_00_{lonstr}_00_DEM.tif"
 
 
-def extract_era5_data(  # pylint: disable=too-many-arguments
+# pylint: disable=too-many-arguments
+def extract_era5_data(
     files_era5: List,
     files_era5_land: List,
     lat: Union[int, float],
     lon: Union[int, float],
     start_time: np.datetime64,
     end_time: np.datetime64,
+    timestep: str,
 ) -> Dict:
     """Extracts and converts the required variables from the era5 data.
 
@@ -102,6 +101,8 @@ def extract_era5_data(  # pylint: disable=too-many-arguments
         lon: Longitude of the site.
         start_time: Start time of the model run.
         end_time: End time of the model run.
+        timestep: Desired timestep of the model, this is derived from the forcing data.
+            In a pandas-timedelta compatible format. For example: "1800S"
 
     Returns:
         Dictionary containing the variables extracted from era5.
@@ -110,7 +111,7 @@ def extract_era5_data(  # pylint: disable=too-many-arguments
     for files in (files_era5, files_era5_land):
         ds = xr.open_mfdataset(files)
         ds = ds.sel(latitude=lat, longitude=lon, method="nearest").compute()
-        ds = ds.resample(time=TIMESTEP).interpolate("linear")
+        ds = ds.resample(time=timestep).interpolate("linear")
         ds = ds.sel(time=slice(start_time, end_time))
         ds = ds.drop_vars(["latitude", "longitude"])
         datasets.append(ds)
@@ -132,12 +133,14 @@ def extract_era5_data(  # pylint: disable=too-many-arguments
     return data
 
 
+# pylint: disable=too-many-arguments
 def extract_cams_data(
     files_cams: List,
     lat: Union[int, float],
     lon: Union[int, float],
     start_time: np.datetime64,
     end_time: np.datetime64,
+    timestep: str,
 ) -> xr.DataArray:
     """Extracts and converts the required variables from the CAMS CO2 dataset.
 
@@ -147,6 +150,8 @@ def extract_cams_data(
         lon: Longitude of the site.
         start_time: Start time of the model run.
         end_time: End time of the model run.
+        timestep: Desired timestep of the model, this is derived from the forcing data.
+            In a pandas-timedelta compatible format. For example: "1800S"
 
     Returns:
         DataArray containing the CO2 concentration.
@@ -154,7 +159,7 @@ def extract_cams_data(
     ds = xr.open_mfdataset(files_cams)
     ds = ds.sel(latitude=lat, longitude=lon, method="nearest")
     ds = ds.drop_vars(["latitude", "longitude"])
-    ds = ds.resample(time=TIMESTEP).interpolate("linear")
+    ds = ds.resample(time=timestep).interpolate("linear")
     ds = ds.sel(time=slice(start_time, end_time))
     return ds.co2
 
@@ -203,13 +208,14 @@ def extract_canopy_height_data(
     return canopy_height.values[0]
 
 
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument, too-many-arguments
 def extract_lai_data(
     files_lai: List,
     lat: Union[int, float],
     lon: Union[int, float],
     start_time: np.datetime64,
     end_time: np.datetime64,
+    timestep: str,
 ) -> xr.DataArray:
     """Generates LAI values, until a dataset is chosen.
 
@@ -223,7 +229,7 @@ def extract_lai_data(
     Returns:
         DataArray containing the LAI of the specified site for the given timeframe.
     """
-    timeseries = xr.date_range(start=start_time, end=end_time, freq=TIMESTEP)
+    timeseries = xr.date_range(start=start_time, end=end_time, freq=timestep)
     return xr.DataArray(
         data=np.ones(len(timeseries)) * 4,
         dims=["time"],

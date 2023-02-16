@@ -34,8 +34,10 @@ def read_forcing_data_plumber2(forcing_file, start_time, end_time):
 
     Args:
         forcing_file (Path): Path to the netCDF file containing the forcing data
-        start_time (str): Start of time range in ISO format string e.g. 'YYYY-MM-DDTHH:MM:SS'.
-        end_time (str): End of time range in ISO format string e.g. 'YYYY-MM-DDTHH:MM:SS'.
+        start_time (str): Start of time range in ISO format string, e.g. ,
+            'YYYY-MM-DDTHH:MM:SS'.
+        end_time (str): End of time range in ISO format string, e.g.,
+            'YYYY-MM-DDTHH:MM:SS'.
 
     Returns:
         dict: Dictionary containing the different variables required by STEMMUS_SCOPE
@@ -108,12 +110,14 @@ def read_forcing_data_plumber2(forcing_file, start_time, end_time):
     return data
 
 
+# pylint: disable=too-many-arguments
 def read_forcing_data_global(
     global_data_dir: Path,
     lat: float,
     lon: float,
     start_time: np.datetime64,
     end_time: np.datetime64,
+    timestep: str = "1800S"
 ) -> Dict:
     """Read forcing data for a certain location, based on global datasets.
 
@@ -123,6 +127,8 @@ def read_forcing_data_global(
         lon: Longitude of the site of interest.
         start_time: Start time of the model run.
         end_time: End time of the model run.
+        timestep: Desired timestep of the model, this is derived from the forcing data.
+            In a pandas-timedelta compatible format. Defaults to "1800S" (half an hour).
 
     Returns:
         Dictionary containing the forcing data.
@@ -139,31 +145,34 @@ def read_forcing_data_global(
 
     data = {
         "time": xr.DataArray(
-            pd.date_range(str(start_time), str(end_time), freq=TIMESTEP).rename("time")
+            pd.date_range(str(start_time), str(end_time), freq=timestep).rename("time")
         )
     }
     era5_data = gds.extract_era5_data(
-        files_era5, files_era5land, lat, lon, start_time, end_time
+        files_era5, files_era5land, lat, lon, start_time, end_time, timestep
     )
     data = {**data, **era5_data}
 
     data["co2_conv"] = (
         vc.co2_mass_fraction_to_kg_per_m3(
-            gds.extract_cams_data(files_cams, lat, lon, start_time, end_time)
+            gds.extract_cams_data(files_cams, lat, lon, start_time, end_time, timestep)
         )
         * 1e6
     )  # kg/m3 -> mg/m3
 
     data["lai"] = vc.mask_data(
-        gds.extract_lai_data(files_lai, lat, lon, start_time, end_time), min_value=0.01
+        gds.extract_lai_data(files_lai, lat, lon, start_time, end_time, timestep),
+        min_value=0.01
     )
 
     data["elevation"] = gds.extract_prism_dem_data(file_dem, lat, lon)
 
     data["canopy_height"] = gds.extract_canopy_height_data(file_canopy_height, lat, lon)
-    data["reference_height"] = 0.7 * data["canopy_height"]
+    # Height of measurement. Data has no actual equivalent. Set to a temp. value. see
+    #  issue #145.
+    data["reference_height"] = 10.
 
-    data["sitename"] = "StemmusScope_Global"
+    data["sitename"] = "global"
 
     # Expected time format is days (as floating point) since Jan 1st 00:00.
     data["doy_float"] = (
@@ -312,7 +321,7 @@ def prepare_forcing(config):
             )
 
         data = read_forcing_data_global(
-            global_data_dir=Path(config["GlobalDataPath"]),
+            global_data_dir=Path(config["ForcingPath"]),
             lat=loc[0],
             lon=loc[1],
             start_time=config["StartTime"],

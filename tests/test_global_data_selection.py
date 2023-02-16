@@ -11,6 +11,7 @@ TEST_LAT = 37.933804  # Same as XX-Xxx
 TEST_LON = -107.807526
 START_TIME = np.datetime64("1996-01-01T00:00")
 END_TIME = np.datetime64("1996-01-01T12:00")
+TIMESTEP = "1800S"
 
 
 def test_get_filename_canopy_height():
@@ -37,6 +38,7 @@ def get_forcing_data():
         lon=TEST_LON,
         start_time=START_TIME,
         end_time=END_TIME,
+        timestep=TIMESTEP,
     )
 
 
@@ -55,7 +57,7 @@ expected_keys_values = [
     ("lai", 4.),
     ("elevation", 111.),
     ("canopy_height", 1.0),
-    ("reference_height", 0.7),
+    ("reference_height", 10.),
     ("doy_float", 0.),
 ]
 
