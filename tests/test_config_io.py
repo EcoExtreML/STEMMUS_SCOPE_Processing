@@ -10,7 +10,6 @@ class TestConfigIO:
     def dummy_config(self):
         dummy_config = {
             "WorkDir": "tests/test_data/directories/",
-            "GlobalDataPath": "tests/test_data/directories/global/",
             "SoilPropertyPath": "tests/test_data/directories/model_parameters/soil_property/",
             "ForcingPath": "tests/test_data/directories/forcing/plumber2_data/",
             "Location": "XX-Xxx",

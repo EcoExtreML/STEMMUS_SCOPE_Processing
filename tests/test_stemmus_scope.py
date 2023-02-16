@@ -287,7 +287,7 @@ class TestWithOctave:
 class TestWithGlobalData:
     @pytest.fixture
     def model(self, tmp_path):
-        config_file = str(data_folder / "config_file_test.txt")
+        config_file = str(data_folder / "config_file_global.txt")
         exe_file = Path(tmp_path) / "STEMMUS_SCOPE"
 
         # create dummy exe file
