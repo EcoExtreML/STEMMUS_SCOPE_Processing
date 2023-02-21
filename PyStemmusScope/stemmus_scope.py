@@ -123,10 +123,10 @@ class StemmusScope:
 
     def setup(
         self,
-        WorkDir: Optional[str],
-        Location: Optional[str],
-        StartTime: Optional[str],
-        EndTime: Optional[str],
+        WorkDir: Optional[str] = None,
+        Location: Optional[str] = None,
+        StartTime: Optional[str] = None,
+        EndTime: Optional[str] = None,
     ) -> Tuple[str, str]:
         """Configure the model run.
 

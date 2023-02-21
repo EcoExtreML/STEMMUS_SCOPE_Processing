@@ -57,7 +57,7 @@ def os_name():
 
 def to_absolute_path(
     input_path: str,
-    parent: Optional[Path],
+    parent: Optional[Path] = None,
     must_be_in_parent=True,
 ) -> Path:
     """Parse input string as :py:class:`pathlib.Path` object.
