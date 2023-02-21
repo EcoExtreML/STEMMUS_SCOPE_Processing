@@ -32,19 +32,21 @@ from . import variable_conversion as vc
 logger = logging.getLogger(__name__)
 
 DATASET_ATTRS = {
-    'model': 'STEMMUS_SCOPE',
-    'institution': 'University of Twente; Northwest A&F University',
-    'contact': (
-        'Zhongbo Su, z.su@utwente.nl; '
-        'Yijian Zeng, y.zeng@utwente.nl; '
-        'Yunfei Wang, y.wang-3@utwente.nl'
-        ),
-    'license_type': 'CC BY 4.0',
-    'license_url': 'https://creativecommons.org/licenses/by/4.0/',
+    "model": "STEMMUS_SCOPE",
+    "institution": "University of Twente; Northwest A&F University",
+    "contact": (
+        "Zhongbo Su, z.su@utwente.nl; "
+        "Yijian Zeng, y.zeng@utwente.nl; "
+        "Yunfei Wang, y.wang-3@utwente.nl"
+    ),
+    "license_type": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
 }
 
 
-def _select_forcing_variables(forcing_dict: Dict, forcing_var: str, alma_var: str) -> xr.DataArray:
+def _select_forcing_variables(
+    forcing_dict: Dict, forcing_var: str, alma_var: str
+) -> xr.DataArray:
     """Select the variable needed by ALMA convention.
 
     Args:
@@ -82,7 +84,7 @@ def _prepare_soil_data(file_name: str, var_name: str, time: List) -> xr.DataArra
     data = data.iloc[1:]
 
     # make sure it is float and not str
-    data = data.astype('float32')
+    data = data.astype("float32")
 
     # get depth, thickness info
     depths = []
@@ -133,7 +135,9 @@ def _prepare_soil_data(file_name: str, var_name: str, time: List) -> xr.DataArra
     return data_array
 
 
-def _prepare_simulated_data(file_name: str, model_name: str, alma_name: str, time: List) ->  xr.DataArray:
+def _prepare_simulated_data(
+    file_name: str, model_name: str, alma_name: str, time: List
+) -> xr.DataArray:
     """Return model simulation as `xr.DataArray`.
 
     Args:
@@ -159,13 +163,15 @@ def _prepare_simulated_data(file_name: str, model_name: str, alma_name: str, tim
     data.name = alma_name
 
     # make sure it is float and not str
-    data = data.astype('float32')
+    data = data.astype("float32")
 
     # convert dataframe to xarray data array
     return data.to_xarray()
 
 
-def _create_soil_layer_metadata(thicknesses: List[float], depths: List[float]) -> List[str]:
+def _create_soil_layer_metadata(
+    thicknesses: List[float], depths: List[float]
+) -> List[str]:
     """Create soil layer metadata for STEMMUS_SCOPE.
 
     Note:
@@ -196,7 +202,7 @@ def _update_dataset_attrs_dims(dataset: xr.Dataset, forcing_dict: Dict) -> xr.Da
     dataset_expanded = dataset.expand_dims(["x", "y"])
 
     # change the order of dims
-    req_dims = ['time', 'x', 'y']
+    req_dims = ["time", "x", "y"]
     if any(dim not in dataset_expanded.dims for dim in req_dims):
         raise ValueError("Data should have dimensions time, y, x.")
 
@@ -209,29 +215,29 @@ def _update_dataset_attrs_dims(dataset: xr.Dataset, forcing_dict: Dict) -> xr.Da
     lat = forcing_dict["latitude"]
     lon = forcing_dict["longitude"]
     dataset_reordered.attrs = DATASET_ATTRS
-    dataset_reordered.attrs['latitude'] = lat
-    dataset_reordered.attrs['longitude'] = lon
+    dataset_reordered.attrs["latitude"] = lat
+    dataset_reordered.attrs["longitude"] = lon
 
     # update values of x and y coords
     dataset = dataset_reordered.assign_coords(
         {
             "x": [lon],
             "y": [lat],
-            }
-        )
+        }
+    )
 
     # update x, y attributes
     dataset["x"].attrs = {
-            "long_name": "Gridbox longitude",
-            "standard_name": "longitude",
-            "units": "degrees",
-            }
+        "long_name": "Gridbox longitude",
+        "standard_name": "longitude",
+        "units": "degrees",
+    }
 
     dataset["y"].attrs = {
-            "long_name": "Gridbox latitude",
-            "standard_name": "latitude",
-            "units": "degrees",
-            }
+        "long_name": "Gridbox latitude",
+        "standard_name": "latitude",
+        "units": "degrees",
+    }
 
     return dataset
 
@@ -251,14 +257,14 @@ def to_netcdf(config_file: str, cf_filename: str) -> str:
 
     # list of required forcing variables, Alma_short_name: forcing_io_name, # model_name
     var_names = {
-        "RH": "rh", # RH
-        "SWdown_ec": "sw_down", # Rin
-        "LWdown_ec": "lw_down", # Rli
+        "RH": "rh",  # RH
+        "SWdown_ec": "sw_down",  # Rin
+        "LWdown_ec": "lw_down",  # Rli
         "Qair": "Qair",
-        "Tair": "t_air_celcius", # Ta
-        "Psurf": "psurf_hpa", # P
-        "Wind": "wind_speed", # u
-        "Precip": "precip_conv", # Pre
+        "Tair": "t_air_celcius",  # Ta
+        "Psurf": "psurf_hpa",  # P
+        "Wind": "wind_speed",  # u
+        "Precip": "precip_conv",  # Pre
     }
 
     if fmt == "site":
@@ -291,7 +297,9 @@ def to_netcdf(config_file: str, cf_filename: str) -> str:
 
         if alma_name in var_names:
             # select data
-            data_array = _select_forcing_variables(forcing_dict, var_names[alma_name], alma_name)
+            data_array = _select_forcing_variables(
+                forcing_dict, var_names[alma_name], alma_name
+            )
 
         # create data array
         elif alma_name in {"SoilTemp", "SoilMoist"}:
@@ -299,7 +307,7 @@ def to_netcdf(config_file: str, cf_filename: str) -> str:
         else:
             data_array = _prepare_simulated_data(
                 file_name, df["short_name_STEMMUS-SCOPE"], alma_name, time
-                )
+            )
 
         # update attributes of array
         data_array.attrs = {
@@ -320,7 +328,10 @@ def to_netcdf(config_file: str, cf_filename: str) -> str:
     dataset = _update_dataset_attrs_dims(dataset, forcing_dict)
 
     # # save to nc file
-    nc_filename = Path(config["OutputPath"]) / f"{Path(config['OutputPath']).stem}_STEMMUS_SCOPE.nc"
-    dataset.to_netcdf(path= nc_filename)
+    nc_filename = (
+        Path(config["OutputPath"])
+        / f"{Path(config['OutputPath']).stem}_STEMMUS_SCOPE.nc"
+    )
+    dataset.to_netcdf(path=nc_filename)
 
     return str(nc_filename)

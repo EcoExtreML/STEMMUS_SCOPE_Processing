@@ -72,7 +72,9 @@ class TestSaveForcingData:
         config = config_io.read_config(config_path)
         forcing_file = utils.get_forcing_file(config)
         forcing_data = forcing_io.read_forcing_data_plumber2(
-            forcing_file, model.config["StartTime"], model.config["EndTime"],
+            forcing_file,
+            model.config["StartTime"],
+            model.config["EndTime"],
         )
 
         # check data values
@@ -155,13 +157,17 @@ class TestSaveSimulatedData:
 
         forcing_file = utils.get_forcing_file(config)
         forcing_data = forcing_io.read_forcing_data_plumber2(
-            forcing_file, model.config["StartTime"], model.config["EndTime"],
+            forcing_file,
+            model.config["StartTime"],
+            model.config["EndTime"],
         )
 
         # check data values
         LWnet = np.array([-45.79605, -44.41207, -41.13654, -43.51004, -42.69192])
         np.testing.assert_allclose(
-            LWnet, dataset["LWnet"].values.flatten(), rtol=1e-5,
+            LWnet,
+            dataset["LWnet"].values.flatten(),
+            rtol=1e-5,
         )
         # check size of time dimension
         assert dataset["time"].shape[0] == 5
@@ -240,12 +246,16 @@ class TestSoilData:
 
         forcing_file = utils.get_forcing_file(config)
         forcing_data = forcing_io.read_forcing_data_plumber2(
-            forcing_file, model.config["StartTime"], model.config["EndTime"],
+            forcing_file,
+            model.config["StartTime"],
+            model.config["EndTime"],
         )
         # check data values
         SoilMoist = np.array([2.21277, 2.236381, 2.256538, 4.571108])
         np.testing.assert_allclose(
-            SoilMoist, dataset["SoilMoist"].isel(time=0).values.flatten(), rtol=1e-5,
+            SoilMoist,
+            dataset["SoilMoist"].isel(time=0).values.flatten(),
+            rtol=1e-5,
         )
         # check size of time dimension
         assert dataset["time"].shape[0] == 5
@@ -344,7 +354,9 @@ class TestSaveToNetcdf:
 
         forcing_file = utils.get_forcing_file(config)
         forcing_data = forcing_io.read_forcing_data_plumber2(
-            forcing_file, model.config["StartTime"], model.config["EndTime"],
+            forcing_file,
+            model.config["StartTime"],
+            model.config["EndTime"],
         )
 
         # check size of time dimension

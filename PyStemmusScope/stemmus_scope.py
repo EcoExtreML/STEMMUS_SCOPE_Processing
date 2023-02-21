@@ -16,6 +16,7 @@ from . import utils
 
 logger = logging.getLogger(__name__)
 
+
 def _is_model_src_exe(model_src_path: Path):
     """Check if input exists.
 
@@ -26,9 +27,11 @@ def _is_model_src_exe(model_src_path: Path):
         directory containing model source codes.
     """
     if model_src_path.is_file():
-        msg = ("The model executable file can be used on a Unix system "
+        msg = (
+            "The model executable file can be used on a Unix system "
             "where MCR is installed, see the "
-            "`documentation<https://pystemmusscope.readthedocs.io/>`_.")
+            "`documentation<https://pystemmusscope.readthedocs.io/>`_."
+        )
         logger.info("%s", msg)
         return True
     if model_src_path.is_dir():
@@ -36,29 +39,33 @@ def _is_model_src_exe(model_src_path: Path):
     msg = (
         "Provide a valid path to an executable file or "
         "to a directory containing model source codes, "
-        "see the `documentation<https://pystemmusscope.readthedocs.io/>`_.")
+        "see the `documentation<https://pystemmusscope.readthedocs.io/>`_."
+    )
     raise ValueError(msg)
 
 
 def _check_interpreter(interpreter: str):
-    if interpreter not in {"Octave" , "Matlab"}:
+    if interpreter not in {"Octave", "Matlab"}:
         msg = (
             "Set `interpreter` as Octave or Matlab to run the model using source codes."
             "Otherwise set `model_src_path` to the model executable file, "
-            "see the `documentation<https://pystemmusscope.readthedocs.io/>`_.")
+            "see the `documentation<https://pystemmusscope.readthedocs.io/>`_."
+        )
         raise ValueError(msg)
 
 
 def _run_sub_process(args: list, cwd):
     # pylint: disable=consider-using-with
     result = subprocess.Popen(
-        args, cwd=cwd,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        args,
+        cwd=cwd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         shell=True,
     )
     exit_code = result.wait()
     stdout, stderr = result.communicate()
-    #TODO handle stderr properly
+    # TODO handle stderr properly
     # when using octave, exit_code might be 139
     # see issue STEMMUS_SCOPE_Processing/issues/46
     if exit_code not in [0, 139]:
@@ -70,10 +77,10 @@ def _run_sub_process(args: list, cwd):
 
     # TODO return log info line by line!
     logger.info(stdout)
-    return stdout.decode('utf-8')
+    return stdout.decode("utf-8")
 
 
-class StemmusScope():
+class StemmusScope:
     """PyStemmusScope wrapper around Stemmus_Scope model."""
 
     def __init__(self, config_file: str, model_src_path: str, interpreter: str = None):
@@ -177,28 +184,28 @@ class StemmusScope():
             # run using MCR
             args = [f"{self.exe_file} {self.cfg_file}"]
             # set matlab log dir
-            os.environ['MATLAB_LOG_DIR'] = str(self._config["InputPath"])
+            os.environ["MATLAB_LOG_DIR"] = str(self._config["InputPath"])
             result = _run_sub_process(args, None)
-        if self.interpreter=="Matlab":
+        if self.interpreter == "Matlab":
             # set Matlab arguments
             path_to_config = f"'{self.cfg_file}'"
-            eval_code= f'STEMMUS_SCOPE_exe({path_to_config});exit;'
+            eval_code = f"STEMMUS_SCOPE_exe({path_to_config});exit;"
             args = ["matlab", "-r", eval_code, "-nodisplay", "-nosplash", "-nodesktop"]
             # seperate args dont work on linux!
-            if utils.os_name() !="nt":
+            if utils.os_name() != "nt":
                 args = shlex.join(args)
             result = _run_sub_process(args, self.model_src)
-        if self.interpreter=="Octave":
+        if self.interpreter == "Octave":
             # set Octave arguments
             # use subprocess instead of oct2py,
             # see issue STEMMUS_SCOPE_Processing/issues/46
             path_to_config = f"'{self.cfg_file}'"
             # fix for windows
             path_to_config = path_to_config.replace("\\", "/")
-            eval_code = f'STEMMUS_SCOPE_exe({path_to_config});exit;'
+            eval_code = f"STEMMUS_SCOPE_exe({path_to_config});exit;"
             args = ["octave", "--eval", eval_code, "--no-gui", "--silent"]
             # seperate args dont work on linux!
-            if utils.os_name() !="nt":
+            if utils.os_name() != "nt":
                 args = shlex.join(args)
             result = _run_sub_process(args, self.model_src)
         return result

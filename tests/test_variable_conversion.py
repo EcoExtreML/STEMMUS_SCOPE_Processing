@@ -9,7 +9,7 @@ def test_calculate_ea():
     rh = np.array([0.03, 76.35])
     calculated_ea = vc.calculate_ea(t_air_celcius, rh)
 
-    expected_ea = np.array([1.72583644e-04, 6.31192282e+00])
+    expected_ea = np.array([1.72583644e-04, 6.31192282e00])
 
     # check values
     np.testing.assert_almost_equal(expected_ea, calculated_ea)
@@ -30,9 +30,9 @@ def test_calculate_ea():
 def test_soil_moisture():
     volumetric_water_content = np.array([0.22, 0.65])
     thickness = np.array([1, 20])
-    calculated_soil_moisture =vc.soil_moisture(volumetric_water_content, thickness)
+    calculated_soil_moisture = vc.soil_moisture(volumetric_water_content, thickness)
 
-    expected_soil_moisture = np.array([220., 13000.])
+    expected_soil_moisture = np.array([220.0, 13000.0])
     np.testing.assert_almost_equal(expected_soil_moisture, calculated_soil_moisture)
 
     # check lengths

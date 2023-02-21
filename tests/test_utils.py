@@ -1,4 +1,3 @@
-
 from pathlib import Path
 from unittest.mock import patch
 import pytest
@@ -150,7 +149,7 @@ class TestTime:
             utils.check_time_fmt(config["StartTime"], config["EndTime"])
 
 
-class TestGetForcingFile():
+class TestGetForcingFile:
     @pytest.fixture
     def config_file(self):
         config_file = str(data_folder / "config_file_test.txt")

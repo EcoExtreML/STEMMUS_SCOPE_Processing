@@ -14,6 +14,7 @@ from . import utils
 
 logger = logging.getLogger(__name__)
 
+
 def read_config(path_to_config_file):
     """Read config from given config file.
 
@@ -29,7 +30,7 @@ def read_config(path_to_config_file):
     with open(path_to_config_file, encoding="utf8") as f:
         for line in f:
             (key, val) = line.split("=")
-            config[key] = val.rstrip('\n')
+            config[key] = val.rstrip("\n")
 
     validate_config(config)
 
@@ -41,8 +42,10 @@ def validate_config(config: Union[Path, dict]):
     if isinstance(config, Path):
         config = read_config(config)
     elif not isinstance(config, dict):
-        raise ValueError("The input to validate_config should be either a Path or dict"
-                         f" object, but a {type(config)} object was passed.")
+        raise ValueError(
+            "The input to validate_config should be either a Path or dict"
+            f" object, but a {type(config)} object was passed."
+        )
 
     # TODO: add check if the input data directories/file exist, and return clear error to user.
     _ = utils.check_location_fmt(config["Location"])
@@ -58,7 +61,7 @@ def create_io_dir(config):
         Path (string) to input, output directory and config file for every station/forcing.
     """
     # get start time with the format Y-M-D-HM
-    timestamp = time.strftime('%Y-%m-%d-%H%M')
+    timestamp = time.strftime("%Y-%m-%d-%H%M")
 
     loc, fmt = utils.check_location_fmt(config["Location"])
     if fmt == "site":
@@ -75,7 +78,7 @@ def create_io_dir(config):
         raise NotImplementedError()
 
     # create input directory
-    work_dir = utils.to_absolute_path(config['WorkDir'])
+    work_dir = utils.to_absolute_path(config["WorkDir"])
     input_dir = work_dir / "input" / input_dir_name
     input_dir.mkdir(parents=True, exist_ok=True)
     message = f"Prepare work directory {input_dir} for the location: {loc}"
@@ -91,8 +94,9 @@ def create_io_dir(config):
     logger.info("%s", message)
 
     # update config file for ForcingFileName and InputPath
-    config_file_path = _update_config_file(input_dir, output_dir,
-        config, site_name, timestamp)
+    config_file_path = _update_config_file(
+        input_dir, output_dir, config, site_name, timestamp
+    )
 
     return str(input_dir), str(output_dir), config_file_path
 
@@ -106,11 +110,18 @@ def _copy_data(input_dir, config):
         input_dir: Path to the input directory.
         config: Dictionary containing all the paths.
     """
-    folder_list_vegetation = ["directional", "fluspect_parameters", "leafangles",
-        "radiationdata", "soil_spectrum"]
+    folder_list_vegetation = [
+        "directional",
+        "fluspect_parameters",
+        "leafangles",
+        "radiationdata",
+        "soil_spectrum",
+    ]
     for folder in folder_list_vegetation:
         os.makedirs(input_dir / folder, exist_ok=True)
-        shutil.copytree(str(config[folder]), str(input_dir / folder), dirs_exist_ok=True)
+        shutil.copytree(
+            str(config[folder]), str(input_dir / folder), dirs_exist_ok=True
+        )
 
     # copy input_data.xlsx
     shutil.copy(str(config["input_data"]), str(input_dir))
@@ -133,7 +144,7 @@ def _update_config_file(input_dir, output_dir, config, site_name, timestamp):
         Path to updated config file.
     """
     config_file_path = input_dir / f"{site_name}_{timestamp}_config.txt"
-    with open(config_file_path, 'w', encoding="utf8") as f:
+    with open(config_file_path, "w", encoding="utf8") as f:
         for key, value in config.items():
             if key == "InputPath":
                 update_entry = f"{key}={str(input_dir)}/\n"

@@ -84,7 +84,6 @@ def get_filename_dem(lat: Union[int, float], lon: Union[int, float]) -> str:
     return f"Copernicus_DSM_30_{latstr}_00_{lonstr}_00_DEM.tif"
 
 
-
 def extract_era5_data(  # noqa:PLR0913 (too many arguments)
     files_era5: List,
     files_era5_land: List,
@@ -109,6 +108,7 @@ def extract_era5_data(  # noqa:PLR0913 (too many arguments)
     Returns:
         Dictionary containing the variables extracted from ERA5.
     """
+
     def preproc(ds):
         ds = ds.sel(latitude=lat, longitude=lon, method="nearest")
         return ds.drop_vars(["latitude", "longitude"])

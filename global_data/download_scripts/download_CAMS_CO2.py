@@ -10,10 +10,7 @@ with open(Path.home() / ".adsloginrc", encoding="utf8") as f:
     uid = f.readline().strip()
     api_key = f.readline().strip()
 
-http = urllib3.PoolManager(
-    cert_reqs="CERT_REQUIRED",
-    ca_certs=certifi.where()
-)
+http = urllib3.PoolManager(cert_reqs="CERT_REQUIRED", ca_certs=certifi.where())
 
 c = cdsapi.Client(
     url="https://ads.atmosphere.copernicus.eu/api/v2",
@@ -27,10 +24,8 @@ c.retrieve(
         "format": "netcdf",
         "model_level": "60",  # surface level data
         "date": "2003-01-02/2020-12-31",
-        "step": [
-            "0", "3", "6", "9", "12", "15", "18", "21"
-        ],
+        "step": ["0", "3", "6", "9", "12", "15", "18", "21"],
         "variable": "carbon_dioxide",
     },
-    "CAMS_CO2_2003-2020.nc"
+    "CAMS_CO2_2003-2020.nc",
 )

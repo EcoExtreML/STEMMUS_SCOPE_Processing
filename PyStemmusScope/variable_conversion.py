@@ -93,7 +93,9 @@ def co2_molar_fraction_to_kg_per_m3(
     return molar_fraction * molecular_weight_co2 * molar_density_air
 
 
-def co2_mass_fraction_to_kg_per_m3(mass_fraction: Union[float, np.ndarray, xr.DataArray]):
+def co2_mass_fraction_to_kg_per_m3(
+    mass_fraction: Union[float, np.ndarray, xr.DataArray]
+):
     """Convert CO2 mass fraction [kg cO2/kg air] to concentration in [kg CO2/m3 air].
 
     Note: the density of air [kg/m3] used for the calculation is assumed to be constant
@@ -153,7 +155,9 @@ def field_moisture_content(theta_r, theta_s, alpha, coef_n):
     return field_moisture_content
 
 
-def soil_moisture(volumetric_water_content: np.ndarray, thickness: np.ndarray) -> np.ndarray:
+def soil_moisture(
+    volumetric_water_content: np.ndarray, thickness: np.ndarray
+) -> np.ndarray:
     """Calculate the soil moisture (kg/m2) from volumetric water content(m3/m3).
 
     based on SM = VolumetricWaterContent * Density * Thickness.

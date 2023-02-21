@@ -7,12 +7,14 @@ import xarray as xr
 TEST_DATA_DIR = Path(
     "./tests/test_data/directories/model_parameters/soil_initialcondition/"
 )
-FILE_TIME = np.datetime64("1996-01-01T00:00",)
+FILE_TIME = np.datetime64(
+    "1996-01-01T00:00",
+)
 LOCATION = "XX-Xxx"
 LAT = 37.933804  # from XX-Xxx dummy file.
 LON = -107.807526
 
-timestr = np.datetime_as_string(FILE_TIME)[:-6].replace("-","")
+timestr = np.datetime_as_string(FILE_TIME)[:-6].replace("-", "")
 filenames_varnames = [
     (f"{LOCATION}_{timestr}_00-land_skin_temperature.nc", "skt"),
     (f"{LOCATION}_{timestr}_00-land_soil_temperature_level_1.nc", "stl1"),
@@ -34,6 +36,6 @@ for filename, varname in filenames_varnames:
             "time": np.array([FILE_TIME]),
             "latitude": np.array([LAT]),
             "longitude": np.array([LON]),
-        }
+        },
     )
     ds.to_netcdf(TEST_DATA_DIR / filename)

@@ -115,7 +115,7 @@ def read_forcing_data_global(  # noqa:PLR0913 (too many arguments)
     lon: float,
     start_time: np.datetime64,
     end_time: np.datetime64,
-    timestep: str = "1800S"
+    timestep: str = "1800S",
 ) -> Dict:
     """Read forcing data for a certain location, based on global datasets.
 
@@ -159,7 +159,7 @@ def read_forcing_data_global(  # noqa:PLR0913 (too many arguments)
 
     data["lai"] = vc.mask_data(
         gds.extract_lai_data(files_lai, lat, lon, start_time, end_time, timestep),
-        min_value=0.01
+        min_value=0.01,
     )
 
     data["elevation"] = gds.extract_prism_dem_data(file_dem, lat, lon)
@@ -167,7 +167,7 @@ def read_forcing_data_global(  # noqa:PLR0913 (too many arguments)
     data["canopy_height"] = gds.extract_canopy_height_data(file_canopy_height, lat, lon)
     # Height of measurement. Data has no actual equivalent. Set to a temp. value. see
     #  issue #145.
-    data["reference_height"] = 10.
+    data["reference_height"] = 10.0
 
     data["sitename"] = "global"
 
@@ -323,7 +323,7 @@ def prepare_forcing(config):
             lon=loc[1],
             start_time=config["StartTime"],
             end_time=config["EndTime"],
-            )
+        )
     else:
         raise NotImplementedError
 
