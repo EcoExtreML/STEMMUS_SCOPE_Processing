@@ -26,7 +26,7 @@ def _is_model_src_exe(model_src_path: Path):
     if model_src_path.is_file():
         msg = ("The model executable file can be used on a Unix system "
             "where MCR is installed, see the "
-            "`documentaion<https://pystemmusscope.readthedocs.io/>`_.")
+            "`documentation<https://pystemmusscope.readthedocs.io/>`_.")
         logger.info("%s", msg)
         return True
     if model_src_path.is_dir():
@@ -157,6 +157,7 @@ class StemmusScope():
 
         forcing_io.prepare_forcing(self._config)
         soil_io.prepare_soil_data(self._config)
+        soil_io.prepare_soil_init(self._config)
 
         return str(self.cfg_file)
 

@@ -1,18 +1,25 @@
+from typing import Union
 import numpy as np
+import xarray as xr
+
+
+AVG_DENSITY_AIR = 1.292  # [kg/m3]
 
 
 def calculate_ea(t_air_celcius, rh):
-    """Function that calculates the actual vapour pressure (kPa) from the
-    air temperature (degree Celcius) and relative humidity (%)
+    """Calculate the actual vapor pressure.
+
+    Calculate the actual vapor pressure (kPa) from the air temperature (degree Celcius)
+    and relative humidity (%).
 
     Args:
-        t_air_celcius: numpy array containing the air temperature in degrees C.
+        t_air_celcius: the air temperature in degrees C.
 
-        rh: numpy array of same shape as t_air_celcius, containing the relative humidity
-            as a percentage (e.g. ranging from 0 - 100).
+        rh: the relative humidity (same shape as t_air_celcius) as a percentage
+            (e.g. ranging from 0 - 100).
 
     Returns:
-        numpy array with the calculated actual vapor pressure
+        the actual vapor pressure
     """
     # Teten O. Über einige meteorologische Begriffe. Z. Geophys., 1930; 6. 297-309.
     # Murray FW. On the computation of saturation vapor pressure,
@@ -20,19 +27,54 @@ def calculate_ea(t_air_celcius, rh):
 
     # check rh values
     if rh.min() < 0.0 or rh.max() > 100.0:
-        raise ValueError("relative humidity should be in percentage ranging from 0 - 100")
+        raise ValueError(
+            "relative humidity should be in percentage ranging from 0 - 100"
+        )
 
     # check lengths
     if rh.shape != t_air_celcius.shape:
         raise ValueError("input arrays should have the same shape (size).")
 
-    es = 0.61078 * 10 ** (t_air_celcius * 7.5 / (237.3 + t_air_celcius))
-    return es * rh / 100
+    return calculate_es(t_air_celcius) * rh / 100
 
 
-def co2_molar_fraction_to_kg_per_m3(molar_fraction):
-    """Function to convert CO2 molar fraction [mol cO2/mol air] to CO2
-    concentration in [kg CO2 / m3 air]
+def calculate_es(t_celcius):
+    """Calculate the saturation vapor pressure (kPa) from temperature (deg C).
+
+    Args:
+        t_celcius: the temperature in degrees C.
+
+    Returns:
+        saturation vapor pressure
+    """
+    # Teten O. Über einige meteorologische Begriffe. Z. Geophys., 1930; 6. 297-309.
+    # Murray FW. On the computation of saturation vapor pressure,
+    #   J. Appl. Meteorol., 1967; 6, 203-204
+
+    return 0.61078 * 10 ** (t_celcius * 7.5 / (237.3 + t_celcius))
+
+
+def specific_humidity(e_a, p_air):
+    """Calculate the humidity [kg water / m3 air] using e_a and the air pressure
+
+    See: Pal Arya, S.: Introduction to Micrometeorology, Academic Press,
+        San Diego, California, 1988.
+
+    Args:
+        e_a: Actual vapor pressure
+        p_air: Air pressure (same units as e_a)
+
+    Returns:
+        Specific humidity [kg water / m3 air]
+    """
+    EPSILON = 0.622  # ratio of molecular mass of water vapour to dry air
+    return EPSILON * e_a / p_air
+
+
+def co2_molar_fraction_to_kg_per_m3(
+    molar_fraction: Union[float, np.array, xr.DataArray]
+):
+    """Convert CO2 molar fraction [mol cO2/mol air] to concentration in [kg CO2/m3 air].
 
     Note: the density of air [kg/m3] used for the calculation is assumed to be constant
     here, but will vary depending on the air pressure and air temperature.
@@ -43,11 +85,26 @@ def co2_molar_fraction_to_kg_per_m3(molar_fraction):
     Returns:
         Same as input: CO2 concentration in [kg CO2 / m3 air]
     """
-    molecular_weight_co2 = 44.01 # [kg/mol]
-    avg_density_air = 1.292 # [kg/m3]
-    avg_molar_mass_air = 28.9647 # [kg/mol]
-    molar_density_air = avg_molar_mass_air / avg_density_air # [m3/mol]
-    return molar_fraction * molecular_weight_co2 / molar_density_air
+    molecular_weight_co2 = 44.01  # [kg/mol]
+    avg_molar_mass_air = 28.9647  # [kg/mol]
+    molar_density_air = AVG_DENSITY_AIR / avg_molar_mass_air  # [mol/m3]
+    #   [mol cO2/mol air] * [kg CO2/mol CO2]     * [mol air / m3]    = [kg CO2/m3 air]
+    return molar_fraction * molecular_weight_co2 * molar_density_air
+
+
+def co2_mass_fraction_to_kg_per_m3(mass_fraction: Union[float, np.array, xr.DataArray]):
+    """Convert CO2 mass fraction [kg cO2/kg air] to concentration in [kg CO2/m3 air].
+
+    Note: the density of air [kg/m3] used for the calculation is assumed to be constant
+    here, but will vary depending on the air pressure and air temperature.
+
+    Args:
+        molar_fraction: CO2 concentration as mass fraction
+
+    Returns:
+        Same as input: CO2 concentration in [kg CO2 / m3 air]
+    """
+    return mass_fraction * AVG_DENSITY_AIR
 
 
 def mask_data(data, min_value=None, max_value=None):
@@ -83,16 +140,16 @@ def field_moisture_content(theta_r, theta_s, alpha, coef_n):
     Returns:
         float or np.array: Field moisture content
     """
-    phi_fc = 341.9 # soil water potential at field capacity (cm)
+    phi_fc = 341.9  # soil water potential at field capacity (cm)
 
-    field_moisture_content = theta_r + (theta_s - theta_r)/(
-        1 + (alpha * phi_fc)**coef_n
-        )**(1 -1/coef_n)
+    field_moisture_content = theta_r + (theta_s - theta_r) / (
+        1 + (alpha * phi_fc) ** coef_n
+    ) ** (1 - 1 / coef_n)
 
     return field_moisture_content
 
 
-def soil_moisture(volumetric_water_content:np.array, thickness:np.array) -> np.array:
+def soil_moisture(volumetric_water_content: np.array, thickness: np.array) -> np.array:
     """Calculates the soil moisture (kg/m2) from volumetric water content(m3/m3), based on SM =
         VolumetricWaterContent * Density * Thickness.
 
@@ -108,4 +165,4 @@ def soil_moisture(volumetric_water_content:np.array, thickness:np.array) -> np.a
         raise ValueError("input arrays should have the same shape (size).")
 
     # Density: constant (water_density = 1000 kg per m3)
-    return  (1000.0 * volumetric_water_content * thickness)
+    return 1000.0 * volumetric_water_content * thickness

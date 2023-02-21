@@ -6,8 +6,8 @@ This is the documentation for the python package `PyStemmusScope`, which allows 
 running the STEMMUS-SCOPE model.
 
 
-<!-- markdown-link-check-disable-next-line -->
 The model source code, executable file and utility files are available in the
+<!-- markdown-link-check-disable-next-line -->
 [STEMMUS_SCOPE repository](https://github.com/EcoExtreML/STEMMUS_SCOPE).
 
 The input datasets are available on Snellius and CRIB. First, make sure you have

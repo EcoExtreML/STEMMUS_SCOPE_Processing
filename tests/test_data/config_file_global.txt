@@ -1,0 +1,15 @@
+WorkDir=tests/test_data/directories/
+SoilPropertyPath=tests/test_data/directories/model_parameters/soil_property/
+ForcingPath=tests/test_data/directories/global/
+Location=(37.933804, -107.807526)
+directional=tests/test_data/directories/model_parameters/vegetation_property/directional/
+fluspect_parameters=tests/test_data/directories/model_parameters/vegetation_property/fluspect_parameters/
+leafangles=tests/test_data/directories/model_parameters/vegetation_property/leafangles/
+radiationdata=tests/test_data/directories/model_parameters/vegetation_property/radiationdata/
+soil_spectrum=tests/test_data/directories/model_parameters/vegetation_property/soil_spectrum/
+input_data=tests/test_data/directories/model_parameters/vegetation_property/dummy_data.xlsx
+InitialConditionPath=tests/test_data/directories/global/soil_initial/
+StartTime=1996-01-01T00:00
+EndTime=1996-01-01T02:00
+InputPath=
+OutputPath=

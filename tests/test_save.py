@@ -71,7 +71,7 @@ class TestSaveForcingData:
 
         config = config_io.read_config(config_path)
         forcing_file = utils.get_forcing_file(config)
-        forcing_data = forcing_io.read_forcing_data(
+        forcing_data = forcing_io.read_forcing_data_plumber2(
             forcing_file, model.config["StartTime"], model.config["EndTime"],
         )
 
@@ -154,7 +154,7 @@ class TestSaveSimulatedData:
         dataset = xr.open_dataset(saved_nc_file)
 
         forcing_file = utils.get_forcing_file(config)
-        forcing_data = forcing_io.read_forcing_data(
+        forcing_data = forcing_io.read_forcing_data_plumber2(
             forcing_file, model.config["StartTime"], model.config["EndTime"],
         )
 
@@ -239,7 +239,7 @@ class TestSoilData:
         dataset = xr.open_dataset(saved_nc_file)
 
         forcing_file = utils.get_forcing_file(config)
-        forcing_data = forcing_io.read_forcing_data(
+        forcing_data = forcing_io.read_forcing_data_plumber2(
             forcing_file, model.config["StartTime"], model.config["EndTime"],
         )
         # check data values
@@ -343,7 +343,7 @@ class TestSaveToNetcdf:
         dataset = xr.open_dataset(saved_nc_file)
 
         forcing_file = utils.get_forcing_file(config)
-        forcing_data = forcing_io.read_forcing_data(
+        forcing_data = forcing_io.read_forcing_data_plumber2(
             forcing_file, model.config["StartTime"], model.config["EndTime"],
         )
 
