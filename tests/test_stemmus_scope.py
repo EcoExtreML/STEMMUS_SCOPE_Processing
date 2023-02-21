@@ -309,7 +309,7 @@ class TestWithGlobalData:
 
     def test_setup(self, model_with_setup, tmp_path):
         model, cfg_file = model_with_setup
-        name = "global_N37-934_E-107-808_2022-07-11-1200"
+        name = "global_N37-934_W107-808_2022-07-11-1200"
         actual_input_dir = tmp_path / "input" / name
         actual_output_dir = tmp_path / "output" / name
         actual_cfg_file = str(
