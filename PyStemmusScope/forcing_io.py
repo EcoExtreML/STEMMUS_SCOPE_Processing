@@ -9,9 +9,6 @@ from . import utils
 from . import variable_conversion as vc
 
 
-TIMESTEP = "1800S"
-
-
 def _write_matlab_ascii(fname, data, ncols):
     """Internal function to handle writing data in the Matlab ascii format. Equivalent
     to `save([-], '-ascii')` in Matlab.
