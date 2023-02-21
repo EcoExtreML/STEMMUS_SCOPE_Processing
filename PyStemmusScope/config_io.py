@@ -26,7 +26,7 @@ def read_config(path_to_config_file):
         Dictionary containing paths to work directory and all sub-directories.
     """
     config = {}
-    with open(path_to_config_file, "r", encoding="utf8") as f:
+    with open(path_to_config_file, encoding="utf8") as f:
         for line in f:
             (key, val) = line.split("=")
             config[key] = val.rstrip('\n')
@@ -37,6 +37,7 @@ def read_config(path_to_config_file):
 
 
 def validate_config(config: Union[Path, dict]):
+    """Validate the config file."""
     if isinstance(config, Path):
         config = read_config(config)
     elif not isinstance(config, dict):

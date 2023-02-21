@@ -1,3 +1,4 @@
+"""Download CAMS data using the cdsapi."""
 from pathlib import Path
 import cdsapi
 import certifi

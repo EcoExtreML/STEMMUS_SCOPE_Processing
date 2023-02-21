@@ -6,6 +6,7 @@ import shlex
 import subprocess
 from pathlib import Path
 from typing import Dict
+from typing import Optional
 from typing import Tuple
 from . import config_io
 from . import forcing_io
@@ -16,8 +17,9 @@ from . import utils
 logger = logging.getLogger(__name__)
 
 def _is_model_src_exe(model_src_path: Path):
-    """Check if input exists. Returns True if input is a file and False if it is
-        a directory.
+    """Check if input exists.
+
+    Returns True if input is a file and False if it is a directory.
 
     Args:
         model_src_path(Path): path to Stemmus_Scope executable file or to a
@@ -72,28 +74,29 @@ def _run_sub_process(args: list, cwd):
 
 
 class StemmusScope():
-    """PyStemmusScope wrapper around Stemmus_Scope model.
-
-    For a detailed model description, look at
-    [this publication](https://gmd.copernicus.org/articles/14/1379/2021/).
-
-    Configures the model and prepares forcing and soil data for the model run.
-
-    Arguments:
-        config_file (str): Path to Stemmus_Scope configuration file. An example
-            config_file can be found in tests/test_data in [STEMMUS_SCOPE_Processing
-            repository](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing).
-        model_src_path (str): Path to Stemmus_Scope executable file or to a
-            directory containing model source codes.
-        interpreter (str, optional): Use `Matlab` or `Octave`. Only required if
-            `model_src_path` is a path to model source codes.
-
-    Example:
-        See notebooks/run_model_in_notebook.ipynb at the [STEMMUS_SCOPE_Processing
-        repository](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing)
-    """
+    """PyStemmusScope wrapper around Stemmus_Scope model."""
 
     def __init__(self, config_file: str, model_src_path: str, interpreter: str = None):
+        """PyStemmusScope wrapper around Stemmus_Scope model.
+
+        For a detailed model description, look at
+        [this publication](https://gmd.copernicus.org/articles/14/1379/2021/).
+
+        Configures the model and prepares forcing and soil data for the model run.
+
+        Arguments:
+            config_file (str): Path to Stemmus_Scope configuration file. An example
+                config_file can be found in tests/test_data in [STEMMUS_SCOPE_Processing
+                repository](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing).
+            model_src_path (str): Path to Stemmus_Scope executable file or to a
+                directory containing model source codes.
+            interpreter (str, optional): Use `Matlab` or `Octave`. Only required if
+                `model_src_path` is a path to model source codes.
+
+        Example:
+            See notebooks/run_model_in_notebook.ipynb at the [STEMMUS_SCOPE_Processing
+            repository](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing)
+        """
         # make sure paths are abolute and path objects
         config_file = utils.to_absolute_path(config_file)
         model_src_path = utils.to_absolute_path(model_src_path)
@@ -113,18 +116,21 @@ class StemmusScope():
 
     def setup(
         self,
-        WorkDir: str = None,
-        Location: str = None,
-        StartTime: str = None,
-        EndTime: str = None,
+        WorkDir: Optional[str],
+        Location: Optional[str],
+        StartTime: Optional[str],
+        EndTime: Optional[str],
     ) -> Tuple[str, str]:
-        """Configure model run.
+        """Configure the model run.
 
-        1. Creates config file and input/output directories based on the config template.
+        1. Creates config file and input/output directories based on the config template
         2. Prepare forcing and soil data
 
-        Arguments:
-            WorkDir: path to a directory where input/output directories should be created.
+        Args:
+            WorkDir: path to a directory where input/output directories should be
+                created.
+            Location: Location of the model run. Can be a site ("FI-Hyy") or lat/lon,
+                e.g., "(52.0, 4.05)".
             ForcingFileName: forcing file name. Forcing file should be in netcdf format.
             StartTime: Start time of the model run. It must be in
                 ISO format (e.g. 2007-01-01T00:00).
@@ -163,8 +169,6 @@ class StemmusScope():
 
     def run(self) -> str:
         """Run model using executable.
-
-        Args:
 
         Returns:
             The model log.

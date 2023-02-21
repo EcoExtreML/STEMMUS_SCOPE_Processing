@@ -1,13 +1,15 @@
+"""Assorted utils to be shared across multiple other modules."""
 import os
 import re
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 from typing import Tuple
 import numpy as np
 
 
 def find_nearest_non_nan(da, x, y, xdim="x", ydim="y"):
-    """"Extracts the (Cartesian) nearest non-nan value from a DataArray.
+    """"Extract the (Cartesian) nearest non-nan value from a DataArray.
 
     Args:
         da: DataArray containing the data, and the xdim and ydim as dimensions
@@ -25,10 +27,11 @@ def find_nearest_non_nan(da, x, y, xdim="x", ydim="y"):
 
 
 def convert_to_lsm_coordinates(lat: float, lon: float) -> Tuple[int, int]:
-    """Converts latitude in degrees North to NCAR's LSM coordinate system: Grid with lat
-    values ranging from 0 -- 360, where 0 is the South Pole, and lon values ranging
-    from 0 -- 720, where 0 is the prime meridian. Both representing a 0.5 degree
-    resolution.
+    """Convert latitude in degrees North to NCAR's LSM coordinate system.
+
+    NCAR's LSM coordinates consist of a grid with lat values ranging from 0 -- 360,
+    where 0 is the South Pole, and lon values ranging from 0 -- 720, where 0 is the
+    prime meridian. Both representing a 0.5 degree resolution.
 
     Args:
         lat (float): Latitude in degrees North
@@ -48,12 +51,13 @@ def convert_to_lsm_coordinates(lat: float, lon: float) -> Tuple[int, int]:
 
 
 def os_name():
+    """Alias for os.name."""
     return os.name
 
 
 def to_absolute_path(
     input_path: str,
-    parent: Path = None,
+    parent: Optional[Path],
     must_be_in_parent=True,
 ) -> Path:
     """Parse input string as :py:class:`pathlib.Path` object.
@@ -68,7 +72,6 @@ def to_absolute_path(
     Returns:
         The input path that is an absolute path and a :py:class:`pathlib.Path` object.
     """
-
     must_exist = False
     pathlike = Path(input_path)
     if parent:
@@ -91,10 +94,9 @@ def to_absolute_path(
 
 
 def get_forcing_file(config):
-    """Get forcing file from the location.
-    """
+    """Get forcing file from the location."""
     location, fmt = check_location_fmt(config["Location"])
-    # check if the forcing file exists for the given locaiton(s)
+    # check if the forcing file exists for the given locations(s)
     if fmt == "site":
         # get forcing file list
         forcing_filenames_list = [file.name for file in Path(config["ForcingPath"]).iterdir()]
@@ -162,7 +164,7 @@ def _check_lat_lon(coordinates):
 
 
 def _check_bbox(coordinates):
-    """Check if the bounding box input is valid"""
+    """Check if the bounding box input is valid."""
     raise NotImplementedError
 
 
@@ -188,7 +190,7 @@ def check_time_fmt(start, end):
 
 
 def remove_dates_from_header(filename):
-    """Removes the datetime string from the .mat file header.
+    """Remove the datetime string from the .mat file header.
 
     MATLAB raises an error when some characters are non-UTF-8 (?), e.g. Chinese month
     names. This function removes this part of the file header to avoid this problem.

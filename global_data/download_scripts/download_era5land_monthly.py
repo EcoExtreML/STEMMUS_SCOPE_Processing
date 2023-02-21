@@ -1,3 +1,4 @@
+"""Download monthly ERA5-land data using the cdsapi."""
 import itertools
 from pathlib import Path
 import cdsapi

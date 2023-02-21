@@ -1,3 +1,4 @@
+"""Variable conversion definitions."""
 from typing import Union
 import numpy as np
 import xarray as xr
@@ -55,7 +56,7 @@ def calculate_es(t_celcius):
 
 
 def specific_humidity(e_a, p_air):
-    """Calculate the humidity [kg water / m3 air] using e_a and the air pressure
+    """Calculate the humidity [kg water / m3 air] using e_a and the air pressure.
 
     See: Pal Arya, S.: Introduction to Micrometeorology, Academic Press,
         San Diego, California, 1988.
@@ -72,7 +73,7 @@ def specific_humidity(e_a, p_air):
 
 
 def co2_molar_fraction_to_kg_per_m3(
-    molar_fraction: Union[float, np.array, xr.DataArray]
+    molar_fraction: Union[float, np.ndarray, xr.DataArray]
 ):
     """Convert CO2 molar fraction [mol cO2/mol air] to concentration in [kg CO2/m3 air].
 
@@ -92,14 +93,14 @@ def co2_molar_fraction_to_kg_per_m3(
     return molar_fraction * molecular_weight_co2 * molar_density_air
 
 
-def co2_mass_fraction_to_kg_per_m3(mass_fraction: Union[float, np.array, xr.DataArray]):
+def co2_mass_fraction_to_kg_per_m3(mass_fraction: Union[float, np.ndarray, xr.DataArray]):
     """Convert CO2 mass fraction [kg cO2/kg air] to concentration in [kg CO2/m3 air].
 
     Note: the density of air [kg/m3] used for the calculation is assumed to be constant
     here, but will vary depending on the air pressure and air temperature.
 
     Args:
-        molar_fraction: CO2 concentration as mass fraction
+        mass_fraction: CO2 concentration as mass fraction
 
     Returns:
         Same as input: CO2 concentration in [kg CO2 / m3 air]
@@ -108,12 +109,14 @@ def co2_mass_fraction_to_kg_per_m3(mass_fraction: Union[float, np.array, xr.Data
 
 
 def mask_data(data, min_value=None, max_value=None):
-    """Function to apply a mask to data.
+    """Apply a mask to data.
+
+    Will clip the data to the min_value and max_value.
 
     Args:
         data (np.array): Array containing the original data.
-        condition (np.array): Boolean array to mask the data with.
-        value (float): Value to replaced the masked data with.
+        min_value: Minumum value of the mask.
+        max_value: Maximum value of the mask
 
     Returns:
         np.array: Array where the values under the mask have been replaced with the
@@ -123,8 +126,9 @@ def mask_data(data, min_value=None, max_value=None):
 
 
 def field_moisture_content(theta_r, theta_s, alpha, coef_n):
-    """Calculates the field moisture content at the field capacity, based on the Van
-    Genuchten equation.
+    """Calculate the field moisture content at the field capacity.
+
+    Based on the Van Genuchten equation.
 
     See:
         Genuchten, V. , & Th., M. . (1980). A closed-form equation for predicting the
@@ -149,9 +153,10 @@ def field_moisture_content(theta_r, theta_s, alpha, coef_n):
     return field_moisture_content
 
 
-def soil_moisture(volumetric_water_content: np.array, thickness: np.array) -> np.array:
-    """Calculates the soil moisture (kg/m2) from volumetric water content(m3/m3), based on SM =
-        VolumetricWaterContent * Density * Thickness.
+def soil_moisture(volumetric_water_content: np.ndarray, thickness: np.ndarray) -> np.ndarray:
+    """Calculate the soil moisture (kg/m2) from volumetric water content(m3/m3).
+
+    based on SM = VolumetricWaterContent * Density * Thickness.
 
     Args:
         volumetric_water_content(np.array): volumetric water content in m3/m3
