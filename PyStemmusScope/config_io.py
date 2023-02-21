@@ -67,8 +67,8 @@ def create_io_dir(config):
         site_name = "global"
         latstr = f"{loc[0]:.3f}".replace(".", "-")
         lonstr = f"{loc[1]:.3f}".replace(".", "-")
-        latstr = f"N{latstr}" if loc[0] >= 0 else f"S{abs(latstr)}"
-        lonstr = f"E{lonstr}" if loc[0] >= 0 else f"W{abs(lonstr)}"
+        latstr = f"N{latstr}" if loc[0] >= 0 else f"S{latstr[1:]}"
+        lonstr = f"E{lonstr}" if loc[1] >= 0 else f"W{lonstr[1:]}"
         input_dir_name = f"global_{latstr}_{lonstr}_{timestamp}"
     else:
         raise NotImplementedError()
