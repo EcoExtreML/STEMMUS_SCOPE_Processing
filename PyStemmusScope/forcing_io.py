@@ -108,7 +108,6 @@ def read_forcing_data_plumber2(forcing_file, start_time, end_time):
     return data
 
 
-# pylint: disable=too-many-arguments
 def read_forcing_data_global(  # noqa:PLR0913 (too many arguments)
     global_data_dir: Path,
     lat: float,

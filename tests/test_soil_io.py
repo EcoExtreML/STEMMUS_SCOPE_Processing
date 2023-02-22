@@ -73,14 +73,12 @@ def test_full_routine(tmp_path):
 
 
 def test_data_collection(lat, lon, expected_values):
-    # pylint: disable=protected-access
     matfiledata = soil_io._collect_soil_data(soil_data_folder, lat, lon)
 
     assert sorted(matfiledata.keys()) == sorted(expected_values.keys())
 
 
 def test_soil_composition_vars(lat, lon, depth_indices, expected_values):
-    # pylint: disable=protected-access
     soil_composition_dict = soil_io._read_soil_composition(
         soil_data_folder, lat, lon, depth_indices
     )
@@ -95,7 +93,6 @@ def test_soil_composition_vars(lat, lon, depth_indices, expected_values):
 
 def test_hydraulic_vars(lat, lon, expected_values):
     schaap_depths = [0, 5, 30, 60, 100, 200]
-    # pylint: disable=protected-access
     hydraulic_dict = soil_io._read_hydraulic_parameters(
         soil_data_folder, lat, lon, schaap_depths
     )
@@ -119,7 +116,6 @@ def test_hydraulic_vars(lat, lon, expected_values):
 
 
 def test_lambda_var(lat, lon, depth_indices, expected_values):
-    # pylint: disable=protected-access
     lambda_dict = soil_io._read_lambda_coef(
         soil_data_folder / "lambda", lat, lon, depth_indices
     )
@@ -130,7 +126,6 @@ def test_lambda_var(lat, lon, depth_indices, expected_values):
 
 
 def test_surf_var(lat, lon, expected_values):
-    # pylint: disable=protected-access
     surf_dict = soil_io._read_surface_data(soil_data_folder, lat, lon)
 
     np.testing.assert_almost_equal(

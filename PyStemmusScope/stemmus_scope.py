@@ -55,7 +55,6 @@ def _check_interpreter(interpreter: str):
 
 
 def _run_sub_process(args: list, cwd):
-    # pylint: disable=consider-using-with
     result = subprocess.Popen(
         args,
         cwd=cwd,
