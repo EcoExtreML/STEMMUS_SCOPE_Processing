@@ -4,7 +4,6 @@ Module designed to manage input directories and data for running the model
 and storing outputs.
 """
 import logging
-import os
 import shutil
 import time
 from pathlib import Path
@@ -27,7 +26,7 @@ def read_config(path_to_config_file):
         Dictionary containing paths to work directory and all sub-directories.
     """
     config = {}
-    with open(path_to_config_file, encoding="utf8") as f:
+    with path_to_config_file.open(encoding="utf8") as f:
         for line in f:
             (key, val) = line.split("=")
             config[key] = val.rstrip("\n")
@@ -118,7 +117,7 @@ def _copy_data(input_dir, config):
         "soil_spectrum",
     ]
     for folder in folder_list_vegetation:
-        os.makedirs(input_dir / folder, exist_ok=True)
+        (input_dir / folder).mkdir(parents=True, exist_ok=True)
         shutil.copytree(
             str(config[folder]), str(input_dir / folder), dirs_exist_ok=True
         )
@@ -144,7 +143,7 @@ def _update_config_file(input_dir, output_dir, config, site_name, timestamp):
         Path to updated config file.
     """
     config_file_path = input_dir / f"{site_name}_{timestamp}_config.txt"
-    with open(config_file_path, "w", encoding="utf8") as f:
+    with config_file_path.open(mode="w", encoding="utf8") as f:
         for key, value in config.items():
             if key == "InputPath":
                 update_entry = f"{key}={str(input_dir)}/\n"

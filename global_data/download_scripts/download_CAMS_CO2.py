@@ -6,7 +6,7 @@ import urllib3
 
 
 # UID+api key is read here:
-with open(Path.home() / ".adsloginrc", encoding="utf8") as f:
+with (Path.home() / ".adsloginrc").open(encoding="utf8") as f:
     uid = f.readline().strip()
     api_key = f.readline().strip()
 

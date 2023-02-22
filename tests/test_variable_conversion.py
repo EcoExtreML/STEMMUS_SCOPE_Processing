@@ -4,7 +4,6 @@ from PyStemmusScope import variable_conversion as vc
 
 
 def test_calculate_ea():
-
     t_air_celcius = np.array([-0.82, 42.16])
     rh = np.array([0.03, 76.35])
     calculated_ea = vc.calculate_ea(t_air_celcius, rh)

@@ -7,7 +7,6 @@ The required folders will automatically be generated, and subsequently filled wi
 test data. All the files are designed to mimic the real input data, except the values
 are all nonsense (to avoid any copyright or licensing issues).
 """
-import os
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -26,8 +25,7 @@ END_TIME = np.datetime64("1996-01-03T00:00")
 dirs = ["era5", "era5-land", "co2", "canopy_height", "dem", "soil_initial"]
 for _dir in dirs:
     dir_path = Path(TEST_DATA_DIR) / _dir
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
+    dir_path.mkdir(parents=True, exist_ok=True)
 
 
 def generate_era5_file(

@@ -14,14 +14,14 @@ from . import data_folder
 # create dummy exe file
 def write_exe(in_dir):
     exe_file = Path(in_dir) / "STEMMUS_SCOPE"
-    with open(exe_file, "x", encoding="utf8") as dummy_file:
+    with exe_file.open("x", encoding="utf8") as dummy_file:
         dummy_file.close()
     return exe_file
 
 
 # create csv file
 def write_csv(data, filename):
-    with open(filename, "w", encoding="utf8") as file:
+    with filename.open(mode="w", encoding="utf8") as file:
         for line in data:
             file.write(line)
             file.write("\n")

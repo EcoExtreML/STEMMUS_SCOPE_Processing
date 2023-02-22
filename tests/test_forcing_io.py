@@ -81,14 +81,14 @@ def test_mdata(mdata_file):
 
 # Verifying that the actual data file passes the evaluation
 def test_true_mdata_format():
-    with open(forcing_data_folder / "Mdata.txt", encoding="utf-8") as f:
+    with (forcing_data_folder / "Mdata.txt").open(encoding="utf-8") as f:
         content_exp = f.read()
     assert eval_str(content_exp)
 
 
 # Apply the data format evaluation to the python-generated file
 def test_mdata_format(mdata_file):
-    with open(mdata_file, encoding="utf-8") as f:
+    with mdata_file.open(encoding="utf-8") as f:
         content = f.read()
     assert eval_str(content)
 
@@ -103,7 +103,7 @@ def test_lai_file(lai_file):
 
 
 def test_lai_file_format(lai_file):
-    with open(lai_file, encoding="utf-8") as f:
+    with lai_file.open(encoding="utf-8") as f:
         content = f.read()
     assert eval_str(content)
 
@@ -123,7 +123,7 @@ def test_dat_files(dat_files):
 def test_dat_file_format(dat_files):
     fnames, write_dir = dat_files
     for fname in fnames:
-        with open(Path(write_dir) / fname, encoding="utf-8") as f:
+        with (Path(write_dir) / fname).open(encoding="utf-8") as f:
             eval_str(f.read())
 
 

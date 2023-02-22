@@ -125,6 +125,7 @@ select = [
   "PLE",  # Pylint error https://github.com/charliermarsh/ruff#error-ple
   "PLR",  # Pylint refactor (e.g. too-many-arguments)
   "PLW",  # Pylint warning (useless-else-on-loop)
+  "PTH",  # Enforce use of Pathlib
 ]
 extend-select = [
   "D401",  # First line should be in imperative mood

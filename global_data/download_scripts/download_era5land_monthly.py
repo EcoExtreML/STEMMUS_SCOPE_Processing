@@ -8,7 +8,7 @@ import urllib3
 
 http = urllib3.PoolManager(cert_reqs="CERT_REQUIRED", ca_certs=certifi.where())
 
-with open(Path.home() / ".cdsloginrc", encoding="utf8") as f:
+with (Path.home() / ".cdsloginrc").open(encoding="utf8") as f:
     uid = f.readline().strip()
     api_key = f.readline().strip()
 

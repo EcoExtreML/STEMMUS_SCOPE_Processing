@@ -52,7 +52,7 @@ class TestWithDefaults:
         exe_file = Path(tmp_path) / "STEMMUS_SCOPE"
 
         # create dummy exe file
-        with open(exe_file, "x", encoding="utf8") as dummy_file:
+        with exe_file.open(mode="x", encoding="utf8") as dummy_file:
             dummy_file.close()
 
         yield StemmusScope(config_file=config_file, model_src_path=exe_file)
@@ -82,7 +82,6 @@ class TestWithDefaults:
 
     @patch("subprocess.Popen")
     def test_run_exe_file(self, mocked_popen, model_with_setup):
-
         actual_cfg_file = (
             data_folder
             / "directories"
@@ -126,7 +125,7 @@ class TestWithCustomSetup:
         exe_file = Path(tmp_path) / "STEMUUS_SCOPE"
 
         # create dummy exe file
-        with open(exe_file, "x", encoding="utf8") as dummy_file:
+        with exe_file.open(mode="x", encoding="utf8") as dummy_file:
             dummy_file.close()
         yield StemmusScope(config_file, model_src_path=exe_file)
 
@@ -162,7 +161,6 @@ class TestWithCustomSetup:
 
     @patch("subprocess.Popen")
     def test_run_exe_file(self, mocked_popen, model_with_setup, tmp_path):
-
         actual_cfg_file = (
             tmp_path
             / "input"
@@ -214,7 +212,6 @@ class TestWithMatlab:
 
     @patch("subprocess.Popen")
     def test_run_matlab(self, mocked_popen, model_with_setup, tmp_path):
-
         actual_cfg_file = (
             data_folder
             / "directories"
@@ -274,7 +271,6 @@ class TestWithOctave:
 
     @patch("subprocess.Popen")
     def test_run_matlab(self, mocked_popen, model_with_setup, tmp_path):
-
         actual_cfg_file = (
             data_folder
             / "directories"
@@ -325,7 +321,7 @@ class TestWithGlobalData:
         exe_file = Path(tmp_path) / "STEMMUS_SCOPE"
 
         # create dummy exe file
-        with open(exe_file, "x", encoding="utf8") as dummy_file:
+        with exe_file.open(mode="x", encoding="utf8") as dummy_file:
             dummy_file.close()
         yield StemmusScope(config_file, model_src_path=exe_file)
 

@@ -9,7 +9,7 @@ import numpy as np
 
 
 def find_nearest_non_nan(da, x, y, xdim="x", ydim="y"):
-    """ "Extract the (Cartesian) nearest non-nan value from a DataArray.
+    """Extract the (Cartesian) nearest non-nan value from a DataArray.
 
     Args:
         da: DataArray containing the data, and the xdim and ydim as dimensions
@@ -199,7 +199,7 @@ def check_time_fmt(start, end):
         raise ValueError("Invalid time range. StartTime must be earlier than EndTime.")
 
 
-def remove_dates_from_header(filename):
+def remove_dates_from_header(filename: Path):
     """Remove the datetime string from the .mat file header.
 
     MATLAB raises an error when some characters are non-UTF-8 (?), e.g. Chinese month
@@ -208,7 +208,7 @@ def remove_dates_from_header(filename):
     Args:
         filename (Path): Valid path to the .mat file
     """
-    with open(filename, "rb") as f:
+    with filename.open("rb") as f:
         data = f.read()
 
     # Get locations of date string in header
@@ -223,5 +223,5 @@ def remove_dates_from_header(filename):
     )
 
     # Overwrite the old file
-    with open(filename, "wb") as file:
+    with filename.open(mode="wb") as file:
         file.write(sanitized_data)
