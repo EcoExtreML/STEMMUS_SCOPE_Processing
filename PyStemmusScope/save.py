@@ -279,8 +279,8 @@ def to_netcdf(config_file: str, cf_filename: str) -> str:
             Path(config["ForcingPath"]),
             lat=loc[0],  # type: ignore
             lon=loc[1],  # type: ignore
-            start_time=config["StartTime"],
-            end_time=config["EndTime"],
+            start_time=np.datetime64(config["StartTime"]),
+            end_time=np.datetime64(config["EndTime"]),
         )
 
     # get time info
