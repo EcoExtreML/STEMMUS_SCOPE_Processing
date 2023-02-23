@@ -88,7 +88,7 @@ def test_true_mdata_format():
 
 # Apply the data format evaluation to the python-generated file
 def test_mdata_format(mdata_file):
-    with mdata_file.open(encoding="utf-8") as f:
+    with Path(mdata_file).open(encoding="utf-8") as f:
         content = f.read()
     assert eval_str(content)
 
@@ -103,7 +103,7 @@ def test_lai_file(lai_file):
 
 
 def test_lai_file_format(lai_file):
-    with lai_file.open(encoding="utf-8") as f:
+    with Path(lai_file).open(encoding="utf-8") as f:
         content = f.read()
     assert eval_str(content)
 

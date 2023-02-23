@@ -6,8 +6,9 @@ import shlex
 import subprocess
 from pathlib import Path
 from typing import Dict
+from typing import List
 from typing import Optional
-from typing import Tuple
+from typing import Union
 from . import config_io
 from . import forcing_io
 from . import soil_io
@@ -17,7 +18,7 @@ from . import utils
 logger = logging.getLogger(__name__)
 
 
-def _is_model_src_exe(model_src_path: Path):
+def _is_model_src_exe(model_src_path: Path) -> bool:
     """Check if input exists.
 
     Returns True if input is a file and False if it is a directory.
@@ -44,7 +45,7 @@ def _is_model_src_exe(model_src_path: Path):
     raise ValueError(msg)
 
 
-def _check_interpreter(interpreter: str):
+def _check_interpreter(interpreter: Union[None, str]) -> None:
     if interpreter not in {"Octave", "Matlab"}:
         msg = (
             "Set `interpreter` as Octave or Matlab to run the model using source codes."
@@ -54,7 +55,20 @@ def _check_interpreter(interpreter: str):
         raise ValueError(msg)
 
 
-def _run_sub_process(args: list, cwd):
+def _run_sub_process(args: Union[str, List[str]], cwd: Optional[Path] = None) -> str:
+    """Run subprocess' Popen, using a list of arguments.
+
+    Args:
+        args: Arguments to be run
+        cwd: Desired working directory
+
+    Raises:
+        subprocess.CalledProcessError: If Popen returns an error code other than 0 or
+            139.
+
+    Returns:
+        str: Captured stdout.
+    """
     result = subprocess.Popen(
         args,
         cwd=cwd,
@@ -82,7 +96,12 @@ def _run_sub_process(args: list, cwd):
 class StemmusScope:
     """PyStemmusScope wrapper around Stemmus_Scope model."""
 
-    def __init__(self, config_file: str, model_src_path: str, interpreter: str = None):
+    def __init__(
+        self,
+        config_file: Union[str, Path],
+        model_src_path: Union[str, Path],
+        interpreter: Optional[str] = None,
+    ):
         """PyStemmusScope wrapper around Stemmus_Scope model.
 
         For a detailed model description, look at
@@ -91,12 +110,12 @@ class StemmusScope:
         Configures the model and prepares forcing and soil data for the model run.
 
         Arguments:
-            config_file (str): Path to Stemmus_Scope configuration file. An example
+            config_file: Path to Stemmus_Scope configuration file. An example
                 config_file can be found in tests/test_data in [STEMMUS_SCOPE_Processing
                 repository](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing).
-            model_src_path (str): Path to Stemmus_Scope executable file or to a
+            model_src_path: Path to Stemmus_Scope executable file or to a
                 directory containing model source codes.
-            interpreter (str, optional): Use `Matlab` or `Octave`. Only required if
+            interpreter (optional): Use `Matlab` or `Octave`. Only required if
                 `model_src_path` is a path to model source codes.
 
         Example:
@@ -104,21 +123,21 @@ class StemmusScope:
             repository](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing)
         """
         # make sure paths are abolute and path objects
-        config_file = utils.to_absolute_path(config_file)
-        model_src_path = utils.to_absolute_path(model_src_path)
+        config_path = utils.to_absolute_path(config_file)
+        model_src = utils.to_absolute_path(model_src_path)
 
         # check the path to model source
         self.exe_file = None
-        if _is_model_src_exe(model_src_path):
-            self.exe_file = model_src_path
+        if _is_model_src_exe(model_src):
+            self.exe_file = model_src
         else:
             _check_interpreter(interpreter)
 
-        self.model_src = model_src_path
+        self.model_src = model_src
         self.interpreter = interpreter
 
         # read config template
-        self._config = config_io.read_config(config_file)
+        self._config = config_io.read_config(config_path)
 
     def setup(
         self,
@@ -126,7 +145,7 @@ class StemmusScope:
         Location: Optional[str] = None,
         StartTime: Optional[str] = None,
         EndTime: Optional[str] = None,
-    ) -> Tuple[str, str]:
+    ) -> str:
         """Configure the model run.
 
         1. Creates config file and input/output directories based on the config template
@@ -190,10 +209,11 @@ class StemmusScope:
             path_to_config = f"'{self.cfg_file}'"
             eval_code = f"STEMMUS_SCOPE_exe({path_to_config});exit;"
             args = ["matlab", "-r", eval_code, "-nodisplay", "-nosplash", "-nodesktop"]
+
             # seperate args dont work on linux!
-            if utils.os_name() != "nt":
-                args = shlex.join(args)
-            result = _run_sub_process(args, self.model_src)
+            result = _run_sub_process(
+                args if utils.os_name() == "nt" else shlex.join(args), self.model_src
+            )
         if self.interpreter == "Octave":
             # set Octave arguments
             # use subprocess instead of oct2py,
@@ -203,10 +223,11 @@ class StemmusScope:
             path_to_config = path_to_config.replace("\\", "/")
             eval_code = f"STEMMUS_SCOPE_exe({path_to_config});exit;"
             args = ["octave", "--eval", eval_code, "--no-gui", "--silent"]
+
             # seperate args dont work on linux!
-            if utils.os_name() != "nt":
-                args = shlex.join(args)
-            result = _run_sub_process(args, self.model_src)
+            result = _run_sub_process(
+                args if utils.os_name() == "nt" else shlex.join(args), self.model_src
+            )
         return result
 
     @property

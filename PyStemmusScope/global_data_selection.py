@@ -85,8 +85,8 @@ def get_filename_dem(lat: Union[int, float], lon: Union[int, float]) -> str:
 
 
 def extract_era5_data(  # noqa:PLR0913 (too many arguments)
-    files_era5: List,
-    files_era5_land: List,
+    files_era5: List[Path],
+    files_era5_land: List[Path],
     lat: Union[int, float],
     lon: Union[int, float],
     start_time: np.datetime64,
@@ -139,7 +139,7 @@ def extract_era5_data(  # noqa:PLR0913 (too many arguments)
 
 
 def extract_cams_data(  # noqa:PLR0913 (too many arguments)
-    files_cams: List,
+    files_cams: List[Path],
     lat: Union[int, float],
     lon: Union[int, float],
     start_time: np.datetime64,
@@ -213,7 +213,7 @@ def extract_canopy_height_data(
 
 
 def extract_lai_data(  # noqa:PLR0913 (too many arguments)
-    files_lai: List,  # noqa: D147
+    files_lai: List[Path],  # noqa: D147
     lat: Union[int, float],
     lon: Union[int, float],
     start_time: np.datetime64,

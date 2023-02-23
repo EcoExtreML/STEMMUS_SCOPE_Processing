@@ -5,6 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 from typing import Tuple
+from typing import Union
 import numpy as np
 
 
@@ -56,7 +57,7 @@ def os_name():
 
 
 def to_absolute_path(
-    input_path: str,
+    input_path: Union[str, Path],
     parent: Optional[Path] = None,
     must_be_in_parent=True,
 ) -> Path:
@@ -120,11 +121,18 @@ def get_forcing_file(config):
         raise NotImplementedError
     elif fmt == "bbox":
         raise NotImplementedError
+    else:
+        raise ValueError("Unknown value for site format")
 
     return forcing_file
 
 
-def check_location_fmt(loc):
+# Location format aliases
+LatLonFmt = Tuple[float, float]
+BBoxFmt = Tuple[LatLonFmt, LatLonFmt]
+
+
+def check_location_fmt(loc: str) -> Tuple[Union[str, LatLonFmt, BBoxFmt], str]:
     """Check the format of the model location.
 
     Three types of format are supported:
@@ -134,7 +142,7 @@ def check_location_fmt(loc):
         ((lat1, lon1), (lat2, lon2)), e.g., "((19.5, 125.5), (20.5, 130.0))".
 
     Args:
-        loc (str): Location extracted from the config file.
+        loc: Location extracted from the config file.
 
     Returns:
         Site name (string), location (tuple), or bounding box (tuple of tuples),
@@ -150,14 +158,14 @@ def check_location_fmt(loc):
     if re.fullmatch(site_pattern, loc):
         return loc, "site"
 
-    latlon = re.findall(latlon_pattern, loc)
-    if len(latlon) == 1:
+    re_match = re.findall(latlon_pattern, loc)
+    if len(re_match) == 1:
         # TODO: add check if lat/lon are valid
-        return tuple(float(x) for x in latlon[0]), "latlon"
+        return (float(re_match[0][0]), float(re_match[0][1])), "latlon"
 
-    bbox = re.findall(bbox_pattern, loc)
-    if len(bbox) == 1:
-        bbox = [float(x) for x in bbox[0]]
+    re_match = re.findall(bbox_pattern, loc)
+    if len(re_match) == 1:
+        bbox = [float(x) for x in re_match[0]]
         # TODO: add check if bbox values are valid
         return ((bbox[0], bbox[1]), (bbox[2], bbox[3])), "bbox"
 
@@ -199,16 +207,16 @@ def check_time_fmt(start, end):
         raise ValueError("Invalid time range. StartTime must be earlier than EndTime.")
 
 
-def remove_dates_from_header(filename: Path):
+def remove_dates_from_header(file: Path):
     """Remove the datetime string from the .mat file header.
 
     MATLAB raises an error when some characters are non-UTF-8 (?), e.g. Chinese month
     names. This function removes this part of the file header to avoid this problem.
 
     Args:
-        filename (Path): Valid path to the .mat file
+        file (Path): Valid path to the .mat file
     """
-    with filename.open("rb") as f:
+    with file.open("rb") as f:
         data = f.read()
 
     # Get locations of date string in header
@@ -223,5 +231,5 @@ def remove_dates_from_header(filename: Path):
     )
 
     # Overwrite the old file
-    with filename.open(mode="wb") as file:
-        file.write(sanitized_data)
+    with file.open(mode="wb") as f:
+        f.write(sanitized_data)
