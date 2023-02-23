@@ -86,7 +86,7 @@ features = ["dev"]
 [tool.hatch.envs.default.scripts]
 lint = [
   "ruff check .",
-  # "mypy .",
+  "mypy .",
   "isort --check-only --diff .",
   "black --check --diff .",
 ]
