@@ -4,32 +4,34 @@ Module designed to manage input directories and data for running the model
 and storing outputs.
 """
 import logging
-import os
 import shutil
 import time
 from pathlib import Path
+from typing import Dict
+from typing import Tuple
 from typing import Union
 from . import utils
 
 
 logger = logging.getLogger(__name__)
 
-def read_config(path_to_config_file):
+
+def read_config(config_file: Union[str, Path]) -> Dict[str, str]:
     """Read config from given config file.
 
     Load paths from config file and save them into dict.
 
     Args:
-        path_to_config_file: Path to the config file.
+        config_file: Path to the config file.
 
     Returns:
         Dictionary containing paths to work directory and all sub-directories.
     """
     config = {}
-    with open(path_to_config_file, "r", encoding="utf8") as f:
+    with Path(config_file).open(encoding="utf8") as f:
         for line in f:
             (key, val) = line.split("=")
-            config[key] = val.rstrip('\n')
+            config[key] = val.rstrip("\n")
 
     validate_config(config)
 
@@ -37,27 +39,32 @@ def read_config(path_to_config_file):
 
 
 def validate_config(config: Union[Path, dict]):
-    if isinstance(config, Path):
-        config = read_config(config)
-    elif not isinstance(config, dict):
-        raise ValueError("The input to validate_config should be either a Path or dict"
-                         f" object, but a {type(config)} object was passed.")
+    """Validate the config file."""
+    if isinstance(config, dict):
+        cfg = config  # For proper type narrowing understood by Mypy.
+    elif isinstance(config, Path):
+        cfg = read_config(config)
+    else:
+        raise ValueError(
+            "The input to validate_config should be either a Path or dict"
+            f" object, but a {type(config)} object was passed."
+        )
 
     # TODO: add check if the input data directories/file exist, and return clear error to user.
-    _ = utils.check_location_fmt(config["Location"])
-    utils.check_time_fmt(config["StartTime"], config["EndTime"])
+    _ = utils.check_location_fmt(cfg["Location"])
+    utils.check_time_fmt(cfg["StartTime"], cfg["EndTime"])
 
 
-def create_io_dir(config):
+def create_io_dir(config: Dict) -> Tuple[Path, Path, Path]:
     """Create input directory and copy required files.
 
     Work flow executor to create work directory and all sub-directories.
 
     Returns:
-        Path (string) to input, output directory and config file for every station/forcing.
+        Path to input, output directory and config file for every station/forcing.
     """
     # get start time with the format Y-M-D-HM
-    timestamp = time.strftime('%Y-%m-%d-%H%M')
+    timestamp = time.strftime("%Y-%m-%d-%H%M")
 
     loc, fmt = utils.check_location_fmt(config["Location"])
     if fmt == "site":
@@ -67,14 +74,14 @@ def create_io_dir(config):
         site_name = "global"
         latstr = f"{loc[0]:.3f}".replace(".", "-")
         lonstr = f"{loc[1]:.3f}".replace(".", "-")
-        latstr = f"N{latstr}" if loc[0] >= 0 else f"S{latstr[1:]}"
-        lonstr = f"E{lonstr}" if loc[1] >= 0 else f"W{lonstr[1:]}"
+        latstr = f"N{latstr}" if loc[0] >= 0 else f"S{latstr[1:]}"  # type: ignore
+        lonstr = f"E{lonstr}" if loc[1] >= 0 else f"W{lonstr[1:]}"  # type: ignore
         input_dir_name = f"global_{latstr}_{lonstr}_{timestamp}"
     else:
         raise NotImplementedError()
 
     # create input directory
-    work_dir = utils.to_absolute_path(config['WorkDir'])
+    work_dir = utils.to_absolute_path(config["WorkDir"])
     input_dir = work_dir / "input" / input_dir_name
     input_dir.mkdir(parents=True, exist_ok=True)
     message = f"Prepare work directory {input_dir} for the location: {loc}"
@@ -90,13 +97,14 @@ def create_io_dir(config):
     logger.info("%s", message)
 
     # update config file for ForcingFileName and InputPath
-    config_file_path = _update_config_file(input_dir, output_dir,
-        config, site_name, timestamp)
+    config_file_path = _update_config_file(
+        input_dir, output_dir, config, site_name, timestamp  # type: ignore
+    )
 
-    return str(input_dir), str(output_dir), config_file_path
+    return input_dir, output_dir, config_file_path
 
 
-def _copy_data(input_dir, config):
+def _copy_data(input_dir: Path, config: dict) -> None:
     """Copy required data to the work directory.
 
     Create sub-directories inside the work directory and copy data.
@@ -105,34 +113,46 @@ def _copy_data(input_dir, config):
         input_dir: Path to the input directory.
         config: Dictionary containing all the paths.
     """
-    folder_list_vegetation = ["directional", "fluspect_parameters", "leafangles",
-        "radiationdata", "soil_spectrum"]
+    folder_list_vegetation = [
+        "directional",
+        "fluspect_parameters",
+        "leafangles",
+        "radiationdata",
+        "soil_spectrum",
+    ]
     for folder in folder_list_vegetation:
-        os.makedirs(input_dir / folder, exist_ok=True)
-        shutil.copytree(str(config[folder]), str(input_dir / folder), dirs_exist_ok=True)
+        (input_dir / folder).mkdir(parents=True, exist_ok=True)
+        shutil.copytree(
+            str(config[folder]), str(input_dir / folder), dirs_exist_ok=True
+        )
 
     # copy input_data.xlsx
     shutil.copy(str(config["input_data"]), str(input_dir))
 
 
-def _update_config_file(input_dir, output_dir, config, site_name, timestamp):
+def _update_config_file(
+    input_dir: Path,
+    output_dir: Path,
+    config: Dict,
+    site_name: str,
+    timestamp: str,
+) -> Path:
     """Update config file for each station.
 
     Create config file for each forcing/station under the work directory.
 
     Args:
-        ncfile: Name of forcing file.
         input_dir: Path to the input directory.
         output_dir: Path to the output directory.
         config: Dictionary containing all the paths.
-        site_name: Either inferred from forcing file, or 'latlon' for global data.
+        site_name: The site name (eg. "FI-Hyy"), or "latlon" for global data.
         timestamp: Timestamp when creating the config file.
 
     Returns:
         Path to updated config file.
     """
     config_file_path = input_dir / f"{site_name}_{timestamp}_config.txt"
-    with open(config_file_path, 'w', encoding="utf8") as f:
+    with config_file_path.open(mode="w", encoding="utf8") as f:
         for key, value in config.items():
             if key == "InputPath":
                 update_entry = f"{key}={str(input_dir)}/\n"
@@ -143,4 +163,4 @@ def _update_config_file(input_dir, output_dir, config, site_name, timestamp):
 
             f.write(update_entry)
 
-    return str(config_file_path)
+    return config_file_path

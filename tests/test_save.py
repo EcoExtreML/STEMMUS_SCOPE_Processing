@@ -14,14 +14,14 @@ from . import data_folder
 # create dummy exe file
 def write_exe(in_dir):
     exe_file = Path(in_dir) / "STEMMUS_SCOPE"
-    with open(exe_file, "x", encoding="utf8") as dummy_file:
+    with exe_file.open("x", encoding="utf8") as dummy_file:
         dummy_file.close()
     return exe_file
 
 
 # create csv file
 def write_csv(data, filename):
-    with open(filename, "w", encoding="utf8") as file:
+    with filename.open(mode="w", encoding="utf8") as file:
         for line in data:
             file.write(line)
             file.write("\n")
@@ -42,24 +42,23 @@ class TestSaveForcingData:
     @pytest.fixture
     def model_with_setup(self, tmp_path):
         config_file = str(data_folder / "config_file_test.txt")
-        print(config_io.read_config(config_file))
         exe_file = write_exe(tmp_path)
         model = StemmusScope(config_file, exe_file)
 
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-08-01-1200"
 
-            config_path = model.setup(
+            config_filename = model.setup(
                 WorkDir=str(tmp_path),
                 Location="XX-Xxx",
                 StartTime="1996-01-01T00:00",
                 EndTime="1996-01-01T02:00",  # less than forcing temporal range
             )
-            return model, config_path
+            return model, config_filename
 
     def test_save_to_netcdf(self, cf_convention, model_with_setup):
-        model, config_path = model_with_setup
-        saved_nc_file = save.to_netcdf(config_path, cf_convention)
+        model, config_file = model_with_setup
+        saved_nc_file = save.to_netcdf(config_file, cf_convention)
 
         expected_nc_file = "tests/test_data/directories/output/XX-Xxx-2022-08-01-1200/XX-Xxx-2022-08-01-1200_STEMMUS_SCOPE.nc"
 
@@ -69,10 +68,12 @@ class TestSaveForcingData:
         # check content of netcf file
         dataset = xr.open_dataset(saved_nc_file)
 
-        config = config_io.read_config(config_path)
+        config = config_io.read_config(Path(config_file))
         forcing_file = utils.get_forcing_file(config)
         forcing_data = forcing_io.read_forcing_data_plumber2(
-            forcing_file, model.config["StartTime"], model.config["EndTime"],
+            forcing_file,
+            model.config["StartTime"],
+            model.config["EndTime"],
         )
 
         # check data values
@@ -108,7 +109,7 @@ class TestSaveSimulatedData:
         return cf_convention_file
 
     @pytest.fixture
-    def model_with_setup(self, tmp_path):
+    def model_with_setup(self, tmp_path: Path):
         config_file = str(data_folder / "config_file_test.txt")
         exe_file = write_exe(tmp_path)
         model = StemmusScope(config_file, exe_file)
@@ -116,13 +117,13 @@ class TestSaveSimulatedData:
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-08-01-1200"
 
-            config_path = model.setup(
+            config_filename = model.setup(
                 WorkDir=str(tmp_path),
                 Location="XX-Xxx",
                 StartTime="1996-01-01T00:00",
                 EndTime="1996-01-01T02:00",
             )
-            return model, config_path
+            return model, config_filename
 
     @pytest.fixture(name="_make_csv_file")
     def fixture_make_csv_file(self, model_with_setup):
@@ -141,9 +142,9 @@ class TestSaveSimulatedData:
         write_csv(data, csv_file)
 
     def test_save_to_netcdf(self, cf_convention, _make_csv_file, model_with_setup):
-        model, config_path = model_with_setup
-        config = config_io.read_config(config_path)
-        saved_nc_file = save.to_netcdf(config_path, cf_convention)
+        model, config_filename = model_with_setup
+        config = config_io.read_config(Path(config_filename))
+        saved_nc_file = save.to_netcdf(config_filename, cf_convention)
 
         expected_nc_file = "tests/test_data/directories/output/XX-Xxx-2022-08-01-1200/XX-Xxx-2022-08-01-1200_STEMMUS_SCOPE.nc"
 
@@ -155,13 +156,17 @@ class TestSaveSimulatedData:
 
         forcing_file = utils.get_forcing_file(config)
         forcing_data = forcing_io.read_forcing_data_plumber2(
-            forcing_file, model.config["StartTime"], model.config["EndTime"],
+            forcing_file,
+            model.config["StartTime"],
+            model.config["EndTime"],
         )
 
         # check data values
         LWnet = np.array([-45.79605, -44.41207, -41.13654, -43.51004, -42.69192])
         np.testing.assert_allclose(
-            LWnet, dataset["LWnet"].values.flatten(), rtol=1e-5,
+            LWnet,
+            dataset["LWnet"].values.flatten(),
+            rtol=1e-5,
         )
         # check size of time dimension
         assert dataset["time"].shape[0] == 5
@@ -227,9 +232,9 @@ class TestSoilData:
         write_csv(data, csv_file)
 
     def test_save_to_netcdf(self, cf_convention, _make_csv_file, model_with_setup):
-        model, config_path = model_with_setup
-        config = config_io.read_config(config_path)
-        saved_nc_file = save.to_netcdf(config_path, cf_convention)
+        model, config_file = model_with_setup
+        config = config_io.read_config(Path(config_file))
+        saved_nc_file = save.to_netcdf(config_file, cf_convention)
 
         expected_nc_file = "tests/test_data/directories/output/XX-Xxx-2022-08-01-1200/XX-Xxx-2022-08-01-1200_STEMMUS_SCOPE.nc"
 
@@ -240,12 +245,16 @@ class TestSoilData:
 
         forcing_file = utils.get_forcing_file(config)
         forcing_data = forcing_io.read_forcing_data_plumber2(
-            forcing_file, model.config["StartTime"], model.config["EndTime"],
+            forcing_file,
+            model.config["StartTime"],
+            model.config["EndTime"],
         )
         # check data values
         SoilMoist = np.array([2.21277, 2.236381, 2.256538, 4.571108])
         np.testing.assert_allclose(
-            SoilMoist, dataset["SoilMoist"].isel(time=0).values.flatten(), rtol=1e-5,
+            SoilMoist,
+            dataset["SoilMoist"].isel(time=0).values.flatten(),
+            rtol=1e-5,
         )
         # check size of time dimension
         assert dataset["time"].shape[0] == 5
@@ -293,13 +302,13 @@ class TestSaveToNetcdf:
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-08-01-1200"
 
-            config_path = model.setup(
+            config_filename = model.setup(
                 WorkDir=str(tmp_path),
                 Location="XX-Xxx",
                 StartTime="1996-01-01T00:00",
                 EndTime="1996-01-01T02:00",
             )
-            return model, config_path
+            return model, config_filename
 
     @pytest.fixture(name="_make_csv_file")
     def fixture_make_csv_file(self, model_with_setup):
@@ -330,9 +339,9 @@ class TestSaveToNetcdf:
         write_csv(data, csv_file)
 
     def test_save_to_netcdf(self, cf_convention, _make_csv_file, model_with_setup):
-        model, config_path = model_with_setup
-        config = config_io.read_config(config_path)
-        saved_nc_file = save.to_netcdf(config_path, cf_convention)
+        model, config_file = model_with_setup
+        config = config_io.read_config(Path(config_file))
+        saved_nc_file = save.to_netcdf(config_file, cf_convention)
 
         expected_nc_file = "tests/test_data/directories/output/XX-Xxx-2022-08-01-1200/XX-Xxx-2022-08-01-1200_STEMMUS_SCOPE.nc"
 
@@ -344,7 +353,9 @@ class TestSaveToNetcdf:
 
         forcing_file = utils.get_forcing_file(config)
         forcing_data = forcing_io.read_forcing_data_plumber2(
-            forcing_file, model.config["StartTime"], model.config["EndTime"],
+            forcing_file,
+            model.config["StartTime"],
+            model.config["EndTime"],
         )
 
         # check size of time dimension

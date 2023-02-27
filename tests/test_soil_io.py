@@ -6,12 +6,13 @@ from PyStemmusScope import soil_io
 from . import data_folder
 
 
-soil_data_folder = data_folder / "directories"/ "model_parameters"/ "soil_property"
+soil_data_folder = data_folder / "directories" / "model_parameters" / "soil_property"
+
 
 @pytest.fixture(autouse=True)
 def coordinates():
     # Random location where data was available.
-    lat, lon = 37.933802, -107.807522 #Lat, lon of Telluride, CO
+    lat, lon = 37.933802, -107.807522  # Lat, lon of Telluride, CO
     return (lat, lon)
 
 
@@ -40,20 +41,21 @@ def expected_values():
     values.
     """
     expected_value_dict = {
-        'Ks0': 75.9877,
-        'FOC': np.array([0.1500, 0.1500, 0.2100, 0.2500, 0.2000, 0.1600]),
-        'FOS': np.array([0.5500, 0.5700, 0.5500, 0.5100, 0.5500, 0.5700]),
-        'MSOC': np.array([0.0079, 0.0090, 0.0056, 0.0020, 0.0017, 0.0017]),
-        'fmax': 0.4028,
-        'theta_s0': 0.4705,
-        'SaturatedK': 1.0e-03 * np.array([0.8795, 0.7264, 0.2297, 0.1503, 0.1284, 0.1263]),
-        'SaturatedMC': np.array([0.4705, 0.4572, 0.3999, 0.3769, 0.3659, 0.3546]),
-        'ResidualMC': np.array([0.0637, 0.0617, 0.0562, 0.0536, 0.0516, 0.0485]),
-        'Coefficient_n': np.array([1.5825, 1.6008, 1.5169, 1.4369, 1.4008, 1.4005]),
-        'Coefficient_Alpha': np.array([0.0071, 0.0073, 0.0106, 0.0146, 0.0168, 0.0181]),
-        'Coef_Lamda': np.array([0.1880, 0.1870, 0.1570, 0.1450, 0.1620, 0.1810]),
-        'porosity': np.array([0.4705, 0.4572, 0.3999, 0.3769, 0.3659, 0.3546]),
-        'fieldMC': ([0.2876, 0.2734, 0.2252, 0.2094, 0.2041, 0.1930]),
+        "Ks0": 75.9877,
+        "FOC": np.array([0.1500, 0.1500, 0.2100, 0.2500, 0.2000, 0.1600]),
+        "FOS": np.array([0.5500, 0.5700, 0.5500, 0.5100, 0.5500, 0.5700]),
+        "MSOC": np.array([0.0079, 0.0090, 0.0056, 0.0020, 0.0017, 0.0017]),
+        "fmax": 0.4028,
+        "theta_s0": 0.4705,
+        "SaturatedK": 1.0e-03
+        * np.array([0.8795, 0.7264, 0.2297, 0.1503, 0.1284, 0.1263]),
+        "SaturatedMC": np.array([0.4705, 0.4572, 0.3999, 0.3769, 0.3659, 0.3546]),
+        "ResidualMC": np.array([0.0637, 0.0617, 0.0562, 0.0536, 0.0516, 0.0485]),
+        "Coefficient_n": np.array([1.5825, 1.6008, 1.5169, 1.4369, 1.4008, 1.4005]),
+        "Coefficient_Alpha": np.array([0.0071, 0.0073, 0.0106, 0.0146, 0.0168, 0.0181]),
+        "Coef_Lamda": np.array([0.1880, 0.1870, 0.1570, 0.1450, 0.1620, 0.1810]),
+        "porosity": np.array([0.4705, 0.4572, 0.3999, 0.3769, 0.3659, 0.3546]),
+        "fieldMC": ([0.2876, 0.2734, 0.2252, 0.2094, 0.2041, 0.1930]),
     }
     return expected_value_dict
 
@@ -62,27 +64,26 @@ def test_full_routine(tmp_path):
     # create dummy config
     cfg_file = data_folder / "config_file_test.txt"
     config = config_io.read_config(cfg_file)
-    config['InputPath'] = str(tmp_path)
+    config["InputPath"] = str(tmp_path)
 
-    matfile_path = Path(tmp_path) / 'soil_parameters.mat'
+    matfile_path = Path(tmp_path) / "soil_parameters.mat"
     soil_io.prepare_soil_data(config)
 
     assert matfile_path.exists()
 
 
 def test_data_collection(lat, lon, expected_values):
-    #pylint: disable=protected-access
     matfiledata = soil_io._collect_soil_data(soil_data_folder, lat, lon)
 
     assert sorted(matfiledata.keys()) == sorted(expected_values.keys())
 
 
 def test_soil_composition_vars(lat, lon, depth_indices, expected_values):
-    #pylint: disable=protected-access
-    soil_composition_dict = soil_io._read_soil_composition(soil_data_folder, lat, lon,
-                                                           depth_indices)
+    soil_composition_dict = soil_io._read_soil_composition(
+        soil_data_folder, lat, lon, depth_indices
+    )
 
-    expected_vars = ['FOS', 'FOC', 'MSOC']
+    expected_vars = ["FOS", "FOC", "MSOC"]
 
     for key in expected_vars:
         np.testing.assert_array_almost_equal(
@@ -92,12 +93,21 @@ def test_soil_composition_vars(lat, lon, depth_indices, expected_values):
 
 def test_hydraulic_vars(lat, lon, expected_values):
     schaap_depths = [0, 5, 30, 60, 100, 200]
-    #pylint: disable=protected-access
     hydraulic_dict = soil_io._read_hydraulic_parameters(
-        soil_data_folder, lat, lon, schaap_depths)
+        soil_data_folder, lat, lon, schaap_depths
+    )
 
-    expected_vars = ['Ks0','SaturatedMC', 'ResidualMC', 'Coefficient_n', 'theta_s0',
-                     'Coefficient_Alpha', 'porosity', 'SaturatedK', 'fieldMC']
+    expected_vars = [
+        "Ks0",
+        "SaturatedMC",
+        "ResidualMC",
+        "Coefficient_n",
+        "theta_s0",
+        "Coefficient_Alpha",
+        "porosity",
+        "SaturatedK",
+        "fieldMC",
+    ]
 
     for key in expected_vars:
         np.testing.assert_array_almost_equal(
@@ -106,19 +116,18 @@ def test_hydraulic_vars(lat, lon, expected_values):
 
 
 def test_lambda_var(lat, lon, depth_indices, expected_values):
-    #pylint: disable=protected-access
-    lambda_dict = soil_io._read_lambda_coef(soil_data_folder / 'lambda', lat, lon,
-                                            depth_indices)
+    lambda_dict = soil_io._read_lambda_coef(
+        soil_data_folder / "lambda", lat, lon, depth_indices
+    )
 
     np.testing.assert_array_almost_equal(
-        lambda_dict['Coef_Lamda'], expected_values['Coef_Lamda']
+        lambda_dict["Coef_Lamda"], expected_values["Coef_Lamda"]
     )
 
 
 def test_surf_var(lat, lon, expected_values):
-    #pylint: disable=protected-access
     surf_dict = soil_io._read_surface_data(soil_data_folder, lat, lon)
 
     np.testing.assert_almost_equal(
-        surf_dict['fmax'], expected_values['fmax'], decimal=4
+        surf_dict["fmax"], expected_values["fmax"], decimal=4
     )

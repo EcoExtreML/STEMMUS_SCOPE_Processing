@@ -6,7 +6,9 @@ import shlex
 import subprocess
 from pathlib import Path
 from typing import Dict
-from typing import Tuple
+from typing import List
+from typing import Optional
+from typing import Union
 from . import config_io
 from . import forcing_io
 from . import soil_io
@@ -15,18 +17,22 @@ from . import utils
 
 logger = logging.getLogger(__name__)
 
-def _is_model_src_exe(model_src_path: Path):
-    """Check if input exists. Returns True if input is a file and False if it is
-        a directory.
+
+def _is_model_src_exe(model_src_path: Path) -> bool:
+    """Check if input exists.
+
+    Returns True if input is a file and False if it is a directory.
 
     Args:
         model_src_path(Path): path to Stemmus_Scope executable file or to a
         directory containing model source codes.
     """
     if model_src_path.is_file():
-        msg = ("The model executable file can be used on a Unix system "
+        msg = (
+            "The model executable file can be used on a Unix system "
             "where MCR is installed, see the "
-            "`documentation<https://pystemmusscope.readthedocs.io/>`_.")
+            "`documentation<https://pystemmusscope.readthedocs.io/>`_."
+        )
         logger.info("%s", msg)
         return True
     if model_src_path.is_dir():
@@ -34,29 +40,45 @@ def _is_model_src_exe(model_src_path: Path):
     msg = (
         "Provide a valid path to an executable file or "
         "to a directory containing model source codes, "
-        "see the `documentation<https://pystemmusscope.readthedocs.io/>`_.")
+        "see the `documentation<https://pystemmusscope.readthedocs.io/>`_."
+    )
     raise ValueError(msg)
 
 
-def _check_interpreter(interpreter: str):
-    if interpreter not in {"Octave" , "Matlab"}:
+def _check_interpreter(interpreter: Union[None, str]) -> None:
+    if interpreter not in {"Octave", "Matlab"}:
         msg = (
             "Set `interpreter` as Octave or Matlab to run the model using source codes."
             "Otherwise set `model_src_path` to the model executable file, "
-            "see the `documentation<https://pystemmusscope.readthedocs.io/>`_.")
+            "see the `documentation<https://pystemmusscope.readthedocs.io/>`_."
+        )
         raise ValueError(msg)
 
 
-def _run_sub_process(args: list, cwd):
-    # pylint: disable=consider-using-with
+def _run_sub_process(args: Union[str, List[str]], cwd: Optional[Path] = None) -> str:
+    """Run subprocess' Popen, using a list of arguments.
+
+    Args:
+        args: Arguments to be run
+        cwd: Desired working directory
+
+    Raises:
+        subprocess.CalledProcessError: If Popen returns an error code other than 0 or
+            139.
+
+    Returns:
+        str: Captured stdout.
+    """
     result = subprocess.Popen(
-        args, cwd=cwd,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        args,
+        cwd=cwd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         shell=True,
     )
     exit_code = result.wait()
     stdout, stderr = result.communicate()
-    #TODO handle stderr properly
+    # TODO handle stderr properly
     # when using octave, exit_code might be 139
     # see issue STEMMUS_SCOPE_Processing/issues/46
     if exit_code not in [0, 139]:
@@ -68,63 +90,72 @@ def _run_sub_process(args: list, cwd):
 
     # TODO return log info line by line!
     logger.info(stdout)
-    return stdout.decode('utf-8')
+    return stdout.decode("utf-8")
 
 
-class StemmusScope():
-    """PyStemmusScope wrapper around Stemmus_Scope model.
+class StemmusScope:
+    """PyStemmusScope wrapper around Stemmus_Scope model."""
 
-    For a detailed model description, look at
-    [this publication](https://gmd.copernicus.org/articles/14/1379/2021/).
+    def __init__(
+        self,
+        config_file: Union[str, Path],
+        model_src_path: Union[str, Path],
+        interpreter: Optional[str] = None,
+    ):
+        """PyStemmusScope wrapper around Stemmus_Scope model.
 
-    Configures the model and prepares forcing and soil data for the model run.
+        For a detailed model description, look at
+        [this publication](https://gmd.copernicus.org/articles/14/1379/2021/).
 
-    Arguments:
-        config_file (str): Path to Stemmus_Scope configuration file. An example
-            config_file can be found in tests/test_data in [STEMMUS_SCOPE_Processing
-            repository](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing).
-        model_src_path (str): Path to Stemmus_Scope executable file or to a
-            directory containing model source codes.
-        interpreter (str, optional): Use `Matlab` or `Octave`. Only required if
-            `model_src_path` is a path to model source codes.
+        Configures the model and prepares forcing and soil data for the model run.
 
-    Example:
-        See notebooks/run_model_in_notebook.ipynb at the [STEMMUS_SCOPE_Processing
-        repository](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing)
-    """
+        Arguments:
+            config_file: Path to Stemmus_Scope configuration file. An example
+                config_file can be found in tests/test_data in [STEMMUS_SCOPE_Processing
+                repository](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing).
+            model_src_path: Path to Stemmus_Scope executable file or to a
+                directory containing model source codes.
+            interpreter (optional): Use `Matlab` or `Octave`. Only required if
+                `model_src_path` is a path to model source codes.
 
-    def __init__(self, config_file: str, model_src_path: str, interpreter: str = None):
+        Example:
+            See notebooks/run_model_in_notebook.ipynb at the [STEMMUS_SCOPE_Processing
+            repository](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing)
+        """
         # make sure paths are abolute and path objects
-        config_file = utils.to_absolute_path(config_file)
-        model_src_path = utils.to_absolute_path(model_src_path)
+        config_path = utils.to_absolute_path(config_file)
+        model_src = utils.to_absolute_path(model_src_path)
 
         # check the path to model source
         self.exe_file = None
-        if _is_model_src_exe(model_src_path):
-            self.exe_file = model_src_path
+        if _is_model_src_exe(model_src):
+            self.exe_file = model_src
         else:
             _check_interpreter(interpreter)
 
-        self.model_src = model_src_path
+        self.model_src = model_src
         self.interpreter = interpreter
 
         # read config template
-        self._config = config_io.read_config(config_file)
+        self._config = config_io.read_config(config_path)
 
     def setup(
         self,
-        WorkDir: str = None,
-        Location: str = None,
-        StartTime: str = None,
-        EndTime: str = None,
-    ) -> Tuple[str, str]:
-        """Configure model run.
+        WorkDir: Optional[str] = None,
+        Location: Optional[str] = None,
+        StartTime: Optional[str] = None,
+        EndTime: Optional[str] = None,
+    ) -> str:
+        """Configure the model run.
 
-        1. Creates config file and input/output directories based on the config template.
+        1. Creates config file and input/output directories based on the config template
         2. Prepare forcing and soil data
 
-        Arguments:
-            WorkDir: path to a directory where input/output directories should be created.
+        Args:
+            WorkDir: path to a directory where input/output directories should be
+                created.
+            Location: Location of the model run. Can be a site ("FI-Hyy") or lat/lon,
+                e.g., "(52.0, 4.05)".
             ForcingFileName: forcing file name. Forcing file should be in netcdf format.
             StartTime: Start time of the model run. It must be in
                 ISO format (e.g. 2007-01-01T00:00).
@@ -164,8 +195,6 @@ class StemmusScope():
     def run(self) -> str:
         """Run model using executable.
 
-        Args:
-
         Returns:
             The model log.
         """
@@ -173,30 +202,32 @@ class StemmusScope():
             # run using MCR
             args = [f"{self.exe_file} {self.cfg_file}"]
             # set matlab log dir
-            os.environ['MATLAB_LOG_DIR'] = str(self._config["InputPath"])
+            os.environ["MATLAB_LOG_DIR"] = str(self._config["InputPath"])
             result = _run_sub_process(args, None)
-        if self.interpreter=="Matlab":
+        if self.interpreter == "Matlab":
             # set Matlab arguments
             path_to_config = f"'{self.cfg_file}'"
-            eval_code= f'STEMMUS_SCOPE_exe({path_to_config});exit;'
+            eval_code = f"STEMMUS_SCOPE_exe({path_to_config});exit;"
             args = ["matlab", "-r", eval_code, "-nodisplay", "-nosplash", "-nodesktop"]
+
             # seperate args dont work on linux!
-            if utils.os_name() !="nt":
-                args = shlex.join(args)
-            result = _run_sub_process(args, self.model_src)
-        if self.interpreter=="Octave":
+            result = _run_sub_process(
+                args if utils.os_name() == "nt" else shlex.join(args), self.model_src
+            )
+        if self.interpreter == "Octave":
             # set Octave arguments
             # use subprocess instead of oct2py,
             # see issue STEMMUS_SCOPE_Processing/issues/46
             path_to_config = f"'{self.cfg_file}'"
             # fix for windows
             path_to_config = path_to_config.replace("\\", "/")
-            eval_code = f'STEMMUS_SCOPE_exe({path_to_config});exit;'
+            eval_code = f"STEMMUS_SCOPE_exe({path_to_config});exit;"
             args = ["octave", "--eval", eval_code, "--no-gui", "--silent"]
+
             # seperate args dont work on linux!
-            if utils.os_name() !="nt":
-                args = shlex.join(args)
-            result = _run_sub_process(args, self.model_src)
+            result = _run_sub_process(
+                args if utils.os_name() == "nt" else shlex.join(args), self.model_src
+            )
         return result
 
     @property

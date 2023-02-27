@@ -1,3 +1,4 @@
+"""Module for the 'global' data IO of PyStemmusScope."""
 from pathlib import Path
 from typing import Dict
 from typing import List
@@ -83,17 +84,16 @@ def get_filename_dem(lat: Union[int, float], lon: Union[int, float]) -> str:
     return f"Copernicus_DSM_30_{latstr}_00_{lonstr}_00_DEM.tif"
 
 
-# pylint: disable=too-many-arguments
-def extract_era5_data(
-    files_era5: List,
-    files_era5_land: List,
+def extract_era5_data(  # noqa:PLR0913 (too many arguments)
+    files_era5: List[Path],
+    files_era5_land: List[Path],
     lat: Union[int, float],
     lon: Union[int, float],
     start_time: np.datetime64,
     end_time: np.datetime64,
     timestep: str,
 ) -> Dict:
-    """Extracts and converts the required variables from the ERA5 data.
+    """Extract and convert the required variables from the ERA5 data.
 
     Args:
         files_era5: List of ERA5 files.
@@ -108,6 +108,7 @@ def extract_era5_data(
     Returns:
         Dictionary containing the variables extracted from ERA5.
     """
+
     def preproc(ds):
         ds = ds.sel(latitude=lat, longitude=lon, method="nearest")
         return ds.drop_vars(["latitude", "longitude"])
@@ -137,16 +138,15 @@ def extract_era5_data(
     return data
 
 
-# pylint: disable=too-many-arguments
-def extract_cams_data(
-    files_cams: List,
+def extract_cams_data(  # noqa:PLR0913 (too many arguments)
+    files_cams: List[Path],
     lat: Union[int, float],
     lon: Union[int, float],
     start_time: np.datetime64,
     end_time: np.datetime64,
     timestep: str,
 ) -> xr.DataArray:
-    """Extracts and converts the required variables from the CAMS CO2 dataset.
+    """Extract and convert the required variables from the CAMS CO2 dataset.
 
     Args:
         files_cams: List of CAMS files.
@@ -173,7 +173,7 @@ def extract_prism_dem_data(
     lat: Union[int, float],
     lon: Union[int, float],
 ) -> float:
-    """Extracts the elevation from the PRISM DEM dataset.
+    """Extract the elevation from the PRISM DEM dataset.
 
     Args:
         file_dem: The DEM .tiff file.
@@ -193,7 +193,7 @@ def extract_canopy_height_data(
     lat: Union[int, float],
     lon: Union[int, float],
 ) -> float:
-    """Extracts the canopy height from the ETH global canopy height dataset.
+    """Extract the canopy height from the ETH global canopy height dataset.
 
     Args:
         file_canopy_height: The canopy height .tiff file.
@@ -212,16 +212,15 @@ def extract_canopy_height_data(
     return canopy_height.values[0]
 
 
-# pylint: disable=unused-argument, too-many-arguments
-def extract_lai_data(
-    files_lai: List,
+def extract_lai_data(  # noqa:PLR0913 (too many arguments)
+    files_lai: List[Path],  # noqa: D147
     lat: Union[int, float],
     lon: Union[int, float],
     start_time: np.datetime64,
     end_time: np.datetime64,
     timestep: str,
 ) -> xr.DataArray:
-    """Generates LAI values, until a dataset is chosen.
+    """Generate LAI values, until a dataset is chosen.
 
     Args:
         files_lai: List of paths to the *.nc files.
@@ -229,6 +228,8 @@ def extract_lai_data(
         lon: Longitude of the site.
         start_time: Start time of the model run.
         end_time: End time of the model run.
+        timestep: Desired timestep of the model, this is derived from the forcing data.
+            In a pandas-timedelta compatible format. For example: "1800S"
 
     Returns:
         DataArray containing the LAI of the specified site for the given timeframe.

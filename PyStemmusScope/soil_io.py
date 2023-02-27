@@ -1,5 +1,9 @@
+"""Module for the soil data IO of PyStemmusScope."""
 from pathlib import Path
 from typing import Dict
+from typing import Iterable
+from typing import List
+from typing import Tuple
 import hdf5storage
 import numpy as np
 import xarray as xr
@@ -7,45 +11,54 @@ from . import utils
 from . import variable_conversion as vc
 
 
-def _open_multifile_datasets(paths, lat, lon, lat_key='lat', lon_key='lon'):
-    """Internal function to open multifile netCDF files, and selects the lat & lon
+def _open_multifile_datasets(
+    paths: Iterable[Path],
+    lat: float,
+    lon: float,
+    lat_key: str = "lat",
+    lon_key: str = "lon",
+) -> xr.Dataset:
+    """Open mfdatasets, and select location before merging.
+
+    Open multifile netCDF files, and selects the lat & lon
     before merging them by coordinates. xarray's open_mfdataset does not support this
     type of functionality.
 
     Args:
-        paths (iterable): Iterable containing the paths to the netCDF files
-        lat (float): Latitude of the site of interest (in degrees North)
-        lon (float): Longitude of the site of interest (in degrees East)
+        paths: Iterable containing the paths to the netCDF files
+        lat: Latitude of the site of interest (in degrees North)
+        lon: Longitude of the site of interest (in degrees East)
+        lat_key: Variable name corresponding to the latitude.
+        lon_key: Variable name corresponding to the longitude.
 
     Returns:
-        xarray.Dataset: Dataset containing the merged data for a single location in
-            space.
+        Dataset containing the merged data for a single location in space.
     """
-    datasets = []
+    datasets: List[xr.Dataset] = []
     for file in paths:
         ds = xr.open_dataset(file)
-        ds.attrs = '' # Drop attributed to avoid combine conflicts
-        datasets.append(ds.sel({lat_key: lat, lon_key: lon}, method='nearest'))
-    ds = xr.combine_by_coords(datasets)
+        #  Drop attributes to avoid combine conflicts
+        ds.attrs = ""  # type: ignore
+        datasets.append(ds.sel({lat_key: lat, lon_key: lon}, method="nearest"))
+    return xr.combine_by_coords(datasets)  # type: ignore
 
-    return ds
 
-
-def _read_lambda_coef(lambda_directory, lat, lon, depth_indices):
-    """Internal function that reads the lambda coefficient files and returns the data
-    of interest in a dictionary.
+def _read_lambda_coef(
+    lambda_directory: Path, lat: float, lon: float, depth_indices: List[int]
+) -> Dict:
+    """Read the lambda coefficient files and return the data in a dict.
 
     Args:
-        lambda_directory (Path): Path to the directory which contains the lambda data.
-        lat (float): Latitude of the site of interest (in degrees North)
-        lon (float): Longitude of the site of interest (in degrees East)
-        depth_indices (list): List of which indices (0 - 7) should be selected from the
+        lambda_directory: Path to the directory which contains the lambda data.
+        lat: Latitude of the site of interest (in degrees North)
+        lon: Longitude of the site of interest (in degrees East)
+        depth_indices: List of which indices (0 - 7) should be selected from the
             lambda variable dataset.
 
     Returns:
         dict: Dictionary containing the lambda coefficient data.
     """
-    if not np.all([d in range(0, 8) for d in depth_indices]):
+    if not np.all([d in range(8) for d in depth_indices]):
         raise ValueError("Incorrect depth indices provided. Indices range from 0 to 7")
 
     lambda_files = sorted(lambda_directory.glob("lambda_l*.nc"))
@@ -53,124 +66,135 @@ def _read_lambda_coef(lambda_directory, lat, lon, depth_indices):
     ds = _open_multifile_datasets(lambda_files, lat, lon)
 
     # which depth indices the STEMMUS_SCOPE model expects
-    ds = ds.sortby("depth") # make sure that the depths are sorted in increasing order
-    coef_lambda = ds['lambda'].isel(depth=depth_indices).values
+    ds = ds.sortby("depth")  # make sure that the depths are sorted in increasing order
+    coef_lambda = ds["lambda"].isel(depth=depth_indices).values
 
-    return {'Coef_Lamda': coef_lambda}
+    return {"Coef_Lamda": coef_lambda}
 
 
-def _read_soil_composition(soil_data_path, lat, lon, depth_indices):
-    """Internal function that reads the soil composition files and returns them in a
-    dictionary.
+def _read_soil_composition(
+    soil_data_path: Path, lat: float, lon: float, depth_indices: List[int]
+) -> Dict:
+    """Read the soil composition files and return them in a dict.
 
     Args:
-        soil_data_path (Path): Path to the directory which contains the soil data.
-        lat (float): Latitude of the site of interest (in degrees North)
-        lon (float): Longitude of the site of interest (in degrees East)
-        depth_indices (list): List of which indices (0 - 7) should be selected from the
+        soil_data_path: Path to the directory which contains the soil data.
+        lat: Latitude of the site of interest (in degrees North)
+        lon: Longitude of the site of interest (in degrees East)
+        depth_indices: List of which indices (0 - 7) should be selected from the
             soil composition dataset.
+
     Returns:
-        dict: Dictionary containing the soil composition data.
+        Dictionary containing the soil composition data.
     """
-    soil_comp_fnames = ['CLAY1.nc', 'CLAY2.nc', 'OC1.nc', 'OC2.nc', 'SAND1.nc',
-                        'SAND2.nc', 'SILT1.nc', 'SILT2.nc']
+    soil_comp_fnames = [
+        "CLAY1.nc",
+        "CLAY2.nc",
+        "OC1.nc",
+        "OC2.nc",
+        "SAND1.nc",
+        "SAND2.nc",
+        "SILT1.nc",
+        "SILT2.nc",
+    ]
 
     soil_comp_paths = [soil_data_path / fname for fname in soil_comp_fnames]
 
     ds = _open_multifile_datasets(soil_comp_paths, lat, lon)
 
-    if not np.all([d in range(0, 8) for d in depth_indices]):
+    if not np.all([d in range(8) for d in depth_indices]):
         raise ValueError("Incorrect depth indices provided. Indices range from 0 to 7")
 
-    ds = ds.sortby("depth") # make sure that the depths are sorted in increasing order
+    ds = ds.sortby("depth")  # make sure that the depths are sorted in increasing order
     ds = ds.isel(depth=depth_indices)
 
-    clay_fraction = ds['CLAY'].values / 100 # convert % to fraction
-    sand_fraction = ds['SAND'].values / 100 # convert % to fraction
-    organic_fraction = ds['OC'].values / 10000 # convert from 1/100th % to fraction.
+    clay_fraction = ds["CLAY"].values / 100  # convert % to fraction
+    sand_fraction = ds["SAND"].values / 100  # convert % to fraction
+    organic_fraction = ds["OC"].values / 10000  # convert from 1/100th % to fraction.
 
-    return {'FOC': clay_fraction, 'FOS': sand_fraction, 'MSOC': organic_fraction}
+    return {"FOC": clay_fraction, "FOS": sand_fraction, "MSOC": organic_fraction}
 
 
-def _read_hydraulic_parameters(soil_data_path, lat, lon, depths):
-    """Internal function that reads the soil hydraulic parameters from the Schaap
-    dataset and returns them in a dictionary.
+def _read_hydraulic_parameters(
+    soil_data_path: Path, lat: float, lon: float, depths: List[int]
+) -> Dict:
+    """Read the soil hydraulic parameters from the Schaap dataset and return a dict.
 
     Args:
-        soil_data_path (Path): Path to the directory which contains the soil data.
-        lat (float): Latitude of the site of interest (in degrees North)
-        lon (float): Longitude of the site of interest (in degrees East)
-        depths (list): List of depths which should be selected from the dataset. The
+        soil_data_path: Path to the directory which contains the soil data.
+        lat: Latitude of the site of interest (in degrees North)
+        lon: Longitude of the site of interest (in degrees East)
+        depths: List of depths which should be selected from the dataset. The
             valid depths are: 0, 5, 15, 30, 60, 100 and 200 cm.
 
     Returns:
         dict: Dictionary containing the hydraulic parameters.
     """
-    ptf_files = sorted((soil_data_path / 'Schaap').glob('PTF_*.nc'))
+    ptf_files = sorted((soil_data_path / "Schaap").glob("PTF_*.nc"))
     ds = _open_multifile_datasets(
-        ptf_files, lat, lon, lat_key='latitude', lon_key='longitude'
+        ptf_files, lat, lon, lat_key="latitude", lon_key="longitude"
     )
 
     valid_depths = [0, 5, 15, 30, 60, 100, 200]
     if not np.all([d in valid_depths for d in depths]):
-        raise ValueError("Incorrect depth value(s) provided. Available depths are"
-                         f"{valid_depths}")
+        raise ValueError(
+            "Incorrect depth value(s) provided. Available depths are" f"{valid_depths}"
+        )
 
-    schaap_vars = ['alpha', 'Ks', 'thetas', 'thetar', 'n']
+    schaap_vars = ["alpha", "Ks", "thetas", "thetar", "n"]
     schaap_data = {key: np.zeros(len(depths)) for key in schaap_vars}
 
     for i, depth in enumerate(depths):
         for var in schaap_vars:
             schaap_data[var][i] = ds[f"{var}_{depth}cm"]
 
-    fieldmc = vc.field_moisture_content(schaap_data['thetar'], schaap_data['thetas'],
-                                        schaap_data['alpha'], schaap_data['n'])
+    fieldmc = vc.field_moisture_content(
+        schaap_data["thetar"],
+        schaap_data["thetas"],
+        schaap_data["alpha"],
+        schaap_data["n"],
+    )
 
-    hydraulic_matfiledata = {
-        'SaturatedMC': schaap_data['thetas'],
-        'ResidualMC': schaap_data['thetar'],
-        'Coefficient_n': schaap_data['n'],
-        'Coefficient_Alpha': schaap_data['alpha'],
-        'porosity': schaap_data['thetas'],
-        'Ks0': schaap_data['Ks'][0],
-        'SaturatedK': schaap_data['Ks'] / (24 * 3600), # convert 1/day -> 1/s
-        'fieldMC': fieldmc,
-        'theta_s0': schaap_data['thetas'][0]
+    return {
+        "SaturatedMC": schaap_data["thetas"],
+        "ResidualMC": schaap_data["thetar"],
+        "Coefficient_n": schaap_data["n"],
+        "Coefficient_Alpha": schaap_data["alpha"],
+        "porosity": schaap_data["thetas"],
+        "Ks0": schaap_data["Ks"][0],
+        "SaturatedK": schaap_data["Ks"] / (24 * 3600),  # convert 1/day -> 1/s
+        "fieldMC": fieldmc,
+        "theta_s0": schaap_data["thetas"][0],
     }
 
-    return hydraulic_matfiledata
 
-
-def _read_surface_data(soil_data_path, lat, lon):
-    """Internal function that reads the fmax variable from the surface dataset and
-    returns it in a dictionary.
+def _read_surface_data(soil_data_path: Path, lat: float, lon: float) -> Dict:
+    """Read the fmax variable from the surface dataset and return it in a dict.
 
     Args:
-        soil_data_path (Path): Path to the directory which contains the surface data.
-        lat (float): Latitude of the site of interest (in degrees North)
-        lon (float): Longitude of the site of interest (in degrees East)
+        soil_data_path: Path to the directory which contains the surface data.
+        lat: Latitude of the site of interest (in degrees North)
+        lon: Longitude of the site of interest (in degrees East)
 
     Returns:
         dict: Dictionary containing the `fmax` value (maximum fractional saturated area)
     """
-    ds = xr.open_dataset(soil_data_path / 'surfdata.nc')
+    ds = xr.open_dataset(soil_data_path / "surfdata.nc")
     lat, lon = utils.convert_to_lsm_coordinates(lat, lon)
-    ds = ds.sel(
-        lsmlat=lat, lsmlon=lon)
+    ds = ds.sel(lsmlat=lat, lsmlon=lon)
 
-    fmax = ds['FMAX'].values
+    fmax = ds["FMAX"].values
 
-    return {'fmax': fmax}
+    return {"fmax": fmax}
 
 
-def _collect_soil_data(soil_data_path, lat, lon):
-    """Internal function that calls the individual data collectors and merges them into
-    a single dictionary ready to be written.
+def _collect_soil_data(soil_data_path: Path, lat: float, lon: float) -> Dict:
+    """Call and merge all individual data collectors into a single write-ready dict.
 
     Args:
-        soil_data_path (Path): Path to the directory which contains the soil data.
-        lat (float): Latitude of the site of interest (in degrees North)
-        lon (float): Longitude of the site of interest (in degrees East)
+        soil_data_path: Path to the directory which contains the soil data.
+        lat: Latitude of the site of interest (in degrees North)
+        lon: Longitude of the site of interest (in degrees East)
 
     Returns:
         dict: Dictionary containing all the processed soil property data.
@@ -181,24 +205,24 @@ def _collect_soil_data(soil_data_path, lat, lon):
     depth_indices = [0, 2, 4, 5, 6, 7]
 
     matfiledata = _read_lambda_coef(lambda_directory, lat, lon, depth_indices)
-    matfiledata.update(_read_hydraulic_parameters(soil_data_path, lat, lon,
-                                                  schaap_depths))
+    matfiledata.update(
+        _read_hydraulic_parameters(soil_data_path, lat, lon, schaap_depths)
+    )
     matfiledata.update(_read_soil_composition(soil_data_path, lat, lon, depth_indices))
     matfiledata.update(_read_surface_data(soil_data_path, lat, lon))
 
     return matfiledata
 
 
-def _retrieve_latlon(file):
-    """Retrieves the latitude and longitude coordinates from the dataset file.
+def _retrieve_latlon(file: Path) -> Tuple[float, float]:
+    """Retrieve the latitude and longitude coordinates from the dataset file.
 
     Args:
-        file (Path): Full path to the netCDF file containing the site latitude
-            and longitude
+        file: Full path to the netCDF file containing the site latitude and longitude.
 
     Returns:
-        tuple(float, float): Tuple containing the latitude and longitude values.
-            Latitude in degrees N, longitude in degrees E.
+        The latitude and longitude values. Latitude in degrees N,
+            longitude in degrees E.
     """
     ds = xr.open_dataset(file)
     lon = ds.longitude.values.flatten()
@@ -206,13 +230,14 @@ def _retrieve_latlon(file):
     return lat, lon
 
 
-def prepare_soil_data(config):
-    """Function that prepares the soil input data for the STEMMUS_SCOPE model. It parses
-    the data for the input location, and writes a file that can be easily read in by
-    Matlab.
+def prepare_soil_data(config: Dict) -> None:
+    """Prepare the soil input data for the STEMMUS_SCOPE model.
+
+    The data for the input location is parsed, and written to a file that can be easily
+    read in by Matlab.
 
     Args:
-        config (dict): The PyStemmusScope configuration dictionary.
+        config: The PyStemmusScope configuration dictionary.
     """
     loc, fmt = utils.check_location_fmt(config["Location"])
 
@@ -220,61 +245,65 @@ def prepare_soil_data(config):
         forcing_file = utils.get_forcing_file(config)
         # Data missing at ID-Pag site. See github.com/EcoExtreML/STEMMUS_SCOPE/issues/77
         if config["Location"].startswith("ID"):
-            lat, lon = -1., 112.
+            lat, lon = -1.0, 112.0
         else:
             lat, lon = _retrieve_latlon(forcing_file)
 
     elif fmt == "latlon":
-        lat = loc[0]
-        lon = loc[1]
-
+        lat = loc[0]  # type: ignore
+        lon = loc[1]  # type: ignore
     else:
         raise NotImplementedError
 
-    matfiledata = _collect_soil_data(Path(config['SoilPropertyPath']), lat, lon)
+    matfiledata = _collect_soil_data(Path(config["SoilPropertyPath"]), lat, lon)
 
     hdf5storage.savemat(
-        Path(config["InputPath"]) / "soil_parameters.mat", mdict=matfiledata, appendmat=False,
+        Path(config["InputPath"]) / "soil_parameters.mat",
+        mdict=matfiledata,
+        appendmat=False,
     )
     utils.remove_dates_from_header(Path(config["InputPath"]) / "soil_parameters.mat")
 
 
-def prepare_soil_init(config):
-    """Function that prepares the soil inital conditions data for the STEMMUS_SCOPE
-    model. It parses the data for the input location, and writes a file that can be
-    easily read in by Matlab.
+def prepare_soil_init(config: Dict) -> None:
+    """Prepare the soil inital conditions data for the STEMMUS_SCOPE model.
+
+    The data for the input location is parsed, and written to a file that can be easily
+    read in by Matlab.
 
     Args:
-        config (dict): The PyStemmusScope configuration dictionary.
+        config: The PyStemmusScope configuration dictionary.
     """
     loc, fmt = utils.check_location_fmt(config["Location"])
 
     if fmt == "site":
         matfiledata = _read_soil_initial_conditions_plumber2(
-            soil_init_path=Path(config['InitialConditionPath']),
-            sitename=loc,
+            soil_init_path=Path(config["InitialConditionPath"]),
+            sitename=loc,  # type: ignore
         )
     elif fmt == "latlon":
         matfiledata = _read_soil_initial_conditions_global(
-            soil_init_path=Path(config['InitialConditionPath']),
-            lat=loc[0],
-            lon=loc[1],
+            soil_init_path=Path(config["InitialConditionPath"]),
+            lat=loc[0],  # type: ignore
+            lon=loc[1],  # type: ignore
             start_time=config["StartTime"],
         )
     else:
         raise NotImplementedError
 
     hdf5storage.savemat(
-        Path(config["InputPath"]) / "soil_init.mat", mdict=matfiledata, appendmat=False,
+        Path(config["InputPath"]) / "soil_init.mat",
+        mdict=matfiledata,
+        appendmat=False,
     )
     utils.remove_dates_from_header(Path(config["InputPath"]) / "soil_init.mat")
 
 
 def _extract_soil_initial_variables(soil_init_ds: xr.Dataset):
-    """Extracts the soil intial variables from the soil init dataset.
+    """Extract the soil intial variables from the soil init dataset.
 
     Args:
-        soil_init_ds (xr.Dataset): Dataset containing the following era5-land variables;
+        soil_init_ds: Dataset containing the following era5-land variables;
             skin_temperature,
             soil_temperature_level_1, soil_temperature_level_2,
             soil_temperature_level_3, soil_temperature_level_4,
@@ -286,7 +315,7 @@ def _extract_soil_initial_variables(soil_init_ds: xr.Dataset):
             soil condition values.
     """
     return {
-        "Tss":  float(soil_init_ds["skt"].values) - 273.15,
+        "Tss": float(soil_init_ds["skt"].values) - 273.15,
         "InitT0": float(soil_init_ds["skt"].values) - 273.15,
         "InitT1": float(soil_init_ds["stl1"].values) - 273.15,
         "InitT2": float(soil_init_ds["stl2"].values) - 273.15,
@@ -322,7 +351,7 @@ def _read_soil_initial_conditions_global(
     lon: float,
     start_time: np.datetime64,
 ) -> Dict[str, float]:
-    """Read soil initial conditions from era5-land data
+    """Read soil initial conditions from era5-land data.
 
     Args:
         soil_init_path (Path): Path to the global soil init data directory.

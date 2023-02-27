@@ -14,7 +14,7 @@ class TestInit:
     def test_model_without_exe(self, tmp_path):
         config_file = str(data_folder / "config_file_test.txt")
         exe_file = Path(tmp_path) / "STEMMUS_SCOPE"
-        if utils.os_name() == 'nt':
+        if utils.os_name() == "nt":
             with pytest.raises(FileNotFoundError):
                 StemmusScope(config_file, model_src_path=exe_file)
         else:
@@ -24,7 +24,7 @@ class TestInit:
 
     def test_model_without_src(self):
         config_file = str(data_folder / "config_file_test.txt")
-        if utils.os_name() == 'nt':
+        if utils.os_name() == "nt":
             with pytest.raises(FileNotFoundError):
                 StemmusScope(config_file, model_src_path="src")
         else:
@@ -52,7 +52,7 @@ class TestWithDefaults:
         exe_file = Path(tmp_path) / "STEMMUS_SCOPE"
 
         # create dummy exe file
-        with open(exe_file, "x", encoding="utf8") as dummy_file:
+        with exe_file.open(mode="x", encoding="utf8") as dummy_file:
             dummy_file.close()
 
         yield StemmusScope(config_file=config_file, model_src_path=exe_file)
@@ -68,8 +68,12 @@ class TestWithDefaults:
     def test_setup(self, model_with_setup):
         model, cfg_file = model_with_setup
 
-        actual_input_dir = data_folder / "directories" / "input" / "XX-Xxx_2022-07-11-1200"
-        actual_output_dir = data_folder / "directories" / "output" / "XX-Xxx_2022-07-11-1200"
+        actual_input_dir = (
+            data_folder / "directories" / "input" / "XX-Xxx_2022-07-11-1200"
+        )
+        actual_output_dir = (
+            data_folder / "directories" / "output" / "XX-Xxx_2022-07-11-1200"
+        )
         actual_cfg_file = str(actual_input_dir / "XX-Xxx_2022-07-11-1200_config.txt")
 
         assert actual_input_dir == Path(model.config["InputPath"])
@@ -78,12 +82,17 @@ class TestWithDefaults:
 
     @patch("subprocess.Popen")
     def test_run_exe_file(self, mocked_popen, model_with_setup):
-
-        actual_cfg_file = data_folder / "directories" / "input" / "XX-Xxx_2022-07-11-1200" / "XX-Xxx_2022-07-11-1200_config.txt"
+        actual_cfg_file = (
+            data_folder
+            / "directories"
+            / "input"
+            / "XX-Xxx_2022-07-11-1200"
+            / "XX-Xxx_2022-07-11-1200_config.txt"
+        )
         actual_log = (
             f"b'Reading config from {actual_cfg_file}\n\n "
             "The calculations start now \r\n The calculations end now \r'"
-            ).encode()
+        ).encode()
         mocked_popen.return_value.communicate.return_value = (actual_log, "error")
         mocked_popen.return_value.wait.return_value = 0
 
@@ -92,19 +101,21 @@ class TestWithDefaults:
 
         expected = [f"{model.exe_file} {cfg_file}"]
         mocked_popen.assert_called_with(
-        expected, cwd=None,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE, shell=True,
+            expected,
+            cwd=None,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=True,
         )
 
         # output of subprocess
         expected_log = (
             f"b'Reading config from {cfg_file}\n\n "
             "The calculations start now \r\n The calculations end now \r'"
-            )
+        )
         assert result == expected_log
         # matlab log dir
-        assert os.environ['MATLAB_LOG_DIR'] == str(model.config["InputPath"])
+        assert os.environ["MATLAB_LOG_DIR"] == str(model.config["InputPath"])
 
 
 class TestWithCustomSetup:
@@ -114,7 +125,7 @@ class TestWithCustomSetup:
         exe_file = Path(tmp_path) / "STEMUUS_SCOPE"
 
         # create dummy exe file
-        with open(exe_file, "x", encoding="utf8") as dummy_file:
+        with exe_file.open(mode="x", encoding="utf8") as dummy_file:
             dummy_file.close()
         yield StemmusScope(config_file, model_src_path=exe_file)
 
@@ -123,7 +134,7 @@ class TestWithCustomSetup:
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-07-11-1200"
             cfg_file = model.setup(
-                WorkDir = str(tmp_path),
+                WorkDir=str(tmp_path),
                 Location="XX-Xxx",
                 StartTime="1996-01-01T00:00",
                 EndTime="1996-01-01T02:00",
@@ -150,34 +161,39 @@ class TestWithCustomSetup:
 
     @patch("subprocess.Popen")
     def test_run_exe_file(self, mocked_popen, model_with_setup, tmp_path):
-
-        actual_cfg_file = tmp_path / "input" / "XX-Xxx_2022-07-11-1200" / "XX-Xxx_2022-07-11-1200_config.txt"
+        actual_cfg_file = (
+            tmp_path
+            / "input"
+            / "XX-Xxx_2022-07-11-1200"
+            / "XX-Xxx_2022-07-11-1200_config.txt"
+        )
         actual_log = (
             f"b'Reading config from {actual_cfg_file}\n\n "
             "The calculations start now \r\n The calculations end now \r'"
-            ).encode()
+        ).encode()
         mocked_popen.return_value.communicate.return_value = (actual_log, "error")
         mocked_popen.return_value.wait.return_value = 0
-
 
         model, cfg_file = model_with_setup
         result = model.run()
 
         expected = [f"{model.exe_file} {cfg_file}"]
         mocked_popen.assert_called_with(
-        expected, cwd=None,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-        shell=True,
+            expected,
+            cwd=None,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=True,
         )
 
         # output of subprocess
         expected_log = (
             f"b'Reading config from {cfg_file}\n\n "
             "The calculations start now \r\n The calculations end now \r'"
-            )
+        )
         assert result == expected_log
         # matlab log dir
-        assert os.environ['MATLAB_LOG_DIR'] == str(model.config["InputPath"])
+        assert os.environ["MATLAB_LOG_DIR"] == str(model.config["InputPath"])
 
 
 class TestWithMatlab:
@@ -196,13 +212,18 @@ class TestWithMatlab:
 
     @patch("subprocess.Popen")
     def test_run_matlab(self, mocked_popen, model_with_setup, tmp_path):
-
-        actual_cfg_file = data_folder / "directories" / "input" / "XX-Xxx_2022-07-11-1200" / "XX-Xxx_2022-07-11-1200_config.txt"
+        actual_cfg_file = (
+            data_folder
+            / "directories"
+            / "input"
+            / "XX-Xxx_2022-07-11-1200"
+            / "XX-Xxx_2022-07-11-1200_config.txt"
+        )
         actual_log = (
             "b'MATLAB is selecting SOFTWARE OPENGL rendering.\n..."
             f"\nReading config from {actual_cfg_file}\n"
             "The calculations start now\n The calculations end now\n'"
-            ).encode()
+        ).encode()
         mocked_popen.return_value.communicate.return_value = (actual_log, "error")
         mocked_popen.return_value.wait.return_value = 0
 
@@ -210,24 +231,26 @@ class TestWithMatlab:
         result = model.run()
 
         path_to_config = f"'{actual_cfg_file}'"
-        eval_code= f'STEMMUS_SCOPE_exe({path_to_config});exit;'
+        eval_code = f"STEMMUS_SCOPE_exe({path_to_config});exit;"
         args = ["matlab", "-r", eval_code, "-nodisplay", "-nosplash", "-nodesktop"]
         # seperate args dont work on linux!
-        if utils.os_name() !="nt":
+        if utils.os_name() != "nt":
             args = shlex.join(args)
 
         mocked_popen.assert_called_with(
-        args, cwd=tmp_path,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-        shell=True,
+            args,
+            cwd=tmp_path,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=True,
         )
 
         # output of subprocess
-        expected_log =  (
+        expected_log = (
             "b'MATLAB is selecting SOFTWARE OPENGL rendering.\n..."
             f"\nReading config from {cfg_file}\n"
             "The calculations start now\n The calculations end now\n'"
-            )
+        )
 
         assert result == expected_log
 
@@ -248,12 +271,17 @@ class TestWithOctave:
 
     @patch("subprocess.Popen")
     def test_run_matlab(self, mocked_popen, model_with_setup, tmp_path):
-
-        actual_cfg_file = data_folder / "directories" / "input" / "XX-Xxx_2022-07-11-1200" / "XX-Xxx_2022-07-11-1200_config.txt"
+        actual_cfg_file = (
+            data_folder
+            / "directories"
+            / "input"
+            / "XX-Xxx_2022-07-11-1200"
+            / "XX-Xxx_2022-07-11-1200_config.txt"
+        )
         actual_log = (
             f"b'Reading config from {actual_cfg_file}\n"
             "The calculations start now\n The calculations end now \n'"
-            ).encode()
+        ).encode()
         mocked_popen.return_value.communicate.return_value = (actual_log, "error")
         mocked_popen.return_value.wait.return_value = 0
 
@@ -263,23 +291,25 @@ class TestWithOctave:
         path_to_config = f"'{actual_cfg_file}'"
         # fix for windows
         path_to_config = path_to_config.replace("\\", "/")
-        eval_code = f'STEMMUS_SCOPE_exe({path_to_config});exit;'
+        eval_code = f"STEMMUS_SCOPE_exe({path_to_config});exit;"
         args = ["octave", "--eval", eval_code, "--no-gui", "--silent"]
         # seperate args dont work on linux!
-        if utils.os_name() !="nt":
+        if utils.os_name() != "nt":
             args = shlex.join(args)
 
         mocked_popen.assert_called_with(
-        args, cwd=tmp_path,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-        shell=True,
+            args,
+            cwd=tmp_path,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=True,
         )
 
         # output of subprocess
-        expected_log =  (
+        expected_log = (
             f"b'Reading config from {cfg_file}\n"
             "The calculations start now\n The calculations end now \n'"
-            )
+        )
 
         assert result == expected_log
 
@@ -291,7 +321,7 @@ class TestWithGlobalData:
         exe_file = Path(tmp_path) / "STEMMUS_SCOPE"
 
         # create dummy exe file
-        with open(exe_file, "x", encoding="utf8") as dummy_file:
+        with exe_file.open(mode="x", encoding="utf8") as dummy_file:
             dummy_file.close()
         yield StemmusScope(config_file, model_src_path=exe_file)
 
@@ -300,7 +330,7 @@ class TestWithGlobalData:
         with patch("time.strftime") as mocked_time:
             mocked_time.return_value = "2022-07-11-1200"
             cfg_file = model.setup(
-                WorkDir = str(tmp_path),
+                WorkDir=str(tmp_path),
                 Location="(37.933804, -107.807526)",
                 StartTime="1996-01-01T00:00",
                 EndTime="1996-01-01T02:00",
@@ -312,9 +342,7 @@ class TestWithGlobalData:
         name = "global_N37-934_W107-808_2022-07-11-1200"
         actual_input_dir = tmp_path / "input" / name
         actual_output_dir = tmp_path / "output" / name
-        actual_cfg_file = str(
-            actual_input_dir / "global_2022-07-11-1200_config.txt"
-        )
+        actual_cfg_file = str(actual_input_dir / "global_2022-07-11-1200_config.txt")
 
         assert actual_input_dir == Path(model.config["InputPath"])
         assert actual_output_dir == Path(model.config["OutputPath"])

@@ -27,9 +27,8 @@ jobs:
           python3 --version
       - name: Upgrade pip and install dependencies
         run: |
-          python3 -m pip install --upgrade pip setuptools
-          python3 -m pip install .[dev,publishing]
+          python3 -m pip install --upgrade hatch
       - name: Install pandoc using apt
         run: sudo apt install pandoc
       - name: Build documentation
-        run: mkdocs build
+        run: hatch run docs:build

@@ -6,7 +6,7 @@ from PyStemmusScope import global_data_selection as gds
 from . import data_folder
 
 
-GLOBAL_DATA_FOLDER = Path(data_folder / "directories"/ "global")
+GLOBAL_DATA_FOLDER = Path(data_folder / "directories" / "global")
 TEST_LAT = 37.933804  # Same as XX-Xxx
 TEST_LON = -107.807526
 START_TIME = np.datetime64("1996-01-01T00:00")
@@ -43,7 +43,7 @@ def get_forcing_data():
 
 
 expected_keys_values = [
-    ("wind_speed", (1 ** 2 + 2 ** 2) ** 0.5),
+    ("wind_speed", (1**2 + 2**2) ** 0.5),
     ("t_air_celcius", 10),
     ("precip_conv", 3 / 10),
     ("psurf_hpa", 1e3),
@@ -53,19 +53,19 @@ expected_keys_values = [
     ("vpd", 3.5562065),
     ("rh", 71.0381175),
     ("Qair", 0.0054255),
-    ("co2_conv", 15504000.),
-    ("lai", 4.),
-    ("elevation", 111.),
+    ("co2_conv", 15504000.0),
+    ("lai", 4.0),
+    ("elevation", 111.0),
     ("canopy_height", 1.0),
-    ("reference_height", 10.),
-    ("doy_float", 0.),
+    ("reference_height", 10.0),
+    ("doy_float", 0.0),
 ]
+
 
 @pytest.mark.parametrize("key, val", expected_keys_values)
 def test_extract_forcing_data(get_forcing_data, key, val):
     ds = get_forcing_data
     assert key in ds.keys()
     np.testing.assert_almost_equal(
-        np.array([val]),
-        ds[key][0] if hasattr(ds[key], "__iter__") else ds[key]
+        np.array([val]), ds[key][0] if hasattr(ds[key], "__iter__") else ds[key]
     )

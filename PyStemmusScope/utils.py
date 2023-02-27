@@ -1,13 +1,16 @@
+"""Assorted utils to be shared across multiple other modules."""
 import os
 import re
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 from typing import Tuple
+from typing import Union
 import numpy as np
 
 
 def find_nearest_non_nan(da, x, y, xdim="x", ydim="y"):
-    """"Extracts the (Cartesian) nearest non-nan value from a DataArray.
+    """Extract the (Cartesian) nearest non-nan value from a DataArray.
 
     Args:
         da: DataArray containing the data, and the xdim and ydim as dimensions
@@ -19,16 +22,17 @@ def find_nearest_non_nan(da, x, y, xdim="x", ydim="y"):
     Returns:
         The input dataarray reduced to only one location/
     """
-    distance = ((da[xdim] - x)**2 + (da[ydim] - y)**2)**0.5
+    distance = ((da[xdim] - x) ** 2 + (da[ydim] - y) ** 2) ** 0.5
     distance = distance.where(~np.isnan(da), np.nan)
-    return da.isel(distance.argmin(dim=[xdim,ydim]))
+    return da.isel(distance.argmin(dim=[xdim, ydim]))
 
 
 def convert_to_lsm_coordinates(lat: float, lon: float) -> Tuple[int, int]:
-    """Converts latitude in degrees North to NCAR's LSM coordinate system: Grid with lat
-    values ranging from 0 -- 360, where 0 is the South Pole, and lon values ranging
-    from 0 -- 720, where 0 is the prime meridian. Both representing a 0.5 degree
-    resolution.
+    """Convert latitude in degrees North to NCAR's LSM coordinate system.
+
+    NCAR's LSM coordinates consist of a grid with lat values ranging from 0 -- 360,
+    where 0 is the South Pole, and lon values ranging from 0 -- 720, where 0 is the
+    prime meridian. Both representing a 0.5 degree resolution.
 
     Args:
         lat (float): Latitude in degrees North
@@ -48,12 +52,13 @@ def convert_to_lsm_coordinates(lat: float, lon: float) -> Tuple[int, int]:
 
 
 def os_name():
+    """Alias for os.name."""
     return os.name
 
 
 def to_absolute_path(
-    input_path: str,
-    parent: Path = None,
+    input_path: Union[str, Path],
+    parent: Optional[Path] = None,
     must_be_in_parent=True,
 ) -> Path:
     """Parse input string as :py:class:`pathlib.Path` object.
@@ -68,13 +73,12 @@ def to_absolute_path(
     Returns:
         The input path that is an absolute path and a :py:class:`pathlib.Path` object.
     """
-
     must_exist = False
     pathlike = Path(input_path)
     if parent:
         if not parent.is_absolute():
             # care for windows, see issue 22
-            must_exist = os_name() == 'nt'
+            must_exist = os_name() == "nt"
         pathlike = parent.joinpath(pathlike)
         if must_be_in_parent:
             try:
@@ -85,36 +89,50 @@ def to_absolute_path(
                 ) from exc
     else:
         # care for windows, see issue 22
-        must_exist = os_name() == 'nt'
+        must_exist = os_name() == "nt"
 
     return pathlike.expanduser().resolve(strict=must_exist)
 
 
 def get_forcing_file(config):
-    """Get forcing file from the location.
-    """
+    """Get forcing file from the location."""
     location, fmt = check_location_fmt(config["Location"])
-    # check if the forcing file exists for the given locaiton(s)
+    # check if the forcing file exists for the given location(s)
     if fmt == "site":
         # get forcing file list
-        forcing_filenames_list = [file.name for file in Path(config["ForcingPath"]).iterdir()]
-        forcing_file = [filename for filename in forcing_filenames_list if location in filename]
+        forcing_filenames_list = [
+            file.name for file in Path(config["ForcingPath"]).iterdir()
+        ]
+        forcing_file = [
+            filename for filename in forcing_filenames_list if location in filename
+        ]
         if not forcing_file:
-            raise ValueError(f"Forcing file does not exist for the given site {location}.")
+            raise ValueError(
+                f"Forcing file does not exist for the given site {location}."
+            )
         if len(forcing_file) > 1:
-            raise ValueError(f"Multiple forcing files exist for the given site {location}." +
-                "Please check your forcing files and remove the redundant files.")
+            raise ValueError(
+                f"Multiple forcing files exist for the given site {location}."
+                + "Please check your forcing files and remove the redundant files."
+            )
         forcing_file = Path(config["ForcingPath"]) / forcing_file[0]
 
     elif fmt == "latlon":
         raise NotImplementedError
     elif fmt == "bbox":
         raise NotImplementedError
+    else:
+        raise ValueError("Unknown value for site format")
 
     return forcing_file
 
 
-def check_location_fmt(loc):
+# Location format aliases
+LatLonFmt = Tuple[float, float]
+BBoxFmt = Tuple[LatLonFmt, LatLonFmt]
+
+
+def check_location_fmt(loc: str) -> Tuple[Union[str, LatLonFmt, BBoxFmt], str]:
     """Check the format of the model location.
 
     Three types of format are supported:
@@ -124,7 +142,7 @@ def check_location_fmt(loc):
         ((lat1, lon1), (lat2, lon2)), e.g., "((19.5, 125.5), (20.5, 130.0))".
 
     Args:
-        loc (str): Location extracted from the config file.
+        loc: Location extracted from the config file.
 
     Returns:
         Site name (string), location (tuple), or bounding box (tuple of tuples),
@@ -140,14 +158,14 @@ def check_location_fmt(loc):
     if re.fullmatch(site_pattern, loc):
         return loc, "site"
 
-    latlon = re.findall(latlon_pattern, loc)
-    if len(latlon) == 1:
+    re_match = re.findall(latlon_pattern, loc)
+    if len(re_match) == 1:
         # TODO: add check if lat/lon are valid
-        return tuple(float(x) for x in latlon[0]), "latlon"
+        return (float(re_match[0][0]), float(re_match[0][1])), "latlon"
 
-    bbox = re.findall(bbox_pattern, loc)
-    if len(bbox) == 1:
-        bbox = [float(x) for x in bbox[0]]
+    re_match = re.findall(bbox_pattern, loc)
+    if len(re_match) == 1:
+        bbox = [float(x) for x in re_match[0]]
         # TODO: add check if bbox values are valid
         return ((bbox[0], bbox[1]), (bbox[2], bbox[3])), "bbox"
 
@@ -162,7 +180,7 @@ def _check_lat_lon(coordinates):
 
 
 def _check_bbox(coordinates):
-    """Check if the bounding box input is valid"""
+    """Check if the bounding box input is valid."""
     raise NotImplementedError
 
 
@@ -172,31 +190,33 @@ def check_time_fmt(start, end):
     if start == "NA":
         start_time = None
     else:
-        start_time = datetime.strptime(start,'%Y-%m-%dT%H:%M')
-    if end== "NA":
+        start_time = datetime.strptime(start, "%Y-%m-%dT%H:%M")
+    if end == "NA":
         end_time = None
     else:
-        end_time = datetime.strptime(end,'%Y-%m-%dT%H:%M')
+        end_time = datetime.strptime(end, "%Y-%m-%dT%H:%M")
 
     for time in [start_time, end_time]:
         if time is not None and time.minute not in [0, 30]:
-            raise ValueError("Invalid time values. Due to the resolution of forcing file," +
-                " the input time should be either 0 or 30 minutes.")
+            raise ValueError(
+                "Invalid time values. Due to the resolution of forcing file,"
+                + " the input time should be either 0 or 30 minutes."
+            )
 
     if (start_time and end_time) and start_time > end_time:
         raise ValueError("Invalid time range. StartTime must be earlier than EndTime.")
 
 
-def remove_dates_from_header(filename):
-    """Removes the datetime string from the .mat file header.
+def remove_dates_from_header(file: Path):
+    """Remove the datetime string from the .mat file header.
 
     MATLAB raises an error when some characters are non-UTF-8 (?), e.g. Chinese month
     names. This function removes this part of the file header to avoid this problem.
 
     Args:
-        filename (Path): Valid path to the .mat file
+        file (Path): Valid path to the .mat file
     """
-    with open(filename, "rb") as f:
+    with file.open("rb") as f:
         data = f.read()
 
     # Get locations of date string in header
@@ -205,11 +225,11 @@ def remove_dates_from_header(filename):
 
     # Rebuild the data, with the dates in the header removed
     sanitized_data = (
-        data[:start_datestring] +
-        b' '*len(data[start_datestring:end_datestring]) +
-        data[end_datestring:]
-        )
+        data[:start_datestring]
+        + b" " * len(data[start_datestring:end_datestring])
+        + data[end_datestring:]
+    )
 
     # Overwrite the old file
-    with open(filename, 'wb') as file:
-        file.write(sanitized_data)
+    with file.open(mode="wb") as f:
+        f.write(sanitized_data)
