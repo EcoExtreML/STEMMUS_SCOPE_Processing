@@ -97,7 +97,7 @@ def to_absolute_path(
 def get_forcing_file(config):
     """Get forcing file from the location."""
     location, fmt = check_location_fmt(config["Location"])
-    # check if the forcing file exists for the given locations(s)
+    # check if the forcing file exists for the given location(s)
     if fmt == "site":
         # get forcing file list
         forcing_filenames_list = [
