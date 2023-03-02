@@ -219,7 +219,7 @@ def extract_lai_data(  # noqa:PLR0913 (too many arguments)
     start_time: np.datetime64,
     end_time: np.datetime64,
     timestep: str,
-) -> xr.DataArray:
+) -> np.ndarray:
     """Generate LAI values, until a dataset is chosen.
 
     Args:
@@ -234,9 +234,13 @@ def extract_lai_data(  # noqa:PLR0913 (too many arguments)
     Returns:
         DataArray containing the LAI of the specified site for the given timeframe.
     """
-    timeseries = xr.date_range(start=start_time, end=end_time, freq=timestep)
-    return xr.DataArray(
-        data=np.ones(len(timeseries)) * 4,
-        dims=["time"],
-        coords={"time": timeseries},
-    )
+
+    def preproc(ds):
+        ds = ds.drop_vars(["crs", "LAI_ERR", "retrieval_flag"])
+        ds = ds.sel(lat=lat, lon=lon, method="nearest")
+        return ds.drop_vars(["lat", "lon"])
+
+    ds_lai = xr.open_mfdataset(files_lai, preprocess=preproc)
+    ds_lai = ds_lai.resample(time=timestep).interpolate("linear")
+    ds_lai = ds_lai.sel(time=slice(start_time, end_time))
+    return ds_lai["LAI"].values

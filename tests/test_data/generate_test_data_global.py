@@ -22,7 +22,15 @@ END_TIME = np.datetime64("1996-01-03T00:00")
 
 
 # Generate directories
-dirs = ["era5", "era5-land", "co2", "canopy_height", "dem", "soil_initial"]
+dirs = [
+    "era5",
+    "era5-land",
+    "co2",
+    "canopy_height",
+    "dem",
+    "soil_initial",
+    "lai",
+]
 for _dir in dirs:
     dir_path = Path(TEST_DATA_DIR) / _dir
     dir_path.mkdir(parents=True, exist_ok=True)
@@ -142,3 +150,48 @@ da.rio.to_raster(
 da = generate_tiff_data(test_value=111.0, resolution=0.001667)["band_data"]
 da = da.rio.write_crs("epsg:4326")
 da.rio.to_raster(TEST_DATA_DIR / "dem" / "Copernicus_DSM_30_N37_00_W108_00_DEM.tif")
+
+
+# LAI
+def generate_lai_data(test_value, resolution):
+    time_coords = pd.date_range(
+        start=START_TIME, end=END_TIME, freq="1d", inclusive="left"
+    )
+    lat_coords = np.arange(
+        start=np.round(TEST_LAT - 10 * resolution),
+        stop=np.round(TEST_LAT + 10 * resolution),
+        step=resolution,
+    )
+    lon_coords = np.arange(
+        start=np.round(TEST_LON - 10 * resolution),
+        stop=np.round(TEST_LON + 10 * resolution),
+        step=resolution,
+    )
+    data = np.zeros((len(lon_coords), len(lat_coords), len(time_coords))) + test_value
+
+    return xr.Dataset(
+        data_vars={
+            "LAI": (("lon", "lat", "time"), data),
+            "LAI_ERR": (("lon", "lat", "time"), data / 2),
+            "retrieval_flag": (("lon", "lat", "time"), data),
+            "crs": (("time"), np.zeros(len(time_coords))),
+        },
+        coords={
+            "lon": lon_coords,
+            "lat": lat_coords,
+            "time": time_coords,
+        },
+    )
+
+
+lai_data = generate_lai_data(test_value=4.0, resolution=1 / 112)
+
+for i in range(lai_data["time"].size):
+    ftime = pd.to_datetime(lai_data.isel(time=i)["time"].values)
+    fname = f"c3s_LAI_{ftime:%Y%m%d}000000_GLOBE_PROBAV_V3.0.1.nc"
+    # Note: isel with a list (incl. comma) to keep the 'time' dimension (!)
+    lai_data.isel(
+        time=[
+            i,
+        ]
+    ).to_netcdf(TEST_DATA_DIR / "lai" / fname)
