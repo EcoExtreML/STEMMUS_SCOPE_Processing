@@ -158,13 +158,13 @@ def generate_lai_data(test_value, resolution):
         start=START_TIME, end=END_TIME, freq="1d", inclusive="left"
     )
     lat_coords = np.arange(
-        start=np.round(TEST_LAT - 10 * resolution),
-        stop=np.round(TEST_LAT + 10 * resolution),
+        start=TEST_LAT - 10 * resolution,
+        stop=TEST_LAT + 10 * resolution,
         step=resolution,
     )
     lon_coords = np.arange(
-        start=np.round(TEST_LON - 10 * resolution),
-        stop=np.round(TEST_LON + 10 * resolution),
+        start=TEST_LON - 10 * resolution,
+        stop=TEST_LON + 10 * resolution,
         step=resolution,
     )
     data = np.zeros((len(lon_coords), len(lat_coords), len(time_coords))) + test_value
