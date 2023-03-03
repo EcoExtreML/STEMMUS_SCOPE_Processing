@@ -2,9 +2,21 @@
 from typing import Tuple
 from typing import Union
 import numpy as np
+import xarray as xr
 
 
-def find_nearest_non_nan(da, x, y, xdim="x", ydim="y"):
+class MissingDataError(Exception):
+    """Error to be raised when requested data is missing."""
+
+
+def find_nearest_non_nan(  # noqa:PLR0913 (too many arguments)
+    da: xr.DataArray,
+    x: float,
+    y: float,
+    xdim: str = "x",
+    ydim: str = "y",
+    max_distance: Union[float, None] = None,
+) -> xr.DataArray:
     """Extract the (Cartesian) nearest non-nan value from a DataArray.
 
     Args:
@@ -13,13 +25,19 @@ def find_nearest_non_nan(da, x, y, xdim="x", ydim="y"):
         y: y-coordinate of interest
         xdim: optional, to be used if the x-dimension is named "lon" or "longitude".
         ydim: optional, to be used if the y-dimension is named "lat" or "latitude".
+        max_distance: Maximum distance between the specified location and the nearest
+            non-nan location.
 
     Returns:
-        The input dataarray reduced to only one location/
+        The input dataarray reduced to only one location
     """
     distance = ((da[xdim] - x) ** 2 + (da[ydim] - y) ** 2) ** 0.5
     distance = distance.where(~np.isnan(da), np.nan)
-    return da.isel(distance.argmin(dim=[xdim, ydim]))
+    if max_distance is None or distance.min() < max_distance:
+        return da.isel(distance.argmin(dim=[xdim, ydim]))
+    raise MissingDataError(
+        "No non-nan data could be found within specified the maximum distance."
+    )
 
 
 def make_lat_lon_strings(
