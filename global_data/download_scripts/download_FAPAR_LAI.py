@@ -14,6 +14,7 @@ with (Path.home() / ".cdsloginrc").open(encoding="utf8") as f:
 
 
 def request_lai_data(year, month):
+    """Request the LAI data from the CDS."""
     c = cdsapi.Client(
         url="https://cds.climate.copernicus.eu/api/v2",
         key=f"{uid}:{api_key}",
@@ -47,10 +48,10 @@ def request_lai_data(year, month):
 
 
 if __name__ == "__main__":
-    years = list(range(2012, 2018))
+    years = [2010, 2011, 2012, 2013, 2015, 2018]  # list(range(2012, 2018))
     months = [str(x).rjust(2, "0") for x in range(1, 13)]
 
     _years, _months = map(list, zip(*itertools.product(years, months)))
 
-    pool = Pool(nodes=2)
+    pool = Pool(nodes=4)
     pool.map(request_lai_data, _years, _months)

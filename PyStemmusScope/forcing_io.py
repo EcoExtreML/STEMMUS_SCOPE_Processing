@@ -6,9 +6,9 @@ import hdf5storage
 import numpy as np
 import pandas as pd
 import xarray as xr
-from . import global_data_selection as gds
 from . import utils
 from . import variable_conversion as vc
+from .global_data import global_data_selection as gds
 
 
 def _write_matlab_ascii(fname, data, ncols):

@@ -2,44 +2,11 @@
 from pathlib import Path
 from typing import Dict
 from typing import List
-from typing import Tuple
 from typing import Union
 import numpy as np
 import xarray as xr
+from .. import variable_conversion as vc
 from . import utils
-from . import variable_conversion as vc
-
-
-def make_lat_lon_strings(
-    lat: Union[int, float],
-    lon: Union[int, float],
-    step: int = 1,
-) -> Tuple[str, str]:
-    """Turn numeric lat and lon values into strings.
-
-    Args:
-        lat: Latitude between -90 and 90.
-        lon: Longitude between -180 and 180.
-        step: The size of the step in values. E.g. if step is 5, valid latitude strings
-            are "N00", "N05", "N10", etc.
-
-    Returns:
-        Two strings, in the form ("N50", "E005")
-    """
-    if lat > 90 or lat < -90:
-        raise ValueError("Latitude out of bounds (-90, 90)")
-    if lon > 180 or lon < -180:
-        raise ValueError("Longitude out of bounds (-180, 180)")
-
-    lat = int(lat // step * step)
-    lon = int(lon // step * step)
-
-    latstr = str(abs(lat)).rjust(2, "0")
-    lonstr = str(abs(lon)).rjust(3, "0")
-    latstr = f"N{latstr}" if lat >= 0 else f"S{latstr}"
-    lonstr = f"E{lonstr}" if lon >= 0 else f"W{lonstr}"
-
-    return latstr, lonstr
 
 
 def get_filename_canopy_height(lat: Union[int, float], lon: Union[int, float]) -> str:
@@ -59,7 +26,7 @@ def get_filename_canopy_height(lat: Union[int, float], lon: Union[int, float]) -
     Returns:
         str: Properly formatted filename for a valid ETH GlobalCanopyHeight file.
     """
-    latstr, lonstr = make_lat_lon_strings(lat, lon, step=3)
+    latstr, lonstr = utils.make_lat_lon_strings(lat, lon, step=3)
     return f"ETH_GlobalCanopyHeight_10m_2020_{latstr}{lonstr}_Map.tif"
 
 
@@ -80,7 +47,7 @@ def get_filename_dem(lat: Union[int, float], lon: Union[int, float]) -> str:
     Returns:
         str: Properly formatted filename for a valid ETH GlobalCanopyHeight file.
     """
-    latstr, lonstr = make_lat_lon_strings(lat, lon, step=1)
+    latstr, lonstr = utils.make_lat_lon_strings(lat, lon, step=1)
     return f"Copernicus_DSM_30_{latstr}_00_{lonstr}_00_DEM.tif"
 
 
