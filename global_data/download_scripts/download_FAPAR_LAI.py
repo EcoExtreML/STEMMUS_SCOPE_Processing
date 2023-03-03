@@ -14,6 +14,7 @@ with (Path.home() / ".cdsloginrc").open(encoding="utf8") as f:
 
 
 def request_lai_data(year, month):
+    """Request the LAI data from the CDS."""
     c = cdsapi.Client(
         url="https://cds.climate.copernicus.eu/api/v2",
         key=f"{uid}:{api_key}",
