@@ -34,7 +34,7 @@ def find_nearest_non_nan(  # noqa:PLR0913 (too many arguments)
     distance = ((da[xdim] - x) ** 2 + (da[ydim] - y) ** 2) ** 0.5
     distance = distance.where(~np.isnan(da), np.nan)
     if max_distance is None or distance.min() < max_distance:
-        return da.isel(distance.argmin(dim=[xdim, ydim]))
+        return da.isel(distance.argmin(dim=[xdim, ydim]))  # type: ignore
     raise MissingDataError(
         "No non-nan data could be found within specified the maximum distance."
     )
