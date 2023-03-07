@@ -1,37 +1,102 @@
-"""Module for the 'global' data IO of PyStemmusScope."""
+"""Module containing the full global dataset collection."""
 from pathlib import Path
-from typing import List
+from typing import Any
+from typing import Dict
+from typing import Tuple
 from typing import Union
 import numpy as np
+import pandas as pd
 import xarray as xr
-from PyStemmusScope.global_data import utils
+from PyStemmusScope import global_data as gd
+from PyStemmusScope import variable_conversion as vc
 
 
-def extract_cams_data(  # noqa:PLR0913 (too many arguments)
-    files_cams: List[Path],
-    lat: Union[int, float],
-    lon: Union[int, float],
-    start_time: np.datetime64,
-    end_time: np.datetime64,
+def collect_datasets(
+    global_data_dir: Path,
+    latlon: Union[Tuple[int, int], Tuple[float, float]],
+    time_range: Tuple[np.datetime64, np.datetime64],
     timestep: str,
-) -> xr.DataArray:
-    """Extract and convert the required variables from the CAMS CO2 dataset.
+) -> Dict:
+    """Collect and merge all the global datasets into one.
 
     Args:
-        files_cams: List of CAMS files.
-        lat: Latitude of the site.
-        lon: Longitude of the site.
-        start_time: Start time of the model run.
-        end_time: End time of the model run.
+        global_data_dir: Path to the directory containing the global datasets.
+        latlon: Latitude and longitude of the site.
+        time_range: Start and end time of the model run.
         timestep: Desired timestep of the model, this is derived from the forcing data.
             In a pandas-timedelta compatible format. For example: "1800S"
 
     Returns:
-        DataArray containing the CO2 concentration.
+        Dictionary containing the variables extracted from the global datasets.
     """
-    ds = xr.open_mfdataset(files_cams)
-    ds = ds.sel(latitude=lat, longitude=lon, method="nearest")
-    ds = ds.drop_vars(["latitude", "longitude"])
-    ds = ds.resample(time=timestep).interpolate("linear")
-    ds = ds.sel(time=slice(start_time, end_time))
-    return ds.co2
+    data: Dict[str, Any] = {
+        "time": xr.DataArray(
+            pd.date_range(str(time_range[0]), str(time_range[1]), freq=timestep).rename(
+                "time"
+            )
+        )
+    }
+    era5_data = gd.era5.retrieve_era5_data(
+        global_data_dir,
+        latlon,
+        time_range,
+        timestep,
+    )
+
+    data = {**data, **era5_data}
+
+    data["co2_conv"] = (
+        vc.co2_mass_fraction_to_kg_per_m3(
+            gd.cams_co2.retrieve_co2_data(
+                global_data_dir,
+                latlon,
+                time_range,
+                timestep,
+            )
+        )
+        * 1e6
+    )  # kg/m3 -> mg/m3
+
+    data["lai"] = vc.mask_data(
+        gd.copernicus_lai.retrieve_lai_data(
+            global_data_dir,
+            latlon,
+            time_range,
+            timestep,
+        ),
+        min_value=0.01,
+    )
+
+    data["elevation"] = gd.prism_dem.retrieve_dem_data(global_data_dir, latlon)
+
+    data["canopy_height"] = gd.eth_canopy_height.retrieve_canopy_height_data(
+        global_data_dir,
+        latlon[0],
+        latlon[1],
+    )
+
+    # Height of measurement. Data has no actual equivalent. Set to a temporary value.
+    # See issue #145.
+    data["reference_height"] = 10.0
+
+    data["sitename"] = "global"
+
+    # Expected time format is days (as floating point) since Jan 1st 00:00.
+    data["doy_float"] = (
+        data["time"].dt.dayofyear
+        - 1
+        + data["time"].dt.hour / 24
+        + data["time"].dt.minute / 60 / 24
+    )
+    data["year"] = data["time"].dt.year.astype(float)
+
+    data["DELT"] = (
+        (data["time"].values[1] - data["time"].values[0]) / np.timedelta64(1, "s")
+    ).astype(float)
+    data["total_timesteps"] = data["time"].size
+
+    data["latitude"] = latlon[0]
+    data["longitude"] = latlon[1]
+
+    # TODO: Add land cover data retrieval.
+    data["IGBP_veg_long"] = "Evergreen Needleleaf Forests"

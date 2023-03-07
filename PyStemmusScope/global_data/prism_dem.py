@@ -5,7 +5,7 @@ import xarray as xr
 from PyStemmusScope.global_data import utils
 
 
-def load_prism_dem_data(
+def retrieve_dem_data(
     global_data_dir: Path,
     lat: Union[int, float],
     lon: Union[int, float],

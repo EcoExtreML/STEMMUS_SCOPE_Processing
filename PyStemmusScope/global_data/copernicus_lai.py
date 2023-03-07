@@ -1,11 +1,14 @@
+"""Module for loading and validating the Copernicus LAI dataset."""
 from pathlib import Path
-from typing import Dict
 from typing import List
 from typing import Tuple
 from typing import Union
 import numpy as np
 import xarray as xr
 from PyStemmusScope.global_data import utils
+
+
+RESOLUTION_LAI = 1 / 112  # Resolution of the LAI dataset in degrees
 
 
 def retrieve_lai_data(
@@ -51,45 +54,48 @@ def extract_lai_data(
 
     Args:
         files_lai: List of paths to the *.nc files.
-        lat: Latitude of the site.
-        lon: Longitude of the site.
-        start_time: Start time of the model run.
-        end_time: End time of the model run.
+        latlon: Latitude and longitude of the site.
+        time_range: Start and end time of the model run.
         timestep: Desired timestep of the model, this is derived from the forcing data.
             In a pandas-timedelta compatible format. For example: "1800S"
 
     Returns:
         DataArray containing the LAI of the specified site for the given time range.
     """
+    ds = xr.open_mfdataset(files_lai)
 
-    def preproc(ds):
-        ds = ds.drop_vars(["crs", "LAI_ERR", "retrieval_flag"])
-        ds = ds.sel(lat=latlon[0], lon=latlon[1], method="nearest")
-        return ds.drop_vars(["lat", "lon"])
+    check_lai_dataset(ds)
 
-    ds_lai = xr.open_mfdataset(files_lai, preprocess=preproc)
-    ds_lai = ds_lai.resample(time=timestep).interpolate("linear")
-    ds_lai = ds_lai.sel(time=slice(time_range[0], time_range[1]))
+    ds = ds.drop_vars(["crs", "LAI_ERR", "retrieval_flag"])
+    ds = ds.sel(
+        lat=latlon[0],
+        lon=latlon[1],
+        method="nearest",
+        tolerance=RESOLUTION_LAI,
+    )
 
-    check_lai_dataset(ds_lai)
+    ds = ds.drop_vars(["lat", "lon"])
+    ds = ds.compute()  # Load into memory before resampling
+    ds = ds.resample(time=timestep).interpolate("linear")
+    ds = ds.sel(time=slice(time_range[0], time_range[1]))
 
-    return ds_lai["LAI"].values
+    return ds["LAI"].values
 
 
 def check_lai_dataset(
-    laidata: xr.Dataset,
+    lai_data: xr.Dataset,
     latlon: Union[Tuple[int, int], Tuple[float, float]],
     time_range: Tuple[np.datetime64, np.datetime64],
 ) -> None:
-    """Validate the LAI dataset (variables, location & time range).
+    """Validate the LAI dataset (variables name, location & time range).
 
     Args:
-        laidata: Dataset containing the LAI data.
+        lai_data: Dataset containing the LAI data.
         latlon: Latitude and longitude of the site.
         time_range: Start and end time of the model run.
     """
     try:
-        utils.assert_variables_present(laidata, ["LAI"])
+        utils.assert_variables_present(lai_data, ["LAI"])
     except utils.MissingDataError as err:
         raise utils.MissingDataError(
             "Could not find the variable 'LAI' in the LAI dataset. "
@@ -98,7 +104,7 @@ def check_lai_dataset(
 
     try:
         utils.assert_location_within_bounds(
-            laidata, x=latlon[1], y=latlon[0], xdim="lon", ydim="lat"
+            lai_data, x=latlon[1], y=latlon[0], xdim="lon", ydim="lat"
         )
     except utils.MissingDataError as err:
         raise utils.MissingDataError(
@@ -107,7 +113,7 @@ def check_lai_dataset(
         ) from err
 
     try:
-        utils.assert_time_within_bounds(laidata, time_range[0], time_range[1])
+        utils.assert_time_within_bounds(lai_data, time_range[0], time_range[1])
     except utils.MissingDataError as err:
         raise utils.MissingDataError(
             "The LAI data does not cover the given start end end time. "

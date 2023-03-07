@@ -5,7 +5,7 @@ import xarray as xr
 from PyStemmusScope.global_data import utils
 
 
-def load_canopy_height_data(
+def retrieve_canopy_height_data(
     global_data_dir: Path,
     lat: Union[int, float],
     lon: Union[int, float],
