@@ -1,8 +1,8 @@
 from pathlib import Path
 import numpy as np
+import PyStemmusScope.global_data as gd
 import pytest
 from PyStemmusScope import forcing_io
-import PyStemmusScope.global_data as gd
 from . import data_folder
 
 

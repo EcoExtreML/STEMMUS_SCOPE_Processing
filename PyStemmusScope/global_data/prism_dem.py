@@ -22,6 +22,8 @@ def retrieve_dem_data(
     """
     filename = global_data_dir / "dem" / get_filename_dem(lat, lon)
 
+    assert_tile_existance(filename.name.replace("_DEM.tif", ".tar"))
+
     if not filename.exists():
         raise FileNotFoundError(
             f"Could not find a file with the name '{filename.name}' in the directory "
@@ -70,3 +72,17 @@ def get_filename_dem(lat: Union[int, float], lon: Union[int, float]) -> str:
     """
     latstr, lonstr = utils.make_lat_lon_strings(lat, lon, step=1)
     return f"Copernicus_DSM_30_{latstr}_00_{lonstr}_00_DEM.tif"
+
+
+def assert_tile_existance(filename: str) -> None:
+    """Assert that a DEM tile exists with the specified filename."""
+    valid_name_file = Path(__file__).parent / "assets" / "valid_dem_filenames.txt"
+
+    with valid_name_file.open(encoding="utf-8") as f:
+        valid_filenames = f.read()
+
+    if filename not in valid_filenames:
+        raise utils.InvalidLocationError(
+            "\nNo DEM data tile exists for the specified location.\n"
+            "Please select a different location."
+        )

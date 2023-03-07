@@ -21,11 +21,12 @@ def retrieve_canopy_height_data(
         Canopy height at the location.
     """
     filename = global_data_dir / "canopy_height" / get_filename_canopy_height(lat, lon)
+    assert_tile_existance(filename.name)
 
     if not filename.exists():
         raise FileNotFoundError(
-            f"Could not find a file with the name '{filename.name}' in the directory "
-            f"{filename.parent}. Please download the file, or change the global data "
+            f"Could not find a file with the name '{filename.name}' in the directory\n"
+            f"{filename.parent}. Please download the file, or change the global data\n"
             "dir to point to the right location."
         )
     return extract_canopy_height_data(filename, lat, lon)
@@ -94,3 +95,19 @@ def get_filename_canopy_height(lat: Union[int, float], lon: Union[int, float]) -
     """
     latstr, lonstr = utils.make_lat_lon_strings(lat, lon, step=3)
     return f"ETH_GlobalCanopyHeight_10m_2020_{latstr}{lonstr}_Map.tif"
+
+
+def assert_tile_existance(filename: str) -> None:
+    """Assert that a canopy height tile exists with the specified filename."""
+    valid_name_file = (
+        Path(__file__).parent / "assets" / "valid_eth_canopy_height_filenames.txt"
+    )
+
+    with valid_name_file.open(encoding="utf-8") as f:
+        valid_filenames = f.read()
+
+    if filename not in valid_filenames:
+        raise utils.InvalidLocationError(
+            "\nNo canopy height data tile exists for the specified location.\n"
+            "Please select a different location."
+        )

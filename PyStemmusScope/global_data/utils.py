@@ -10,6 +10,10 @@ class MissingDataError(Exception):
     """Error to be raised when requested data is missing."""
 
 
+class InvalidLocationError(Exception):
+    """Error to be raised when a location is given where no data will ever exist."""
+
+
 def assert_variables_present(
     dataset: xr.Dataset,
     variables: List[str],
