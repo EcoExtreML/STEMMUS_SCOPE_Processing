@@ -25,7 +25,7 @@ def retrieve_dem_data(
     if not filename.exists():
         raise FileNotFoundError(
             f"Could not find a file with the name '{filename.name}' in the directory "
-            f"{filename.parent()}. Please download the file, or change the global data "
+            f"{filename.parent}. Please download the file, or change the global data "
             "dir to point to the right location."
         )
     return extract_prism_dem_data(filename, lat, lon)

@@ -2,6 +2,7 @@
 from pathlib import Path
 from typing import Dict
 from typing import List
+from typing import Literal
 from typing import Tuple
 from typing import Union
 import numpy as np
@@ -10,7 +11,8 @@ import xarray as xr
 from PyStemmusScope.global_data import utils
 
 
-ERA5_VARIABLES = ["u10", "v10", "t2m", "mtpr", "sp", "ssrd", "strd", "d2m"]
+ERA5_VARIABLES = ["u10", "v10", "mtpr", "sp", "ssrd", "strd"]
+ERA5LAND_VARIABLES = ["t2m", "d2m"]
 RESOLUTION_ERA5 = 0.25  # Resolution in degrees, to find nearest gridpoint.
 RESOLUTION_ERA5LAND = 0.10
 
@@ -78,18 +80,14 @@ def load_era5_data(
         [
             get_era5_dataset(
                 files=files,
+                name=name,  # type: ignore
                 latlon=latlon,
-                tolerance=resolution,
                 time_range=time_range,
                 timestep=timestep,
             )
-            for (files, resolution) in zip(
-                [files_era5, files_era5_land], [RESOLUTION_ERA5, RESOLUTION_ERA5LAND]
-            )
+            for (name, files) in [("ERA5", files_era5), ("ERA5-land", files_era5_land)]
         ]
     )
-
-    check_era5_dataset(ds, latlon, time_range)
 
     data = {}
     data["wind_speed"] = (ds["u10"] ** 2 + ds["v10"] ** 2) ** 0.5
@@ -109,8 +107,8 @@ def load_era5_data(
 
 def get_era5_dataset(
     files: List[Path],
+    name: Literal["ERA5", "ERA5-land"],
     latlon: Union[Tuple[int, int], Tuple[float, float]],
-    tolerance: float,
     time_range: Tuple[np.datetime64, np.datetime64],
     timestep: str,
 ) -> xr.Dataset:
@@ -119,7 +117,7 @@ def get_era5_dataset(
     Args:
         files: The ERA5 or ERA5-land files.
         latlon: Latitude and longitude of the site.
-        tolerance: Tolerance for finding the nearest gridpoint.
+        name: Either "ERA5" or "ERA5-land".
         time_range: Start and end time of the model run.
         timestep: Desired timestep of the model, this is derived from the forcing data.
             In a pandas-timedelta compatible format. For example: "1800S"
@@ -127,17 +125,29 @@ def get_era5_dataset(
     Returns:
         The ERA5 or ERA5-land dataset.
     """
+    tol = RESOLUTION_ERA5 if name == "ERA5" else RESOLUTION_ERA5LAND
 
-    def preproc(ds):
+    ds = xr.open_mfdataset(files)
+    check_era5_dataset(ds, name, latlon, time_range)
+
+    try:
         ds = ds.sel(
             latitude=latlon[0],
             longitude=latlon[1],
             method="nearest",
-            tolerance=tolerance,
+            tolerance=tol,
         )
-        return ds.drop_vars(["latitude", "longitude"])
+    except KeyError as err:
+        if "not all values found" in str(err):
+            raise utils.MissingDataError(
+                f"No data point was found within {tol} degrees of the specified "
+                f"location {latlon}. Please check the netCDF files or select a "
+                "different location"
+            ) from err
+        else:
+            raise err
 
-    ds = xr.open_mfdataset(files, preprocess=preproc)
+    ds = ds.drop_vars(["latitude", "longitude"])
     ds = ds.compute()
     ds = ds.resample(time=timestep).interpolate("linear")
     return ds.sel(time=slice(time_range[0], time_range[1]))
@@ -145,22 +155,25 @@ def get_era5_dataset(
 
 def check_era5_dataset(
     era5data: xr.Dataset,
+    name: Literal["ERA5", "ERA5-land"],
     latlon: Union[Tuple[int, int], Tuple[float, float]],
     time_range: Tuple[np.datetime64, np.datetime64],
 ) -> None:
-    """Validate the ERA5 and ERA5-land dataset (variables, location & time range).
+    """Validate the ERA5 or ERA5-land dataset (variables, location & time range).
 
     Args:
         era5data: Dataset containing the ERA5 and ERA5-land data.
+        name: Either "ERA5" or "ERA5-land".
         latlon: Latitude and longitude of the site.
         time_range: Start and end time of the model run.
     """
+    vars = ERA5_VARIABLES if name == "ERA5" else ERA5LAND_VARIABLES
     try:
-        utils.assert_variables_present(era5data, ERA5_VARIABLES)
+        utils.assert_variables_present(era5data, vars)
     except utils.MissingDataError as err:
         raise utils.MissingDataError(
-            "(Some) ERA5 or ERA5-land variables are missing. "
-            "Please check the ERA5 and ERA5-land folders and netCDF files."
+            f"(Some) {name} variables are missing. "
+            f"Please check the {name} folder and netCDF files."
         ) from err
 
     try:
@@ -169,15 +182,15 @@ def check_era5_dataset(
         )
     except utils.MissingDataError as err:
         raise utils.MissingDataError(
-            "The ERA5 or ERA5-land data does not cover the given location. Please "
-            "check the ERA5 and ERA5-land netCDF files, or select a different location."
+            f"The {name} data does not cover the given location. Please "
+            f"check the {name} netCDF files, or select a different location."
         ) from err
 
     try:
         utils.assert_time_within_bounds(era5data, time_range[0], time_range[1])
     except utils.MissingDataError as err:
         raise utils.MissingDataError(
-            "The ERA5 or ERA5-land data does not cover the given start end end time. "
-            "Please check the ERA5 and ERA5-land netCDF files, or modify the model "
+            f"The {name} data does not cover the given start end end time. "
+            f"Please check the {name} netCDF files, or modify the model "
             "start and end time."
         ) from err

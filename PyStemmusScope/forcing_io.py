@@ -248,7 +248,9 @@ def prepare_forcing(config: dict) -> None:
     if fmt == "site":
         forcing_file = utils.get_forcing_file(config)
         data = read_forcing_data_plumber2(
-            forcing_file, config["StartTime"], config["EndTime"]
+            forcing_file=forcing_file,
+            start_time=config["StartTime"],
+            end_time=config["EndTime"],
         )
 
     elif fmt == "latlon":
@@ -262,8 +264,8 @@ def prepare_forcing(config: dict) -> None:
             global_data_dir=Path(config["ForcingPath"]),
             lat=loc[0],  # type: ignore
             lon=loc[1],  # type: ignore
-            start_time=config["StartTime"],
-            end_time=config["EndTime"],
+            start_time=np.datetime64(config["StartTime"]),
+            end_time=np.datetime64(config["EndTime"]),
         )
     else:
         raise NotImplementedError

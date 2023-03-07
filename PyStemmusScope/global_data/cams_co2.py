@@ -49,7 +49,7 @@ def extract_cams_data(
     latlon: Union[Tuple[int, int], Tuple[float, float]],
     time_range: Tuple[np.datetime64, np.datetime64],
     timestep: str,
-) -> xr.DataArray:
+) -> np.ndarray:
     """Extract and convert the required variables from the CAMS CO2 dataset.
 
     Args:
@@ -64,7 +64,7 @@ def extract_cams_data(
     """
     ds = xr.open_mfdataset(files_cams)
 
-    check_cams_dataset(cams_dat=ds, latlon=latlon, time_range=time_range)
+    check_cams_dataset(cams_data=ds, latlon=latlon, time_range=time_range)
 
     ds = ds.sel(
         latitude=latlon[0],
@@ -102,7 +102,7 @@ def check_cams_dataset(
 
     try:
         utils.assert_location_within_bounds(
-            cams_data, x=latlon[1], y=latlon[0], xdim="lon", ydim="lat"
+            cams_data, x=latlon[1], y=latlon[0], xdim="longitude", ydim="latitude"
         )
     except utils.MissingDataError as err:
         raise utils.MissingDataError(

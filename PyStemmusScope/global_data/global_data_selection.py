@@ -67,7 +67,9 @@ def collect_datasets(
         min_value=0.01,
     )
 
-    data["elevation"] = gd.prism_dem.retrieve_dem_data(global_data_dir, latlon)
+    data["elevation"] = gd.prism_dem.retrieve_dem_data(
+        global_data_dir, latlon[0], latlon[1]
+    )
 
     data["canopy_height"] = gd.eth_canopy_height.retrieve_canopy_height_data(
         global_data_dir,
@@ -100,3 +102,5 @@ def collect_datasets(
 
     # TODO: Add land cover data retrieval.
     data["IGBP_veg_long"] = "Evergreen Needleleaf Forests"
+
+    return data

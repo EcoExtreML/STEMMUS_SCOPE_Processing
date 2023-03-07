@@ -2,7 +2,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 from PyStemmusScope import forcing_io
-from PyStemmusScope.global_data import utils
+import PyStemmusScope.global_data as gd
 from . import data_folder
 
 
@@ -15,18 +15,18 @@ TIMESTEP = "1800S"
 
 
 def test_get_filename_canopy_height():
-    fname = utils.get_filename_canopy_height(lat=52, lon=4)
+    fname = gd.eth_canopy_height.get_filename_canopy_height(lat=52, lon=4)
     assert fname == "ETH_GlobalCanopyHeight_10m_2020_N51E003_Map.tif"
 
-    fname = utils.get_filename_canopy_height(lat=-33.45, lon=-70.66)
+    fname = gd.eth_canopy_height.get_filename_canopy_height(lat=-33.45, lon=-70.66)
     assert fname == "ETH_GlobalCanopyHeight_10m_2020_S36W072_Map.tif"
 
 
 def test_get_filename_dem():
-    fname = utils.get_filename_dem(lat=52, lon=4)
+    fname = gd.prism_dem.get_filename_dem(lat=52, lon=4)
     assert fname == "Copernicus_DSM_30_N52_00_E004_00_DEM.tif"
 
-    fname = utils.get_filename_dem(lat=-33.45, lon=-70.66)
+    fname = gd.prism_dem.get_filename_dem(lat=-33.45, lon=-70.66)
     assert fname == "Copernicus_DSM_30_S34_00_W071_00_DEM.tif"
 
 

@@ -64,7 +64,7 @@ def extract_lai_data(
     """
     ds = xr.open_mfdataset(files_lai)
 
-    check_lai_dataset(ds)
+    check_lai_dataset(ds, latlon, time_range)
 
     ds = ds.drop_vars(["crs", "LAI_ERR", "retrieval_flag"])
     ds = ds.sel(
