@@ -1,4 +1,5 @@
 """Module load and check the Prism DEM (Digital Elevation Model) dataset."""
+import gzip
 from pathlib import Path
 from typing import Union
 import xarray as xr
@@ -76,10 +77,12 @@ def get_filename_dem(lat: Union[int, float], lon: Union[int, float]) -> str:
 
 def assert_tile_existance(filename: str) -> None:
     """Assert that a DEM tile exists with the specified filename."""
-    valid_name_file = Path(__file__).parent / "assets" / "valid_dem_filenames.txt"
+    valid_name_file = (
+        Path(__file__).parent / "assets" / "dem_filenames_compressed.txt.gz"
+    )
 
-    with valid_name_file.open(encoding="utf-8") as f:
-        valid_filenames = f.read()
+    with gzip.open(valid_name_file, "rb") as f:
+        valid_filenames = f.read().decode("utf-8")
 
     if filename not in valid_filenames:
         raise utils.InvalidLocationError(

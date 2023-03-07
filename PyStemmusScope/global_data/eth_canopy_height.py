@@ -1,4 +1,5 @@
 """Module to load and check the ETH Canopy Height (2020) dataset."""
+import gzip
 from pathlib import Path
 from typing import Union
 import xarray as xr
@@ -100,11 +101,11 @@ def get_filename_canopy_height(lat: Union[int, float], lon: Union[int, float]) -
 def assert_tile_existance(filename: str) -> None:
     """Assert that a canopy height tile exists with the specified filename."""
     valid_name_file = (
-        Path(__file__).parent / "assets" / "valid_eth_canopy_height_filenames.txt"
+        Path(__file__).parent / "assets" / "h_canopy_filenames_compressed.txt.gz"
     )
 
-    with valid_name_file.open(encoding="utf-8") as f:
-        valid_filenames = f.read()
+    with gzip.open(valid_name_file, "rb") as f:
+        valid_filenames = f.read().decode("utf-8")
 
     if filename not in valid_filenames:
         raise utils.InvalidLocationError(
