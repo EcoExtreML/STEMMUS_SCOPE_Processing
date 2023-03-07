@@ -145,7 +145,7 @@ def read_forcing_data_global(  # noqa:PLR0913 (too many arguments)
             pd.date_range(str(start_time), str(end_time), freq=timestep).rename("time")
         )
     }
-    era5_data = gds.extract_era5_data(
+    era5_data = gds.load_era5_data(
         files_era5, files_era5land, lat, lon, start_time, end_time, timestep
     )
     data = {**data, **era5_data}

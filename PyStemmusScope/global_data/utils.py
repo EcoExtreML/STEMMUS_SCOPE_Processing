@@ -1,4 +1,5 @@
 """Utility funtions for the global data IO."""
+from typing import List
 from typing import Tuple
 from typing import Union
 import numpy as np
@@ -7,6 +8,64 @@ import xarray as xr
 
 class MissingDataError(Exception):
     """Error to be raised when requested data is missing."""
+
+
+def assert_variables_present(
+    dataset: xr.Dataset,
+    variables: List[str],
+):
+    """Check if the required variables are in the specified dataset."""
+    missing_variables = set(variables) - set(dataset.keys())
+    if len(missing_variables) > 0:
+        raise MissingDataError(
+            "Some required variables are missing from the data:"
+            "".join(f"\n    {var}" for var in missing_variables)
+        )
+
+
+def assert_location_within_bounds(
+    data: Union[xr.DataArray, xr.Dataset],
+    x: float,
+    y: float,
+    xdim: str = "x",
+    ydim: str = "y",
+) -> None:
+    """Compare a locations x/y (lon/lat) values to the range of the available data."""
+    if (
+        x > data[xdim].max()
+        or x < data[xdim].min()
+        or y > data[ydim].max()
+        or y < data[ydim].min()
+    ):
+        raise MissingDataError(
+            f"The specified location {xdim}={x}, {ydim}={y} is not covered by the range"
+            f" of the available data: {xdim}=[{data[xdim].min()}-{data[xdim].max()}], "
+            f"{ydim}=[{data[ydim].min()}-{data[ydim].max()}]."
+        )
+
+
+def assert_time_within_bounds(
+    data: Union[xr.DataArray, xr.Dataset],
+    start_time: np.datetime64,
+    end_time: np.datetime64,
+    time_dim: str = "time",
+) -> None:
+    """Assert that the start and end time are within the data's time bounds.
+
+    Args:
+        data: Dataset or DataArray that requires validation
+        start_time: Start time of the model run.
+        end_time: End time of the model run.
+        time_dim: Name of the time dimension. Defaults to "time".
+    """
+    if (float(start_time) > float(data[time_dim].max())) or (
+        float(end_time) < float(data[start_time].min())
+    ):
+        raise MissingDataError(
+            "The available data cannot cover the specified start and end time.\n"
+            f"Data start: {np.datetime_as_string(data[time_dim].min(), unit='m')}\n"
+            f"Data end: {np.datetime_as_string(data[time_dim].max(), unit='m')}"
+        )
 
 
 def find_nearest_non_nan(  # noqa:PLR0913 (too many arguments)
@@ -26,7 +85,7 @@ def find_nearest_non_nan(  # noqa:PLR0913 (too many arguments)
         xdim: optional, to be used if the x-dimension is named "lon" or "longitude".
         ydim: optional, to be used if the y-dimension is named "lat" or "latitude".
         max_distance: Maximum distance between the specified location and the nearest
-            non-nan location.
+            non-nan location (same units as x and y coordinates).
 
     Returns:
         The input dataarray reduced to only one location
