@@ -6,6 +6,9 @@ import xarray as xr
 from PyStemmusScope.global_data import utils
 
 
+MAX_DISTANCE = 0.01  #  Maximum lat/lon distance to be considered nearby. Approx 1km.
+
+
 def retrieve_dem_data(
     global_data_dir: Path,
     lat: Union[int, float],
@@ -27,9 +30,11 @@ def retrieve_dem_data(
 
     if not filename.exists():
         raise FileNotFoundError(
-            f"Could not find a file with the name '{filename.name}' in the directory "
-            f"{filename.parent}. Please download the file, or change the global data "
-            "dir to point to the right location."
+            f"\nCould not find a file with the name '{filename.name}'"
+            f"\nin the directory:"
+            f"\n    {filename.parent}."
+            f"\nPlease download the file, or change the global data"
+            f"\ndirectory to point to the right location."
         )
     return extract_prism_dem_data(filename, lat, lon)
 
@@ -49,8 +54,23 @@ def extract_prism_dem_data(
     Returns:
         Elevation of the location.
     """
-    ds = xr.open_dataarray(file_dem, engine="rasterio")
-    elevation = ds.sel(x=lon, y=lat, method="nearest")
+    da = xr.open_dataarray(file_dem, engine="rasterio")
+    elevation = da.sel(x=lon, y=lat, method="nearest")
+
+    try:
+        elevation = utils.find_nearest_non_nan(
+            da.compute(),
+            x=lon,
+            y=lat,
+            max_distance=MAX_DISTANCE,
+        )
+    except utils.MissingDataError as err:
+        raise utils.MissingDataError(
+            f"\nNo valid DEM data found within {MAX_DISTANCE} degrees"
+            f"\nof the selected location ({lat:.3f}, {lon:.3f})."
+            "\nPlease select a different (nearby) location."
+        ) from err
+
     return elevation.values[0]
 
 

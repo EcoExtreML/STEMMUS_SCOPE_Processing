@@ -40,11 +40,11 @@ def retrieve_era5_data(
 
     if len(files_era5) == 0:
         raise FileNotFoundError(
-            f"No netCDF files found in the folder '{global_data_dir / 'era5':str}'"
+            f"No netCDF files found in the folder '{global_data_dir / 'era5'}'"
         )
     if len(files_era5_land) == 0:
         raise FileNotFoundError(
-            f"No netCDF files found in the folder '{global_data_dir / 'era5-land':str}'"
+            f"No netCDF files found in the folder '{global_data_dir / 'era5-land'}'"
         )
 
     return load_era5_data(
@@ -190,7 +190,7 @@ def check_era5_dataset(
         utils.assert_time_within_bounds(era5data, time_range[0], time_range[1])
     except utils.MissingDataError as err:
         raise utils.MissingDataError(
-            f"The {name} data does not cover the given start end end time. "
+            f"The {name} data does not cover the given start and end time. "
             f"Please check the {name} netCDF files, or modify the model "
             "start and end time."
         ) from err

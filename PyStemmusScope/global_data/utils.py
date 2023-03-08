@@ -65,8 +65,8 @@ def assert_time_within_bounds(
         time_dim: Name of the time dimension. Defaults to "time".
     """
     if (
-        datetime_to_unix(start_time) > datetime_to_unix(data[time_dim].max().values)
-    ) or (datetime_to_unix(end_time) < datetime_to_unix(data[time_dim].min().values)):
+        datetime_to_unix(start_time) < datetime_to_unix(data[time_dim].min().values)
+    ) or (datetime_to_unix(end_time) > datetime_to_unix(data[time_dim].max().values)):
         raise MissingDataError(
             "\nThe available data cannot cover the specified start and end time.\n"
             f"    Specified model time range:\n"

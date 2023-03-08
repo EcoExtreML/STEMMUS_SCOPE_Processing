@@ -33,7 +33,7 @@ def retrieve_lai_data(
 
     if len(files) == 0:
         raise FileNotFoundError(
-            f"No netCDF files found in the folder '{global_data_dir / 'lai':str}'"
+            f"No netCDF files found in the folder '{global_data_dir / 'lai'}'"
         )
 
     return extract_lai_data(
@@ -67,12 +67,23 @@ def extract_lai_data(
     check_lai_dataset(ds, latlon, time_range)
 
     ds = ds.drop_vars(["crs", "LAI_ERR", "retrieval_flag"])
-    ds = ds.sel(
-        lat=latlon[0],
-        lon=latlon[1],
-        method="nearest",
-        tolerance=RESOLUTION_LAI,
-    )
+
+    try:
+        ds = ds.sel(
+            lat=latlon[0],
+            lon=latlon[1],
+            method="nearest",
+            tolerance=RESOLUTION_LAI,
+        )
+    except KeyError as err:
+        if "not all values found" in str(err):
+            raise utils.MissingDataError(
+                f"\nNo data point was found within {RESOLUTION_LAI} degrees"
+                f"\nof the specified location {latlon}."
+                f"\nPlease check the netCDF files or select a different location"
+            ) from err
+        else:
+            raise err
 
     ds = ds.drop_vars(["lat", "lon"])
     ds = ds.compute()  # Load into memory before resampling
@@ -98,8 +109,8 @@ def check_lai_dataset(
         utils.assert_variables_present(lai_data, ["LAI"])
     except utils.MissingDataError as err:
         raise utils.MissingDataError(
-            "Could not find the variable 'LAI' in the LAI dataset. "
-            "Please check the netCDF files or the path."
+            "\nCould not find the variable 'LAI' in the LAI dataset. "
+            "\nPlease check the netCDF files or the path."
         ) from err
 
     try:
@@ -108,14 +119,15 @@ def check_lai_dataset(
         )
     except utils.MissingDataError as err:
         raise utils.MissingDataError(
-            "The LAI data does not cover the given location. "
-            "Please check the LAI netCDF files, or select a different location."
+            "\nThe LAI data does not cover the given location."
+            "\nPlease check the LAI netCDF files, or select a different location."
         ) from err
 
     try:
         utils.assert_time_within_bounds(lai_data, time_range[0], time_range[1])
     except utils.MissingDataError as err:
         raise utils.MissingDataError(
-            "The LAI data does not cover the given start end end time. "
-            "Please check the LAI netCDF files, or modify the model start and end time."
+            "\nThe LAI data does not cover the given start end end time. "
+            "\nPlease check the LAI netCDF files, or modify the model"
+            "\nstart and end time."
         ) from err

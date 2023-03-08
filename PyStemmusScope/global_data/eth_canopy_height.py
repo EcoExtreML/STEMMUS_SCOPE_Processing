@@ -6,6 +6,9 @@ import xarray as xr
 from PyStemmusScope.global_data import utils
 
 
+MAX_DISTANCE = 0.01  # Maximum lat/lon distance to be considered nearby.
+
+
 def retrieve_canopy_height_data(
     global_data_dir: Path,
     lat: Union[int, float],
@@ -26,9 +29,11 @@ def retrieve_canopy_height_data(
 
     if not filename.exists():
         raise FileNotFoundError(
-            f"Could not find a file with the name '{filename.name}' in the directory\n"
-            f"{filename.parent}. Please download the file, or change the global data\n"
-            "dir to point to the right location."
+            f"\nCould not find a file with the name '{filename.name}'"
+            f"\nin the directory:"
+            f"\n    {filename.parent}."
+            f"\nPlease download the file, or change the global data"
+            f"\ndirectory to point to the right location."
         )
     return extract_canopy_height_data(filename, lat, lon)
 
@@ -51,12 +56,13 @@ def extract_canopy_height_data(
     da = xr.open_dataarray(file_canopy_height, engine="rasterio")
     da = da.sortby(["x", "y"])
 
-    try:
-        utils.assert_location_within_bounds(da, x=lon, y=lat)
-    except utils.MissingDataError as err:
-        raise utils.MissingDataError("No valid canopy height data available.") from err
+    # try:
+    #     utils.assert_location_within_bounds(da, x=lon, y=lat)
+    # except utils.MissingDataError as err:
+    #     raise utils.MissingDataError(
+    #         "\nNo valid canopy height data available."
+    #     ) from err
 
-    max_distance = 0.01  # Maximum lat/lon distance to be considered nearby.
     pad = 0.05  # Add padding around the data before trying to find nearest non-nan
     da = da.sel(y=slice(lat - pad, lat + pad), x=slice(lon - pad, lon + pad))
 
@@ -65,13 +71,13 @@ def extract_canopy_height_data(
             da.compute(),
             x=lon,
             y=lat,
-            max_distance=max_distance,
+            max_distance=MAX_DISTANCE,
         )
     except utils.MissingDataError as err:
         raise utils.MissingDataError(
-            f"No valid canopy height data found within {max_distance} degrees for the "
-            f"selected location ({lat:.3f}, {lon:.3f})."
-            " Please select a different (nearby) location."
+            f"\nNo valid canopy height data found within {MAX_DISTANCE} degrees"
+            f"\nof the selected location ({lat:.3f}, {lon:.3f})."
+            "\nPlease select a different (nearby) location."
         ) from err
 
     return canopy_height.values[0]
@@ -109,6 +115,6 @@ def assert_tile_existance(filename: str) -> None:
 
     if filename not in valid_filenames:
         raise utils.InvalidLocationError(
-            "\nNo canopy height data tile exists for the specified location.\n"
-            "Please select a different location."
+            "\nNo canopy height data tile exists for the specified location."
+            "\nPlease select a different location."
         )
