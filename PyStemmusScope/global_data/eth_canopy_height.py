@@ -56,13 +56,6 @@ def extract_canopy_height_data(
     da = xr.open_dataarray(file_canopy_height, engine="rasterio")
     da = da.sortby(["x", "y"])
 
-    # try:
-    #     utils.assert_location_within_bounds(da, x=lon, y=lat)
-    # except utils.MissingDataError as err:
-    #     raise utils.MissingDataError(
-    #         "\nNo valid canopy height data available."
-    #     ) from err
-
     pad = 0.05  # Add padding around the data before trying to find nearest non-nan
     da = da.sel(y=slice(lat - pad, lat + pad), x=slice(lon - pad, lon + pad))
 
