@@ -1,14 +1,12 @@
 """Module for forcing data input and output operations."""
 from pathlib import Path
-from typing import Any
 from typing import Dict
 import hdf5storage
 import numpy as np
-import pandas as pd
 import xarray as xr
-from . import global_data_selection as gds
-from . import utils
-from . import variable_conversion as vc
+from PyStemmusScope import global_data
+from PyStemmusScope import utils
+from PyStemmusScope import variable_conversion as vc
 
 
 def _write_matlab_ascii(fname, data, ncols):
@@ -131,67 +129,12 @@ def read_forcing_data_global(  # noqa:PLR0913 (too many arguments)
     Returns:
         Dictionary containing the forcing data.
     """
-    files_cams = list((global_data_dir / "co2").glob("*.nc"))
-    file_canopy_height = (
-        global_data_dir / "canopy_height" / gds.get_filename_canopy_height(lat, lon)
+    return global_data.collect_datasets(
+        global_data_dir=global_data_dir,
+        latlon=(lat, lon),
+        time_range=(start_time, end_time),
+        timestep=timestep,
     )
-    file_dem = global_data_dir / "dem" / gds.get_filename_dem(lat, lon)
-    files_era5 = list((global_data_dir / "era5").glob("*.nc"))
-    files_era5land = list((global_data_dir / "era5-land").glob("*.nc"))
-    files_lai = list((global_data_dir / "lai").glob("*.nc"))
-
-    data: Dict[str, Any] = {
-        "time": xr.DataArray(
-            pd.date_range(str(start_time), str(end_time), freq=timestep).rename("time")
-        )
-    }
-    era5_data = gds.extract_era5_data(
-        files_era5, files_era5land, lat, lon, start_time, end_time, timestep
-    )
-    data = {**data, **era5_data}
-
-    data["co2_conv"] = (
-        vc.co2_mass_fraction_to_kg_per_m3(
-            gds.extract_cams_data(files_cams, lat, lon, start_time, end_time, timestep)
-        )
-        * 1e6
-    )  # kg/m3 -> mg/m3
-
-    data["lai"] = vc.mask_data(
-        gds.extract_lai_data(files_lai, lat, lon, start_time, end_time, timestep),
-        min_value=0.01,
-    )
-
-    data["elevation"] = gds.extract_prism_dem_data(file_dem, lat, lon)
-
-    data["canopy_height"] = gds.extract_canopy_height_data(file_canopy_height, lat, lon)
-    # Height of measurement. Data has no actual equivalent. Set to a temp. value. see
-    #  issue #145.
-    data["reference_height"] = 10.0
-
-    data["sitename"] = "global"
-
-    # Expected time format is days (as floating point) since Jan 1st 00:00.
-    data["doy_float"] = (
-        data["time"].dt.dayofyear
-        - 1
-        + data["time"].dt.hour / 24
-        + data["time"].dt.minute / 60 / 24
-    )
-    data["year"] = data["time"].dt.year.astype(float)
-
-    data["DELT"] = (
-        (data["time"].values[1] - data["time"].values[0]) / np.timedelta64(1, "s")
-    ).astype(float)
-    data["total_timesteps"] = data["time"].size
-
-    data["latitude"] = lat
-    data["longitude"] = lon
-
-    # TODO: Add land cover data retrieval.
-    data["IGBP_veg_long"] = "Evergreen Needleleaf Forests"
-
-    return data
 
 
 def write_dat_files(data: dict, input_dir: Path):
@@ -305,7 +248,9 @@ def prepare_forcing(config: dict) -> None:
     if fmt == "site":
         forcing_file = utils.get_forcing_file(config)
         data = read_forcing_data_plumber2(
-            forcing_file, config["StartTime"], config["EndTime"]
+            forcing_file=forcing_file,
+            start_time=config["StartTime"],
+            end_time=config["EndTime"],
         )
 
     elif fmt == "latlon":
@@ -319,8 +264,8 @@ def prepare_forcing(config: dict) -> None:
             global_data_dir=Path(config["ForcingPath"]),
             lat=loc[0],  # type: ignore
             lon=loc[1],  # type: ignore
-            start_time=config["StartTime"],
-            end_time=config["EndTime"],
+            start_time=np.datetime64(config["StartTime"]),
+            end_time=np.datetime64(config["EndTime"]),
         )
     else:
         raise NotImplementedError

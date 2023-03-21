@@ -9,24 +9,6 @@ from typing import Union
 import numpy as np
 
 
-def find_nearest_non_nan(da, x, y, xdim="x", ydim="y"):
-    """Extract the (Cartesian) nearest non-nan value from a DataArray.
-
-    Args:
-        da: DataArray containing the data, and the xdim and ydim as dimensions
-        x: x-coordinate of interest
-        y: y-coordinate of interest
-        xdim: optional, to be used if the x-dimension is named "lon" or "longitude".
-        ydim: optional, to be used if the y-dimension is named "lat" or "latitude".
-
-    Returns:
-        The input dataarray reduced to only one location/
-    """
-    distance = ((da[xdim] - x) ** 2 + (da[ydim] - y) ** 2) ** 0.5
-    distance = distance.where(~np.isnan(da), np.nan)
-    return da.isel(distance.argmin(dim=[xdim, ydim]))
-
-
 def convert_to_lsm_coordinates(lat: float, lon: float) -> Tuple[int, int]:
     """Convert latitude in degrees North to NCAR's LSM coordinate system.
 
