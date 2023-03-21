@@ -71,9 +71,12 @@ A simple example for the parsing of the data is in `data_analysis_notebooks/pars
 
 ## LAI
 
-LAI data was retreived from the CDS. However, the `satellite-lai-fapar` dataset turned out
-to be insufficient for our purpose.
-LAI source is TBD.
+LAI data was retrieved from the CDS. However, there are some downloading issues with
+the `satellite-lai-fapar` dataset. A ticket has been opened at the ECMWF.
+
+The download script for downloading the LAI data is available under `download_scripts/download_FAPAR_LAI.py`.
+
+A simple example for parsing the LAI data is in `data_analysis_notebooks/parse_LAI.py`.
 
 ## Land cover
 
