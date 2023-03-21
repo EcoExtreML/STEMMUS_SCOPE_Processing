@@ -48,10 +48,10 @@ def request_lai_data(year, month):
 
 
 if __name__ == "__main__":
-    years = [2010, 2011, 2012, 2013, 2015, 2018]  # list(range(2012, 2018))
+    years = list(range(2012, 2018))
     months = [str(x).rjust(2, "0") for x in range(1, 13)]
 
     _years, _months = map(list, zip(*itertools.product(years, months)))
 
-    pool = Pool(nodes=4)
+    pool = Pool(nodes=2)
     pool.map(request_lai_data, _years, _months)
