@@ -126,7 +126,7 @@ def check_cams_dataset(
         utils.assert_time_within_bounds(cams_data, time_range[0], time_range[1])
     except utils.MissingDataError as err:
         raise utils.MissingDataError(
-            "\nThe CO2 data does not cover the given start end end time. "
+            "\nThe CO2 data does not cover the given start and end time. "
             "\nPlease check the CAMS CO2 netCDF files, or modify the model"
             "\nstart and end time."
         ) from err

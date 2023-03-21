@@ -173,7 +173,7 @@ class TestCams:
     def test_out_of_bounds_time(self, time_range):
         with pytest.raises(
             gd.utils.MissingDataError,
-            match="The CO2 data does not cover the given start end end time",
+            match="The CO2 data does not cover the given start and end time",
         ):
             gd.cams_co2.retrieve_co2_data(
                 global_data_dir=GLOBAL_DATA_FOLDER,
@@ -229,7 +229,7 @@ class TestLAI:
     def test_out_of_bounds_time(self, time_range):
         with pytest.raises(
             gd.utils.MissingDataError,
-            match="The LAI data does not cover the given start end end time",
+            match="The LAI data does not cover the given start and end time",
         ):
             gd.copernicus_lai.retrieve_lai_data(
                 global_data_dir=GLOBAL_DATA_FOLDER,

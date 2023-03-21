@@ -127,7 +127,7 @@ def check_lai_dataset(
         utils.assert_time_within_bounds(lai_data, time_range[0], time_range[1])
     except utils.MissingDataError as err:
         raise utils.MissingDataError(
-            "\nThe LAI data does not cover the given start end end time. "
+            "\nThe LAI data does not cover the given start and end time. "
             "\nPlease check the LAI netCDF files, or modify the model"
             "\nstart and end time."
         ) from err

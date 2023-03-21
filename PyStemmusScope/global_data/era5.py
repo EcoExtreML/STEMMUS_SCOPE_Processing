@@ -142,7 +142,7 @@ def get_era5_dataset(
             raise utils.MissingDataError(
                 f"No data point was found within {tol} degrees of the specified "
                 f"location {latlon}. Please check the netCDF files or select a "
-                "different location"
+                "different location."
             ) from err
         else:
             raise err
