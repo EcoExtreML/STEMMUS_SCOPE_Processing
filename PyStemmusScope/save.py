@@ -332,10 +332,7 @@ def to_netcdf(config_file: str, cf_filename: str) -> str:
     # otherwise it cannot be uploaded to modelevaluation portal
     start_time = time.dt.strftime("%Y-%m-%d").values[0]
     time_encode = {
-        "time": {
-            "units": f"seconds since {start_time}",
-            "calendar": "standard"
-            }
+        "time": {"units": f"seconds since {start_time}","calendar": "standard"}
         }
     # save to nc file
     nc_filename = (
