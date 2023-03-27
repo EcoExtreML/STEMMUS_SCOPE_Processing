@@ -30,6 +30,7 @@ dirs = [
     "dem",
     "soil_initial",
     "lai",
+    "landcover",
 ]
 for _dir in dirs:
     dir_path = Path(TEST_DATA_DIR) / _dir
@@ -195,3 +196,76 @@ for i in range(lai_data["time"].size):
             i,
         ]
     ).to_netcdf(TEST_DATA_DIR / "lai" / fname)
+
+
+# Land cover
+def generate_landcover_data(test_value: int, resolution: float) -> xr.Dataset:
+    time_coords = pd.date_range(
+        start=np.datetime64(f"{pd.to_datetime(START_TIME).year}-01-01T00:00"),
+        freq='AS',  # year start
+        periods=pd.to_datetime(END_TIME).year - pd.to_datetime(START_TIME).year + 1,
+        inclusive="both",
+    )
+    lat_coords = np.arange(
+        start=TEST_LAT + 10 * resolution,
+        stop=TEST_LAT - 10 * resolution,
+        step=-resolution,
+    )
+    lon_coords = np.arange(
+        start=TEST_LON - 10 * resolution,
+        stop=TEST_LON + 10 * resolution,
+        step=resolution,
+    )
+
+    # Add the bounds
+    lat_bounds = np.hstack((
+        lat_coords[0] - 0.5 * resolution,
+        lat_coords +  0.5 * resolution
+    ))
+    lat_bounds = np.vstack((lat_bounds[:-1], lat_bounds[1:])).T
+    # has time as dim, so the lat bounds need to be repeated for every time dim.
+    lat_bounds = np.repeat(lat_bounds[np.newaxis, :, :], len(time_coords), axis=0)
+
+    lon_bounds = np.hstack((
+        lon_coords -  0.5 * resolution,
+        lon_coords[-1] + 0.5 * resolution,
+    ))
+    lon_bounds = np.vstack((lon_bounds[:-1], lon_bounds[1:])).T
+    lon_bounds = np.repeat(lon_bounds[np.newaxis, :, :], len(time_coords), axis=0)
+
+    data = np.zeros(
+        (len(time_coords), len(lat_coords), len(lon_coords)), dtype=np.uint8
+    ) + test_value
+
+    ds = xr.Dataset(
+        data_vars={
+            "lccs_class": (("time", "lat", "lon"), data),
+            "lat_bounds": (("time", "lat", "bounds"), lat_bounds),
+            "lon_bounds": (("time", "lon", "bounds"), lon_bounds),
+        },
+        coords={
+            "lon": lon_coords,
+            "lat": lat_coords,
+            "time": time_coords,
+        },
+    )
+    ds["lccs_class"].attrs = {
+        "flag_values": np.array([0, 70], dtype=np.uint8),
+        "flag_meanings": "no_data tree_needleleaved_evergreen_closed_to_open",
+    }
+
+    return ds
+
+
+landcover_data = generate_landcover_data(test_value=70, resolution=1 / 360)
+
+
+for i in range(landcover_data["time"].size):
+    ftime = pd.to_datetime(landcover_data.isel(time=i)["time"].values)
+    fname = f"ESACCI-LC-L4-LCCS-Map-300m-P1Y-{ftime:%Y}-v2.0.7cds.nc"
+    # Note: isel with a list (incl. comma) to keep the 'time' dimension (!)
+    landcover_data.isel(
+        time=[
+            i,
+        ]
+    ).to_netcdf(TEST_DATA_DIR / "landcover" / fname)
