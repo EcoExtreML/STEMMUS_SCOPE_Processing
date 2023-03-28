@@ -19,7 +19,7 @@ def retrieve_landcover_data(
     latlon: Union[Tuple[int, int], Tuple[float, float]],
     time_range: Tuple[np.datetime64, np.datetime64],
     timestep: str,
-) -> Dict[str, str]:
+) -> Dict[str, np.ndarray]:
     """Get the land cover data from the CCI netCDF files.
 
     Args:
@@ -32,8 +32,12 @@ def retrieve_landcover_data(
     Returns:
         Dictionary containing IGBP and LCCS land cover classes.
     """
-
     files_cci = list((global_data_dir / "landcover").glob("*.nc"))
+
+    if len(files_cci) == 0:
+        raise FileNotFoundError(
+            f"No netCDF files found in the folder '{global_data_dir / 'landcover'}'"
+        )
 
     return extract_landcover_data(
         files_cci=files_cci,
@@ -48,7 +52,7 @@ def extract_landcover_data(
     latlon: Union[Tuple[int, int], Tuple[float, float]],
     time_range: Tuple[np.datetime64, np.datetime64],
     timestep: str,
-) -> Dict[str, str]:
+) -> Dict[str, np.ndarray]:
     """Extract the land cover data from the CCI netCDF files.
 
     Args:
@@ -62,16 +66,17 @@ def extract_landcover_data(
         Dictionary containing IGBP and LCCS land cover classes.
     """
     cci_dataset = xr.open_mfdataset(files_cci)
-    cci_dataset = cci_dataset.compute()
+
+    check_cci_dataset(cci_dataset, latlon, time_range)  # Assert spatial/temporal bounds
 
     lat_bounds = cci_dataset["lat_bounds"].load()  # Load so that they are not
     lon_bounds = cci_dataset["lon_bounds"].load()  #  dask arrays
-    lat_idx = np.logical_and(
+    lat_idx = np.logical_and(  # type: ignore
         lat_bounds.isel(bounds=0) >= latlon[0], lat_bounds.isel(bounds=1) < latlon[0]
-    ).argmax()
-    lon_idx = np.logical_and(
+    ).argmax(dim="lat")
+    lon_idx = np.logical_and(  # type: ignore
         lon_bounds.isel(bounds=0) <= latlon[1], lon_bounds.isel(bounds=1) > latlon[1]
-    ).argmax()
+    ).argmax(dim="lon")
 
     lccs_id = cci_dataset.isel(lat=lat_idx, lon=lon_idx)["lccs_class"]
 
@@ -79,7 +84,7 @@ def extract_landcover_data(
     if lccs_id["time"].size == 1:
         data_copy = lccs_id.copy()
         data_copy["time"] = lccs_id["time"] + np.timedelta64(1, "D")
-        lccs_id = xr.concat((lccs_id, data_copy), dim='time')
+        lccs_id = xr.concat((lccs_id, data_copy), dim="time")
 
     lccs_id = lccs_id.interp(
         time=pd.date_range(time_range[0], time_range[1], freq=timestep),
@@ -122,3 +127,34 @@ def get_landcover_table(cci_dataset: xr.Dataset) -> Dict[int, str]:
     flag_meanings = cci_dataset["lccs_class"].attrs["flag_meanings"].split(" ")
     flag_values = cci_dataset["lccs_class"].attrs["flag_values"]
     return {key: flag for key, flag in zip(flag_values, flag_meanings)}
+
+
+def check_cci_dataset(
+    cci_dataset: xr.Dataset,
+    latlon: Union[Tuple[int, int], Tuple[float, float]],
+    time_range: Tuple[np.datetime64, np.datetime64],
+) -> None:
+    """Validate the cci dataset for spatial and temporal bounds."""
+    # Assert spatial bounds
+    if (
+        latlon[0] > cci_dataset["lat"].max() or latlon[0] < cci_dataset["lat"].min()
+    ) or (latlon[1] > cci_dataset["lon"].max() or latlon[1] < cci_dataset["lon"].min()):
+        raise utils.MissingDataError(
+            f"\nThe specified location {latlon} was not within bounds of the CCI land"
+            f"\ncover dataset."
+            f"\nPlease check the netCDF files or select a different location"
+        )
+
+    # Assert temporal bounds
+    first_year_cci = pd.to_datetime(cci_dataset["time"].min().to_numpy()).year
+    last_year_cci = pd.to_datetime(cci_dataset["time"].max().to_numpy()).year
+    first_year_range = pd.to_datetime(time_range[0]).year
+    last_year_range = pd.to_datetime(time_range[-1]).year
+    # As the data is yearly, allow some leeway with the time bounds
+    if (first_year_range + 1 < first_year_cci) or (last_year_range - 1 > last_year_cci):
+        raise utils.MissingDataError(
+            f"\nThe specified time range {time_range} was not within the range of the"
+            f"\nCCI land cover dataset:"
+            f"\n({cci_dataset['time'].min(), cci_dataset['time'].max()})"
+            f"\nPlease check the netCDF files or select a different location"
+        )

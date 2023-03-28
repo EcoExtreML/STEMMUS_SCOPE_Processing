@@ -202,7 +202,7 @@ for i in range(lai_data["time"].size):
 def generate_landcover_data(test_value: int, resolution: float) -> xr.Dataset:
     time_coords = pd.date_range(
         start=np.datetime64(f"{pd.to_datetime(START_TIME).year}-01-01T00:00"),
-        freq='AS',  # year start
+        freq="AS",  # year start
         periods=pd.to_datetime(END_TIME).year - pd.to_datetime(START_TIME).year + 1,
         inclusive="both",
     )
@@ -218,24 +218,26 @@ def generate_landcover_data(test_value: int, resolution: float) -> xr.Dataset:
     )
 
     # Add the bounds
-    lat_bounds = np.hstack((
-        lat_coords[0] - 0.5 * resolution,
-        lat_coords +  0.5 * resolution
-    ))
+    lat_bounds = np.hstack(
+        (lat_coords[0] - 0.5 * resolution, lat_coords + 0.5 * resolution)
+    )
     lat_bounds = np.vstack((lat_bounds[:-1], lat_bounds[1:])).T
     # has time as dim, so the lat bounds need to be repeated for every time dim.
     lat_bounds = np.repeat(lat_bounds[np.newaxis, :, :], len(time_coords), axis=0)
 
-    lon_bounds = np.hstack((
-        lon_coords -  0.5 * resolution,
-        lon_coords[-1] + 0.5 * resolution,
-    ))
+    lon_bounds = np.hstack(
+        (
+            lon_coords - 0.5 * resolution,
+            lon_coords[-1] + 0.5 * resolution,
+        )
+    )
     lon_bounds = np.vstack((lon_bounds[:-1], lon_bounds[1:])).T
     lon_bounds = np.repeat(lon_bounds[np.newaxis, :, :], len(time_coords), axis=0)
 
-    data = np.zeros(
-        (len(time_coords), len(lat_coords), len(lon_coords)), dtype=np.uint8
-    ) + test_value
+    data = (
+        np.zeros((len(time_coords), len(lat_coords), len(lon_coords)), dtype=np.uint8)
+        + test_value
+    )
 
     ds = xr.Dataset(
         data_vars={
