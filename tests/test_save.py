@@ -372,3 +372,9 @@ class TestSaveToNetcdf:
         assert "z" in dataset
         # check z attributes
         assert "layer_1: 0.0 - 1.0 cm" in dataset["z"].attrs["definition"]
+
+        # test time attrs
+        start_time = forcing_data["time"].dt.strftime("%Y-%m-%d").values[0]
+        dataset = xr.open_dataset(saved_nc_file, decode_times=False)
+        assert dataset.time.attrs["units"] == f"seconds since {start_time}"
+        assert dataset.time.attrs["calendar"] == "standard"

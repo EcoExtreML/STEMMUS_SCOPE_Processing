@@ -284,7 +284,7 @@ def to_netcdf(config_file: str, cf_filename: str) -> str:
         )
 
     # get time info
-    time = forcing_dict["time"].values
+    time = forcing_dict["time"]
 
     # read convention file
     conventions = pd.read_csv(cf_filename)
@@ -327,11 +327,18 @@ def to_netcdf(config_file: str, cf_filename: str) -> str:
     # update dimensions
     dataset = _update_dataset_attrs_dims(dataset, forcing_dict)
 
-    # # save to nc file
+    # for writing to netcdf, time attrs should be added
+    # time attrs should be the same as plumber 2 forcing data
+    # otherwise it cannot be uploaded to modelevaluation portal
+    start_time = time.dt.strftime("%Y-%m-%d").values[0]
+    time_encode = {
+        "time": {"units": f"seconds since {start_time}", "calendar": "standard"}
+    }
+    # save to nc file
     nc_filename = (
         Path(config["OutputPath"])
         / f"{Path(config['OutputPath']).stem}_STEMMUS_SCOPE.nc"
     )
-    dataset.to_netcdf(path=nc_filename)
+    dataset.to_netcdf(path=nc_filename, encoding=time_encode)
 
     return str(nc_filename)
