@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2023-04-03
+<!-- markdown-link-check-disable-next-line -->
+This version is only compatible with [STEMMUS_SCOPE 1.2.0](https://github.com/EcoExtreML/STEMMUS_SCOPE/releases/tag/1.2.0).
+
+### Added:
+- LAI data can now be read by the global data routines ([#69](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/69)).
+- Data validation checks (file existance, spatial & temporal bounds, ...) to global data read routines ([#71](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/71)).
+
+### Changed:
+- The project has been moved to a `pyproject.toml` + `hatch` setup, with ruff as the linter and mypy as type checker ([#68](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/68)).
+
+### Fixed:
+- The output netcdf file is again compatible to the model evaluation website ([#76](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/76)).
 
 ## [0.2.0] - 2023-02-21
 <!-- markdown-link-check-disable-next-line -->
