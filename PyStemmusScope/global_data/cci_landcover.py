@@ -126,7 +126,7 @@ def get_landcover_table(cci_dataset: xr.Dataset) -> Dict[int, str]:
     """
     flag_meanings = cci_dataset["lccs_class"].attrs["flag_meanings"].split(" ")
     flag_values = cci_dataset["lccs_class"].attrs["flag_values"]
-    return {key: flag for key, flag in zip(flag_values, flag_meanings)}
+    return dict(zip(flag_values, flag_meanings))
 
 
 def check_cci_dataset(

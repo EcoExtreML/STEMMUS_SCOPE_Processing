@@ -106,6 +106,8 @@ def collect_datasets(
         time_range,
         timestep,
     )
+    # TODO see issue github.com/EcoExtreML/STEMMUS_SCOPE/issues/137
+    # for now, we only use the first value of the time series
     data["IGBP_veg_long"] = landcover_data["IGBP_veg_long"][0]
     data["LCCS_landcover"] = landcover_data["LCCS_landcover"][0]
 
