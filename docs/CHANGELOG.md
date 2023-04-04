@@ -12,6 +12,7 @@ This version is only compatible with [STEMMUS_SCOPE 1.2.0](https://github.com/Ec
 
 ### Added:
 - LAI data can now be read by the global data routines ([#69](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/69)).
+- Land cover data can now be read by global data routines ([#73](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/73))
 - Data validation checks (file existance, spatial & temporal bounds, ...) to global data read routines ([#71](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/71)).
 
 ### Changed:
