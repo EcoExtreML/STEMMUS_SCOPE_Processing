@@ -60,16 +60,22 @@ expected_keys_values = [
     ("canopy_height", 1.0),
     ("reference_height", 10.0),
     ("doy_float", 0.0),
+    ("IGBP_veg_long", "Evergreen Needleleaf Forests"),
+    ("LCCS_landcover", "tree_needleleaved_evergreen_closed_to_open"),
 ]
 
 
 @pytest.mark.parametrize("key, val", expected_keys_values)
 def test_extract_forcing_data(get_forcing_data, key, val):
-    ds = get_forcing_data
-    assert key in ds.keys()
-    np.testing.assert_almost_equal(
-        np.array([val]), ds[key][0] if hasattr(ds[key], "__iter__") else ds[key]
-    )
+    data = get_forcing_data
+    assert key in data.keys()
+    if isinstance(val, str):
+        assert data[key] == val
+    else:
+        np.testing.assert_almost_equal(
+            np.array([val]),
+            data[key][0] if hasattr(data[key], "__iter__") else data[key],
+        )
 
 
 class TestEra5:
@@ -302,4 +308,48 @@ class TestDEM:
                 global_data_dir=GLOBAL_DATA_FOLDER,
                 lat=TEST_LAT,
                 lon=TEST_LON,
+            )
+
+
+class TestLandCover:
+    def test_missing_data(self):
+        with pytest.raises(
+            FileNotFoundError, match="No netCDF files found in the folder"
+        ):
+            gd.cci_landcover.retrieve_landcover_data(
+                global_data_dir=GLOBAL_DATA_FOLDER / "false",
+                latlon=(TEST_LAT, TEST_LON),
+                time_range=(START_TIME, END_TIME),
+                timestep=TIMESTEP,
+            )
+
+    @pytest.mark.parametrize("latlon", [(200, TEST_LON), (TEST_LAT, 200)])
+    def test_out_of_bounds_loc(self, latlon):
+        with pytest.raises(
+            gd.utils.MissingDataError,
+            match="not within bounds of the CCI land",
+        ):
+            gd.cci_landcover.retrieve_landcover_data(
+                global_data_dir=GLOBAL_DATA_FOLDER,
+                latlon=latlon,
+                time_range=(START_TIME, END_TIME),
+                timestep=TIMESTEP,
+            )
+
+    dummy_timeranges = [
+        (np.datetime64("1980-01-01"), END_TIME),
+        (START_TIME, np.datetime64("2020-01-01")),
+    ]
+
+    @pytest.mark.parametrize("time_range", dummy_timeranges)
+    def test_out_of_bounds_time(self, time_range):
+        with pytest.raises(
+            gd.utils.MissingDataError,
+            match="was not within the range of the",
+        ):
+            gd.cci_landcover.retrieve_landcover_data(
+                global_data_dir=GLOBAL_DATA_FOLDER,
+                latlon=(TEST_LAT, TEST_LON),
+                time_range=time_range,
+                timestep=TIMESTEP,
             )

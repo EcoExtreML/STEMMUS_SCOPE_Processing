@@ -100,7 +100,15 @@ def collect_datasets(
     data["latitude"] = latlon[0]
     data["longitude"] = latlon[1]
 
-    # TODO: Add land cover data retrieval.
-    data["IGBP_veg_long"] = "Evergreen Needleleaf Forests"
+    landcover_data = gd.cci_landcover.retrieve_landcover_data(
+        global_data_dir,
+        latlon,
+        time_range,
+        timestep,
+    )
+    # TODO see issue github.com/EcoExtreML/STEMMUS_SCOPE/issues/137
+    # for now, we only use the first value of the time series
+    data["IGBP_veg_long"] = landcover_data["IGBP_veg_long"][0]
+    data["LCCS_landcover"] = landcover_data["LCCS_landcover"][0]
 
     return data
