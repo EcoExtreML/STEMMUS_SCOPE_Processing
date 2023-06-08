@@ -73,10 +73,12 @@ def test_extract_forcing_data_floats(get_forcing_data, key, val):
         data[key][0] if hasattr(data[key], "__iter__") else data[key],
     )
 
+
 expected_keys_values_str = [
     ("IGBP_veg_long", "Evergreen Needleleaf Forests"),
     ("LCCS_landcover", "tree_needleleaved_evergreen_closed_to_open"),
 ]
+
 
 @pytest.mark.parametrize("key, val", expected_keys_values_str)
 def test_extract_forcing_data_str(get_forcing_data, key, val):
