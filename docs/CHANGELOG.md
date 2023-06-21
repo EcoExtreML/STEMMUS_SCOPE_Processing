@@ -6,11 +6,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added:
+
+### Removed:
+
 ### Changed:
-- The landcover type outputs in `forcing_globals.mat` (e.g. `IGBP_veg_long`) are now time dependent, instead of a single constant value.
+
+
+## [0.3.0] - 2023-06-21
+<!-- markdown-link-check-disable-next-line -->
+This version is only compatible with [STEMMUS_SCOPE 1.3.0](https://github.com/EcoExtreML/STEMMUS_SCOPE/releases/tag/1.2.0).
+
+### Changed:
+- The landcover type outputs in `forcing_globals.mat` (e.g. `IGBP_veg_long`) are now time dependent, instead of a single constant value ([#84](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/84)).
+
+### Fixed:
+- The regional landcover classes from the IGBP classification system are now supported as well ([#80](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/80)).
 
 ## [0.2.1] - 2023-04-03
-<!-- markdown-link-check-disable-next-line -->
 This version is only compatible with [STEMMUS_SCOPE 1.2.0](https://github.com/EcoExtreML/STEMMUS_SCOPE/releases/tag/1.2.0).
 
 ### Added:
@@ -25,7 +38,6 @@ This version is only compatible with [STEMMUS_SCOPE 1.2.0](https://github.com/Ec
 - The output netcdf file is again compatible to the model evaluation website ([#76](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/76)).
 
 ## [0.2.0] - 2023-02-21
-<!-- markdown-link-check-disable-next-line -->
 This version is only compatible with [STEMMUS_SCOPE 1.2.0](https://github.com/EcoExtreML/STEMMUS_SCOPE/releases/tag/1.2.0).
 
 ### Added:
@@ -43,11 +55,9 @@ This version is only compatible with [STEMMUS_SCOPE 1.2.0](https://github.com/Ec
 ## [0.1.0] - 2022-11-24
 The first release of PyStemmusScope. Compatible with STEMMUS_SCOPE 1.1.11.
 
-### Added
-
-### Removed
-
-### Changed
-
-<!-- [Unreleased]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/compare/v1.0.0...HEAD
-[0.0.1]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/releases/tag/v0.0.1 -->
+[Unreleased]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/compare/v0.3.0...HEAD
+[0.1.0]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/releases/tag/v0.1.0
+[0.1.1]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/releases/tag/v0.1.1
+[0.2.0]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/releases/tag/v0.2.0
+[0.2.1]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/releases/tag/v0.2.1
+[0.3.0]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/releases/tag/v0.3.0
