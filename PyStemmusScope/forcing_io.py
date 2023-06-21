@@ -96,7 +96,9 @@ def read_forcing_data_plumber2(forcing_file: Path, start_time: str, end_time: st
     data["latitude"] = ds_forcing["latitude"].values
     data["longitude"] = ds_forcing["longitude"].values
     data["elevation"] = ds_forcing["elevation"].values
-    data["IGBP_veg_long"] = ds_forcing["IGBP_veg_long"].values
+    data["IGBP_veg_long"] = np.repeat(
+        ds_forcing["IGBP_veg_long"].values, ds_forcing.time.size
+    ).T
     data["reference_height"] = ds_forcing["reference_height"].values
     data["canopy_height"] = ds_forcing["canopy_height"].values
 
@@ -209,8 +211,6 @@ def prepare_global_variables(data: dict, input_path: Path):
             function `read_forcing_data`.
         input_path: Path to which the file should be written to.
     """
-    total_duration = data["total_timesteps"]
-
     matfile_vars = [
         "latitude",
         "longitude",
@@ -223,7 +223,7 @@ def prepare_global_variables(data: dict, input_path: Path):
     ]
     matfiledata = {key: data[key] for key in matfile_vars}
 
-    matfiledata["Dur_tot"] = float(total_duration)  # Matlab expects a 'double'
+    matfiledata["Dur_tot"] = float(data["total_timesteps"])  # Matlab expects a 'double'
 
     hdf5storage.savemat(
         input_path / "forcing_globals.mat", matfiledata, appendmat=False

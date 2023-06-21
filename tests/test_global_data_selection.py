@@ -43,7 +43,7 @@ def get_forcing_data():
     )
 
 
-expected_keys_values = [
+expected_keys_values_float = [
     ("wind_speed", (1**2 + 2**2) ** 0.5),
     ("t_air_celcius", 10),
     ("precip_conv", 3 / 10),
@@ -60,22 +60,32 @@ expected_keys_values = [
     ("canopy_height", 1.0),
     ("reference_height", 10.0),
     ("doy_float", 0.0),
+]
+
+
+@pytest.mark.parametrize("key, val", expected_keys_values_float)
+def test_extract_forcing_data_floats(get_forcing_data, key, val):
+    data = get_forcing_data
+    assert key in data.keys()
+
+    np.testing.assert_almost_equal(
+        np.array([val]),
+        data[key][0] if hasattr(data[key], "__iter__") else data[key],
+    )
+
+
+expected_keys_values_str = [
     ("IGBP_veg_long", "Evergreen Needleleaf Forests"),
     ("LCCS_landcover", "tree_needleleaved_evergreen_closed_to_open"),
 ]
 
 
-@pytest.mark.parametrize("key, val", expected_keys_values)
-def test_extract_forcing_data(get_forcing_data, key, val):
+@pytest.mark.parametrize("key, val", expected_keys_values_str)
+def test_extract_forcing_data_str(get_forcing_data, key, val):
     data = get_forcing_data
     assert key in data.keys()
-    if isinstance(val, str):
-        assert data[key] == val
-    else:
-        np.testing.assert_almost_equal(
-            np.array([val]),
-            data[key][0] if hasattr(data[key], "__iter__") else data[key],
-        )
+
+    assert np.array([val]) == data[key][0]
 
 
 class TestEra5:
