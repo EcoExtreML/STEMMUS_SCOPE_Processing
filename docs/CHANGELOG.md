@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.0] - 2023-06-21
 <!-- markdown-link-check-disable-next-line -->
-This version is only compatible with [STEMMUS_SCOPE 1.3.0](https://github.com/EcoExtreML/STEMMUS_SCOPE/releases/tag/1.2.0).
+This version is only compatible with [STEMMUS_SCOPE 1.3.0](https://github.com/EcoExtreML/STEMMUS_SCOPE/releases/tag/1.3.0).
 
 ### Changed:
 - The landcover type outputs in `forcing_globals.mat` (e.g. `IGBP_veg_long`) are now time dependent, instead of a single constant value ([#84](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/84)).
