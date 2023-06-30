@@ -75,7 +75,7 @@ def read_forcing_data_plumber2(forcing_file: Path, start_time: str, end_time: st
     data["precip_conv"] = ds_forcing["Precip"] / 10  # conversion from mm/s to cm/s
     data["lw_down"] = ds_forcing["LWdown"]
     data["sw_down"] = ds_forcing["SWdown"]
-    data["wind_speed"] = ds_forcing["Wind"]
+    data["wind_speed"] = vc.mask_data(ds_forcing["Wind"], min_value=0.05)
     data["rh"] = ds_forcing["RH"]
     data["vpd"] = ds_forcing["VPD"]
     data["lai"] = vc.mask_data(ds_forcing["LAI"], min_value=0.01)
