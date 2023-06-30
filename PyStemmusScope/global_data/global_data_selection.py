@@ -45,6 +45,8 @@ def collect_datasets(
 
     data = {**data, **era5_data}
 
+    data["wind_speed"] = vc.mask_data(data["wind_speed"], min_value=0.05)
+
     data["co2_conv"] = (
         vc.co2_mass_fraction_to_kg_per_m3(
             gd.cams_co2.retrieve_co2_data(
