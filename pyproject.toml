@@ -58,6 +58,7 @@ dependencies = [
     "rioxarray",  # required for interacting with .tiff files
     "scipy",  # required for xarray's interpolate
     "dask",  # required for xarray.open_mfdataset lazy loading
+    "bmipy",
 ]
 dynamic = ["version"]
 
