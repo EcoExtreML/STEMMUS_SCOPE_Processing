@@ -59,7 +59,7 @@ def test_to_absolute_path_with_relative_input_and_relative_parent():
     # care for windows, see issue 22
     Path(input_path).mkdir(exist_ok=True)
 
-    parsed = utils.to_absolute_path(input_path, parent=Path("."))
+    parsed = utils.to_absolute_path(input_path, parent=Path.cwd())
     expected = Path.cwd() / "input_dir"
     assert parsed == expected
 
