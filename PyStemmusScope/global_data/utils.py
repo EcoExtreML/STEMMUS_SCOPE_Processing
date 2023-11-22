@@ -70,10 +70,10 @@ def assert_time_within_bounds(
         raise MissingDataError(
             "\nThe available data cannot cover the specified start and end time.\n"
             f"    Specified model time range:\n"
-            f"        {np.datetime_as_string(start_time, unit='m')}"
-            f" - {np.datetime_as_string(end_time, unit='m')}\n"
-            f"    Data start: {np.datetime_as_string(data[time_dim].min(), unit='m')}\n"
-            f"    Data end: {np.datetime_as_string(data[time_dim].max(), unit='m')}"
+            f"        {np.datetime_as_string(start_time, unit='m')}"  # type: ignore
+            f" - {np.datetime_as_string(end_time, unit='m')}\n"  # type: ignore
+            f"    Data start: {np.datetime_as_string(data[time_dim].min(), unit='m')}\n"  # type: ignore
+            f"    Data end: {np.datetime_as_string(data[time_dim].max(), unit='m')}"  # type: ignore
         )
 
 
