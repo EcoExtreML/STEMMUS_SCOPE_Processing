@@ -190,7 +190,7 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
         Args:
             time: A model time later than the current model time.
         """
-        while time < self.get_current_time():
+        while time > self.get_current_time():
             self.update()
 
     def finalize(self) -> None:
