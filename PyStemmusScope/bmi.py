@@ -6,6 +6,7 @@ from pathlib import Path
 import h5py
 import numpy as np
 from bmipy.bmi import Bmi
+from PyStemmusScope.bmi_utils import InapplicableBmiMethods
 from PyStemmusScope.config_io import read_config
 
 
@@ -36,6 +37,11 @@ NO_STATE_MSG = (
     "The model state is not available. Please run `.update()` before requesting "
     "\nthis model info. If you did run .update() before, something seems to have "
     "\ngone wrong and you have to restart the model."
+)
+
+NO_CONFIG_MSG = (
+    "The model has not been initialized with a configuration file yet. Please first run"
+    "\n.initialize() before requesting this model info."
 )
 
 
@@ -69,17 +75,16 @@ def get_variable(state: h5py.File, varname: str) -> np.ndarray:
         state: STEMMUS_SCOPE model state
         varname: Variable name
     """
-    match varname:
-        case "respiration":
-            return state["fluxes"]["Resp"][0]
-        case "soil_temperature":
-            return state["TT"][0, :-1]
-        case _:
-            if varname in MODEL_VARNAMES:
-                msg = "Varname is missing in get_variable! Contact devs."
-            else:
-                msg = "Uknown variable name"
-            raise ValueError(msg)
+    if varname == "respiration":
+        return state["fluxes"]["Resp"][0]
+    elif varname == "soil_temperature":
+        return state["TT"][0, :-1]
+    else:
+        if varname in MODEL_VARNAMES:
+            msg = "Varname is missing in get_variable! Contact devs."
+        else:
+            msg = "Uknown variable name"
+        raise ValueError(msg)
 
 
 def set_variable(state: h5py.File, varname: str, value: np.ndarray) -> dict:
@@ -93,17 +98,16 @@ def set_variable(state: h5py.File, varname: str, value: np.ndarray) -> dict:
     Returns:
         Updated model state.
     """
-    match varname:
-        case "respiration":
-            state["fluxes"]["Resp"][0] = value
-        case "soil_temperature":
-            state["TT"][0, :-1] = value
-        case _:
-            if varname in MODEL_VARNAMES:
-                msg = "Varname is missing in get_variable! Contact devs."
-            else:
-                msg = "Uknown variable name"
-            raise ValueError(msg)
+    if varname == "respiration":
+        state["fluxes"]["Resp"][0] = value
+    elif varname == "soil_temperature":
+        state["TT"][0, :-1] = value
+    else:
+        if varname in MODEL_VARNAMES:
+            msg = "Varname is missing in get_variable! Contact devs."
+        else:
+            msg = "Uknown variable name"
+        raise ValueError(msg)
     return state
 
 
@@ -122,10 +126,11 @@ def wait_for_model(process: subprocess.Popen, phrase=b"Select run mode:") -> Non
     """Wait for model to be ready for interaction."""
     output = b""
     while is_alive(process) and phrase not in output:
-        output += str(process.stdout.read(1))  # type: ignore
+        assert process.stdout is not None  # required for type narrowing.
+        output += bytes(process.stdout.read(1))
 
 
-class StemmusScopeBmi(Bmi):
+class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
     """STEMMUS_SCOPE Basic Model Interface."""
 
     config_file: str = ""
@@ -162,6 +167,7 @@ class StemmusScopeBmi(Bmi):
         self.matlab_process = is_alive(self.matlab_process)
         self.matlab_process.stdin.write(b"initialize\n")  # type: ignore
         wait_for_model(self.matlab_process)
+        self.state = load_state(self.config)
 
     def update(self) -> None:
         """Advance the model state by one time step."""
@@ -184,7 +190,8 @@ class StemmusScopeBmi(Bmi):
         Args:
             time: A model time later than the current model time.
         """
-        raise NotImplementedError()
+        while time < self.get_current_time():
+            self.update()
 
     def finalize(self) -> None:
         """Finalize the STEMMUS_SCOPE model."""
@@ -200,8 +207,9 @@ class StemmusScopeBmi(Bmi):
         """
         return "STEMMUS_SCOPE"
 
+    ### VARIABLE INFO METHODS ###
     def get_input_item_count(self) -> int:
-        """Number of model input variables.
+        """Get the number of model input variables.
 
         Returns:
             The number of input variables.
@@ -209,7 +217,7 @@ class StemmusScopeBmi(Bmi):
         return len(MODEL_INPUT_VARNAMES)
 
     def get_output_item_count(self) -> int:
-        """Number of model output variables.
+        """Get the number of model output variables.
 
         Returns:
             The number of output variables.
@@ -240,28 +248,45 @@ class StemmusScopeBmi(Bmi):
 
     def get_var_itemsize(self, name: str) -> int:
         """Get memory use for each array element in bytes."""
-        raise NotImplementedError()
+        return np.array([], dtype=VARNAME_DTYPE[name]).itemsize
 
     def get_var_nbytes(self, name: str) -> int:
         """Get size, in bytes, of the given variable."""
-        raise NotImplementedError()
+        return self.get_grid_size(self.get_var_grid(name)) * self.get_var_itemsize(name)
 
+    ### TIME METHODS ###
     def get_current_time(self) -> float:
-        """Current time of the model."""
-        raise NotImplementedError()
+        """Get the current time of the model."""
+        if self.state is None:
+            raise ValueError(NO_STATE_MSG)
+
+        return self.get_start_time() + np.sum(self.state["TimeStep"][0])
 
     def get_start_time(self) -> float:
         """Start time of the model."""
-        raise NotImplementedError()
+        if len(self.config) == 0:
+            raise ValueError(NO_CONFIG_MSG)
+
+        return (
+            np.datetime64(self.config["StartTime"])
+            .astype("datetime64[s]")
+            .astype("float")
+        )
 
     def get_end_time(self) -> float:
         """End time of the model."""
-        raise NotImplementedError()
+        if len(self.config) == 0:
+            raise ValueError(NO_CONFIG_MSG)
+
+        return (
+            np.datetime64(self.config["EndTime"])
+            .astype("datetime64[s]")
+            .astype("float")
+        )
 
     def get_time_units(self) -> str:
         """Time units of the model."""
-        "* days since *"
-        raise NotImplementedError()
+        return "seconds since 1970-01-01 00:00:00.0 +0000"
 
     def get_time_step(self) -> float:
         """Return the current time step of the model."""
@@ -269,6 +294,7 @@ class StemmusScopeBmi(Bmi):
             raise ValueError(NO_STATE_MSG)
         return float(self.state["KT"][0])
 
+    ### GETTERS AND SETTERS ###
     def get_value(self, name: str, dest: np.ndarray) -> np.ndarray:
         """Get a copy of values of the given variable.
 
@@ -333,7 +359,7 @@ class StemmusScopeBmi(Bmi):
         """
         raise NotImplementedError()
 
-    # Grid information
+    ### GRID INFO ###
     def get_grid_rank(self, grid: int) -> int:
         """Get number of dimensions of the computational grid.
 
@@ -381,7 +407,6 @@ class StemmusScopeBmi(Bmi):
         """
         return "rectilinear"
 
-    # Non-uniform rectilinear, curvilinear
     def get_grid_x(self, grid: int, x: np.ndarray) -> np.ndarray:
         """Get coordinates of grid nodes in the x direction.
 
@@ -394,7 +419,7 @@ class StemmusScopeBmi(Bmi):
         """
         if self.state is None:
             raise ValueError(NO_STATE_MSG)
-        x[:] = self.state["SiteProperties"]["latitude"][0]
+        x[:] = self.state["SiteProperties"]["longitude"][0]
         return x
 
     def get_grid_y(self, grid: int, y: np.ndarray) -> np.ndarray:
@@ -438,50 +463,14 @@ class StemmusScopeBmi(Bmi):
         else:
             raise ValueError()
 
-    # Uniform rectilinear
     def get_grid_shape(self, grid: int, shape: np.ndarray) -> np.ndarray:
         """Get dimensions of the computational grid."""
-        raise NotImplementedError()
+        if grid not in [0, 1]:
+            msg = f"Unknown grid identifier '{grid}'"
+            raise ValueError(msg)
 
-    def get_grid_spacing(self, grid: int, spacing: np.ndarray) -> np.ndarray:
-        """Get distance between nodes of the computational grid."""
-        raise NotImplementedError()
-
-    def get_grid_origin(self, grid: int, origin: np.ndarray) -> np.ndarray:
-        """Get coordinates for the lower-left corner of the computational grid."""
-        raise NotImplementedError()
-
-    # Unstructured grids:
-    def get_var_location(self, name: str) -> str:
-        """Get the grid element type that the a given variable is defined on."""
-        raise NotImplementedError()
-
-    def get_grid_node_count(self, grid: int) -> int:
-        """Get the number of nodes in the grid."""
-        raise NotImplementedError()
-
-    def get_grid_edge_count(self, grid: int) -> int:
-        """Get the number of edges in the grid."""
-        raise NotImplementedError()
-
-    def get_grid_face_count(self, grid: int) -> int:
-        """Get the number of faces in the grid."""
-        raise NotImplementedError()
-
-    def get_grid_edge_nodes(self, grid: int, edge_nodes: np.ndarray) -> np.ndarray:
-        """Get the edge-node connectivity."""
-        raise NotImplementedError()
-
-    def get_grid_face_edges(self, grid: int, face_edges: np.ndarray) -> np.ndarray:
-        """Get the face-edge connectivity."""
-        raise NotImplementedError()
-
-    def get_grid_face_nodes(self, grid: int, face_nodes: np.ndarray) -> np.ndarray:
-        """Get the face-node connectivity."""
-        raise NotImplementedError()
-
-    def get_grid_nodes_per_face(
-        self, grid: int, nodes_per_face: np.ndarray
-    ) -> np.ndarray:
-        """Get the number of nodes for each face."""
-        raise NotImplementedError()
+        self.get_grid_x(grid, shape[-1])  # Last element is x
+        self.get_grid_y(grid, shape[-2])  # Semi-last element is y
+        if grid == 1:
+            self.get_grid_z(grid, shape[-3])  # First element is z
+        return shape
