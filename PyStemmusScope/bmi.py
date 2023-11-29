@@ -91,7 +91,10 @@ def get_variable(state: h5py.File, varname: str) -> np.ndarray:
 
 
 def set_variable(
-    state: h5py.File, varname: str, value: np.ndarray, inds: Union[np.ndarray, None] = None
+    state: h5py.File,
+    varname: str,
+    value: np.ndarray,
+    inds: Union[np.ndarray, None] = None,
 ) -> dict:
     """Set a variable in the model state.
 
