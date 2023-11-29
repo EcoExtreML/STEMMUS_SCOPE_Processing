@@ -3,6 +3,9 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from typing import Dict
+from typing import Tuple
+from typing import Union
 import h5py
 import numpy as np
 from bmipy.bmi import Bmi
@@ -10,25 +13,25 @@ from PyStemmusScope.bmi_utils import InapplicableBmiMethods
 from PyStemmusScope.config_io import read_config
 
 
-MODEL_INPUT_VARNAMES: tuple[str, ...] = ("soil_temperature",)
+MODEL_INPUT_VARNAMES: Tuple[str, ...] = ("soil_temperature",)
 
-MODEL_OUTPUT_VARNAMES: tuple[str, ...] = (
+MODEL_OUTPUT_VARNAMES: Tuple[str, ...] = (
     "soil_temperature",
     "respiration",
 )
 
-MODEL_VARNAMES: tuple[str, ...] = tuple(
+MODEL_VARNAMES: Tuple[str, ...] = tuple(
     set(MODEL_INPUT_VARNAMES + MODEL_OUTPUT_VARNAMES)
 )
 
-VARNAME_UNITS: dict[str, str] = {"respiration": "unknown", "soil_temperature": "degC"}
+VARNAME_UNITS: Dict[str, str] = {"respiration": "unknown", "soil_temperature": "degC"}
 
-VARNAME_DTYPE: dict[str, str] = {
+VARNAME_DTYPE: Dict[str, str] = {
     "respiration": "float64",
     "soil_temperature": "float64",
 }
 
-VARNAME_GRID: dict[str, int] = {
+VARNAME_GRID: Dict[str, int] = {
     "respiration": 0,
     "soil_temperature": 1,
 }
@@ -111,7 +114,7 @@ def set_variable(state: h5py.File, varname: str, value: np.ndarray) -> dict:
     return state
 
 
-def is_alive(process: subprocess.Popen | None) -> subprocess.Popen:
+def is_alive(process: Union[subprocess.Popen, None]) -> subprocess.Popen:
     """Return process if the process is alive, raise an exception if it is not."""
     if process is None:
         msg = "Model process does not seem to be open."
@@ -135,10 +138,10 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
 
     config_file: str = ""
     config: dict = {}
-    state: h5py.File | None = None
-    state_file: Path | None = None
+    state: Union[h5py.File, None] = None
+    state_file: Union[Path, None] = None
 
-    matlab_process: subprocess.Popen | None = None
+    matlab_process: Union[subprocess.Popen, None] = None
 
     def initialize(self, config_file: str) -> None:
         """Perform startup tasks for the model.
@@ -226,11 +229,11 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
 
     # The types of the following two methods are wrong in python-bmi
     # see: https://github.com/csdms/bmi-python/issues/38
-    def get_input_var_names(self) -> tuple[str, ...]:  # type: ignore
+    def get_input_var_names(self) -> Tuple[str, ...]:  # type: ignore
         """List of the model's input variables (as CSDMS Standard Names)."""
         return MODEL_INPUT_VARNAMES
 
-    def get_output_var_names(self) -> tuple[str, ...]:  # type: ignore
+    def get_output_var_names(self) -> Tuple[str, ...]:  # type: ignore
         """List of the model's output variables (as CSDMS Standard Names)."""
         return MODEL_OUTPUT_VARNAMES
 

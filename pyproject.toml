@@ -109,6 +109,7 @@ testpaths = ["tests"]
 
 [tool.mypy]
 ignore_missing_imports = true
+python_version = "3.8"
 
 [tool.black]
 line-length = 88
