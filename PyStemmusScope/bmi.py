@@ -1,9 +1,7 @@
 """BMI wrapper for the STEMMUS_SCOPE model."""
-import os
-import subprocess
 import sys
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Literal, Protocol
 from typing import Tuple
 from typing import Union
 import h5py
@@ -126,23 +124,61 @@ def set_variable(
     return state
 
 
-def is_alive(process: Union[subprocess.Popen, None]) -> subprocess.Popen:
-    """Return process if the process is alive, raise an exception if it is not."""
-    if process is None:
-        msg = "Model process does not seem to be open."
-        raise ConnectionError(msg)
-    if process.poll() is not None:
-        msg = f"Model terminated with return code {process.poll()}"
-        raise ConnectionError(msg)
-    return process
+def get_run_mode(config: dict) -> str:
+    """Get the run mode (docker or EXE) from the config file.
+
+    Args:
+        config: Config dictionary
+
+    Returns:
+        Run mode (either "exe" or "docker").
+    """
+    if "ExeFilePath" in config:
+        return "exe"
+    else:
+        return "docker"
 
 
-def wait_for_model(process: subprocess.Popen, phrase=b"Select run mode:") -> None:
-    """Wait for model to be ready for interaction."""
-    output = b""
-    while is_alive(process) and phrase not in output:
-        assert process.stdout is not None  # required for type narrowing.
-        output += bytes(process.stdout.read(1))
+class StemmusScopeProcess(Protocol):
+    """Protocol for communicating with the model process."""
+    def __init__(self, cfg_file: str) -> None:
+        """Initialize the process class (e.g. create the container)."""
+        ...
+
+    def is_alive(self) -> bool:
+        """Return if the process is alive."""
+        ...
+
+    def initialize(self) -> None:
+        """Initialize the model and wait for it to be ready."""
+        ...
+
+    def update(self) -> None:
+        """Update the model and wait for it to be ready."""
+        ...
+
+    def finalize(self) -> None:
+        """Finalize the model."""
+        ...
+
+
+def load_process(mode: Literal["exe", "docker"]) -> type[StemmusScopeProcess]:
+    """Load the right STEMMUS_SCOPE process."""
+    if mode == "docker":
+        try:
+            from PyStemmusScope.docker_process import StemmusScopeDocker as Process
+        except ImportError as err:
+            msg = (
+                "The docker python package is not available."
+                " Please install before continuing."
+            )
+            raise ImportError(msg) from err
+    elif mode == "exe":
+        from PyStemmusScope.local_process import LocalStemmusScope as Process
+    else:
+        msg = "Unknown mode."
+        raise ValueError(msg)
+    return Process
 
 
 class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
@@ -153,7 +189,8 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
     state: Union[h5py.File, None] = None
     state_file: Union[Path, None] = None
 
-    matlab_process: Union[subprocess.Popen, None] = None
+    _run_mode: Union[str, None] = None
+    _process: Union[type[StemmusScopeProcess], None] = None
 
     def initialize(self, config_file: str) -> None:
         """Perform startup tasks for the model.
@@ -163,40 +200,19 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
         """
         self.config_file = config_file
         self.config = read_config(config_file)
-        self.exe_file = self.config["ExeFilePath"]
+
+        self._run_mode = get_run_mode(self.config)
         self.state_file = Path(self.config["OutputPath"]) / "STEMMUS_SCOPE_state.mat"
 
-        args = [self.exe_file, self.config_file, "interactive"]
-
-        # set matlab log dirc
-        os.environ["MATLAB_LOG_DIR"] = str(self.config["InputPath"])
-
-        self.matlab_process = subprocess.Popen(
-            args,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            bufsize=0,
-        )
-
-        wait_for_model(self.matlab_process)
-        self.matlab_process = is_alive(self.matlab_process)
-        self.matlab_process.stdin.write(b"initialize\n")  # type: ignore
-        wait_for_model(self.matlab_process)
-        self.state = load_state(self.config)
+        self._process = load_process(self._run_mode)(cfg_file=config_file)
+        self._process.initialize()
 
     def update(self) -> None:
         """Advance the model state by one time step."""
         if self.state is not None:
             self.state = self.state.close()  # Close file to allow matlab to write
 
-        if self.matlab_process is None:
-            msg = "Run initialize before trying to update the model."
-            raise AttributeError(msg)
-
-        self.matlab_process = is_alive(self.matlab_process)
-        self.matlab_process.stdin.write(b"update\n")  # type: ignore
-        wait_for_model(self.matlab_process)
-
+        self._process.update()
         self.state = load_state(self.config)
 
     def update_until(self, time: float) -> None:
@@ -210,9 +226,7 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
 
     def finalize(self) -> None:
         """Finalize the STEMMUS_SCOPE model."""
-        self.matlab_process = is_alive(self.matlab_process)
-        self.matlab_process.stdin.write(b"finalize\n")  # type: ignore
-        wait_for_model(self.matlab_process, phrase=b"Finished clean up.")
+        self._process.finalize()
 
     def get_component_name(self) -> str:
         """Name of the component.
