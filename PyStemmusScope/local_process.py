@@ -1,4 +1,5 @@
 """The local STEMMUS_SCOPE model process wrapper."""
+from pathlib import Path
 import subprocess
 from typing import Union
 from PyStemmusScope.config_io import read_config
@@ -24,6 +25,21 @@ def wait_for_model(process: subprocess.Popen, phrase=b"Select BMI mode:") -> Non
         output += bytes(process.stdout.read(1))
 
 
+def find_exe(config: dict) -> str:
+    """Find the right path to the executable file."""
+    if "ExeFilePath" in config:
+        exe_file = config["ExeFilePath"]
+    elif os.getenv("STEMMUS_SCOPE") is not None:
+        exe_file = os.getenv("STEMMUS_SCOPE")
+    else:
+        msg = "No STEMMUS_SCOPE executable found."
+        raise ValueError(msg)
+    if not Path(exe_file).exists():
+        msg = f"No file found at {exe_file}"
+        raise FileNotFoundError(exe_file)
+    return exe_file
+
+
 class LocalStemmusScope:
     """Communicate with the local STEMMUS_SCOPE executable file."""
     def __init__(self, cfg_file: str) -> None:
@@ -31,7 +47,7 @@ class LocalStemmusScope:
         self.cfg_file = cfg_file
         config = read_config(cfg_file)
 
-        exe_file = config["ExeFilePath"]
+        exe_file = find_exe(config)
         args = [exe_file, cfg_file, "bmi"]
 
         os.environ["MATLAB_LOG_DIR"] = str(config["InputPath"])
@@ -56,8 +72,9 @@ class LocalStemmusScope:
     def initialize(self) -> None:
         """Initialize the model and wait for it to be ready."""
         self.matlab_process = is_alive(self.matlab_process)
-        self.matlab_process.stdin.write(
-            bytes(f'initialize "{self.cfg_file}"\n', encoding="utf-8")  # type: ignore
+
+        self.matlab_process.stdin.write(  # type: ignore
+            bytes(f'initialize "{self.cfg_file}"\n', encoding="utf-8")  
         )
         wait_for_model(self.matlab_process)
 
