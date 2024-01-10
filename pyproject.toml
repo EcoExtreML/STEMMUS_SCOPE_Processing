@@ -63,6 +63,9 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
+docker = [
+    "docker",
+]
 dev = [
     "bump2version",
     "hatch",
