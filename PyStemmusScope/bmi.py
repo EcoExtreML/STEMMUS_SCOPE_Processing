@@ -1,4 +1,5 @@
 """BMI wrapper for the STEMMUS_SCOPE model."""
+import os
 import sys
 from pathlib import Path
 from typing import Dict, Literal, Protocol
@@ -135,8 +136,17 @@ def get_run_mode(config: dict) -> str:
     """
     if "ExeFilePath" in config:
         return "exe"
-    else:
+    elif "DockerImage" in config:
         return "docker"
+    elif os.getenv("STEMMUS_SCOPE") is not None:
+        return "exe"
+    else:
+        msg = (
+            "No valid config found, or the STEMMUS_SCOPE environment variable is "
+            "not set.\nPlease use the ExeFilePath or DockerImage configuration entry, "
+            "or set the STEMMUS_SCOPE environment variable."
+        )
+        raise ValueError(msg)
 
 
 class StemmusScopeProcess(Protocol):
