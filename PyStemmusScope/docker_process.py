@@ -1,11 +1,17 @@
 """The Docker STEMMUS_SCOPE model process wrapper."""
+from typing import List, Tuple
+import warnings
 from PyStemmusScope.config_io import read_config
 from pathlib import Path
 import os
-import docker
+
+try:
+    import docker
+except ImportError:
+    docker = None
 
 
-def make_docker_vols_binds(cfg_file: str) -> tuple[list[str], list[str]]:
+def make_docker_vols_binds(cfg_file: str) -> Tuple[List[str], List[str]]:
     """Make docker volume mounting configs.
 
     Args:
@@ -15,35 +21,65 @@ def make_docker_vols_binds(cfg_file: str) -> tuple[list[str], list[str]]:
         volumes, binds
     """
     cfg = read_config(cfg_file)
-    
-    volumes = [cfg["OutputPath"], cfg["InputPath"]]
-    binds = [
-        f"{cfg['OutputPath']}:{cfg['OutputPath']}:rw",
-        f"{cfg['InputPath']}:{cfg['InputPath']}:ro",
-    ]
+    cfg_dir = Path(cfg_file).parent
+    volumes = []
+    binds = []
 
-    if (
-        not Path(cfg_file).parent.is_relative_to(cfg["InputPath"]) or
-        not Path(cfg_file).parent.is_relative_to(cfg["OutputPath"])
-    ):
-        cfg_folder = str(Path(cfg_file).parent)
-        volumes.append(cfg_folder)
-        binds.append(f"{cfg_folder}:{cfg_folder}:ro")
+    # Make sure no subpaths are mounted:
+    if not cfg_dir.is_relative_to(cfg["InputPath"]):
+        volumes.append(str(cfg_dir))
+        binds.append(f"{str(cfg_dir)}:{str(cfg_dir)}")
+    if (not Path(cfg["InputPath"]).is_relative_to(cfg_dir)) or (Path(cfg["InputPath"]) == cfg_dir):
+        volumes.append(cfg["InputPath"])
+        binds.append(f"{cfg['InputPath']}:{cfg['InputPath']}")
+    if not Path(cfg["OutputPath"]).is_relative_to(cfg_dir):
+        volumes.append(cfg["OutputPath"])
+        binds.append(f"{cfg['OutputPath']}:{cfg['OutputPath']}")
 
     return volumes, binds
 
 
+def check_tags(image: str, compatible_tags: tuple[str, ...]):
+    """Check if the tag is compatible with this version of the BMI.
+
+    Args:
+        image: The full image name (including tag)
+        compatible_tags: Tags which are known to be compatible with this version of the
+            BMI.
+    """
+    if ":" not in image:
+        msg = (
+            "Could not validate the Docker image tag, as no tag was provided.\n"
+            "Please set the Docker image tag in the configuration file."
+        )
+        warnings.warn(UserWarning(msg), stacklevel=1)
+
+    tag = image.split(":")[-1]
+    if tag not in compatible_tags:
+        msg = (
+            f"Docker image tag '{tag}' not found in compatible tags "
+            f"({compatible_tags}).\n"
+            "You might experience issues or unexpected results."
+        )
+        warnings.warn(UserWarning(msg), stacklevel=1)
+
+
+
 class StemmusScopeDocker:
     """Communicate with a STEMMUS_SCOPE Docker container."""
-    # The image is hard coded here to ensure compatiblity:
-    image = "ghcr.io/ecoextreml/stemmus_scope:1.5.0"
+    # Default image, can be overridden with config:
+    compatible_tags = ("1.5.0", )
 
     _process_ready_phrase = b"Select BMI mode:"
 
     def __init__(self, cfg_file: str):
         """Create the Docker container.."""
         self.cfg_file = cfg_file
-        
+        config = read_config(cfg_file)
+
+        self.image = config["DockerImage"]
+        check_tags(self.image, self.compatible_tags)
+
         self.client = docker.APIClient()
 
         vols, binds = make_docker_vols_binds(cfg_file)
@@ -52,10 +88,11 @@ class StemmusScopeDocker:
             stdin_open=True,
             tty=True,
             detach=True,
+            user=os.getuid(),  # ensure correct user for writing files.
             volumes=vols,
             host_config=self.client.create_host_config(binds=binds)
         )
-        
+
         self.running = False
     
     def wait_for_model(self):
