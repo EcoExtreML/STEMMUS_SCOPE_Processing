@@ -8,7 +8,7 @@ from typing import Union
 import h5py
 import numpy as np
 from bmipy.bmi import Bmi
-from PyStemmusScope.bmi_utils import InapplicableBmiMethods
+from PyStemmusScope.bmi.utils import InapplicableBmiMethods
 from PyStemmusScope.config_io import read_config
 
 
@@ -176,7 +176,7 @@ def load_process(mode: Literal["exe", "docker"]) -> type[StemmusScopeProcess]:
     """Load the right STEMMUS_SCOPE process."""
     if mode == "docker":
         try:
-            from PyStemmusScope.docker_process import StemmusScopeDocker as Process
+            from PyStemmusScope.bmi.docker_process import StemmusScopeDocker as Process
         except ImportError as err:
             msg = (
                 "The docker python package is not available."
@@ -184,7 +184,7 @@ def load_process(mode: Literal["exe", "docker"]) -> type[StemmusScopeProcess]:
             )
             raise ImportError(msg) from err
     elif mode == "exe":
-        from PyStemmusScope.local_process import LocalStemmusScope as Process
+        from PyStemmusScope.bmi.local_process import LocalStemmusScope as Process
     else:
         msg = "Unknown mode."
         raise ValueError(msg)
