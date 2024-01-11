@@ -1,7 +1,5 @@
 """Module for loading and validating the CAMS CO2 dataset."""
 from pathlib import Path
-from typing import List
-from typing import Tuple
 from typing import Union
 import numpy as np
 import xarray as xr
@@ -13,8 +11,8 @@ RESOLUTION_CAMS = 0.75  # Resolution of the dataset in degrees
 
 def retrieve_co2_data(
     global_data_dir: Path,
-    latlon: Union[Tuple[int, int], Tuple[float, float]],
-    time_range: Tuple[np.datetime64, np.datetime64],
+    latlon: Union[tuple[int, int], tuple[float, float]],
+    time_range: tuple[np.datetime64, np.datetime64],
     timestep: str,
 ) -> np.ndarray:
     """Check for availability and retrieve the CAMS CO2 data.
@@ -45,9 +43,9 @@ def retrieve_co2_data(
 
 
 def extract_cams_data(
-    files_cams: List[Path],
-    latlon: Union[Tuple[int, int], Tuple[float, float]],
-    time_range: Tuple[np.datetime64, np.datetime64],
+    files_cams: list[Path],
+    latlon: Union[tuple[int, int], tuple[float, float]],
+    time_range: tuple[np.datetime64, np.datetime64],
     timestep: str,
 ) -> np.ndarray:
     """Extract and convert the required variables from the CAMS CO2 dataset.
@@ -93,8 +91,8 @@ def extract_cams_data(
 
 def check_cams_dataset(
     cams_data: xr.Dataset,
-    latlon: Union[Tuple[int, int], Tuple[float, float]],
-    time_range: Tuple[np.datetime64, np.datetime64],
+    latlon: Union[tuple[int, int], tuple[float, float]],
+    time_range: tuple[np.datetime64, np.datetime64],
 ) -> None:
     """Validate the CAMS CO2 dataset (variable name, location & time range).
 

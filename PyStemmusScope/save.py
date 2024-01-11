@@ -18,8 +18,6 @@ Note:
 """
 import logging
 from pathlib import Path
-from typing import Dict
-from typing import List
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -45,7 +43,7 @@ DATASET_ATTRS = {
 
 
 def _select_forcing_variables(
-    forcing_dict: Dict, forcing_var: str, alma_var: str
+    forcing_dict: dict, forcing_var: str, alma_var: str
 ) -> xr.DataArray:
     """Select the variable needed by ALMA convention.
 
@@ -66,7 +64,7 @@ def _select_forcing_variables(
     return data_array.rename(alma_var)
 
 
-def _prepare_soil_data(csv_file: Path, var_name: str, time: List) -> xr.DataArray:
+def _prepare_soil_data(csv_file: Path, var_name: str, time: list) -> xr.DataArray:
     """Return simulated soil temperature and soil moisture as `xr.DataArray`.
 
     Args:
@@ -136,7 +134,7 @@ def _prepare_soil_data(csv_file: Path, var_name: str, time: List) -> xr.DataArra
 
 
 def _prepare_simulated_data(
-    csv_file: Path, model_name: str, alma_name: str, time: List
+    csv_file: Path, model_name: str, alma_name: str, time: list
 ) -> xr.DataArray:
     """Return model simulation as `xr.DataArray`.
 
@@ -170,8 +168,8 @@ def _prepare_simulated_data(
 
 
 def _create_soil_layer_metadata(
-    thicknesses: List[float], depths: List[float]
-) -> List[str]:
+    thicknesses: list[float], depths: list[float]
+) -> list[str]:
     """Create soil layer metadata for STEMMUS_SCOPE.
 
     Note:
@@ -186,7 +184,7 @@ def _create_soil_layer_metadata(
     return metadata
 
 
-def _update_dataset_attrs_dims(dataset: xr.Dataset, forcing_dict: Dict) -> xr.Dataset:
+def _update_dataset_attrs_dims(dataset: xr.Dataset, forcing_dict: dict) -> xr.Dataset:
     """Update dimentions of a dataset according to ALMA conventions.
 
     Args:

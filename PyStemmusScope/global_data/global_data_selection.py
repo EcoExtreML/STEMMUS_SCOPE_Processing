@@ -1,8 +1,6 @@
 """Module containing the full global dataset collection."""
 from pathlib import Path
 from typing import Any
-from typing import Dict
-from typing import Tuple
 from typing import Union
 import numpy as np
 import pandas as pd
@@ -13,10 +11,10 @@ from PyStemmusScope import variable_conversion as vc
 
 def collect_datasets(
     global_data_dir: Path,
-    latlon: Union[Tuple[int, int], Tuple[float, float]],
-    time_range: Tuple[np.datetime64, np.datetime64],
+    latlon: Union[tuple[int, int], tuple[float, float]],
+    time_range: tuple[np.datetime64, np.datetime64],
     timestep: str,
-) -> Dict:
+) -> dict:
     """Collect and merge all the global datasets into one.
 
     Args:
@@ -29,7 +27,7 @@ def collect_datasets(
     Returns:
         Dictionary containing the variables extracted from the global datasets.
     """
-    data: Dict[str, Any] = {
+    data: dict[str, Any] = {
         "time": xr.DataArray(
             pd.date_range(str(time_range[0]), str(time_range[1]), freq=timestep).rename(
                 "time"

@@ -1,9 +1,6 @@
 """ERA5 data module, for data validation and data loading."""
 from pathlib import Path
-from typing import Dict
-from typing import List
 from typing import Literal
-from typing import Tuple
 from typing import Union
 import numpy as np
 import PyStemmusScope.variable_conversion as vc
@@ -19,10 +16,10 @@ RESOLUTION_ERA5LAND = 0.10
 
 def retrieve_era5_data(
     global_data_dir: Path,
-    latlon: Union[Tuple[int, int], Tuple[float, float]],
-    time_range: Tuple[np.datetime64, np.datetime64],
+    latlon: Union[tuple[int, int], tuple[float, float]],
+    time_range: tuple[np.datetime64, np.datetime64],
     timestep: str,
-) -> Dict:
+) -> dict:
     """Check for availability and retrieve the ERA5 and ERA5-land data.
 
     Args:
@@ -57,12 +54,12 @@ def retrieve_era5_data(
 
 
 def load_era5_data(
-    files_era5: List[Path],
-    files_era5_land: List[Path],
-    latlon: Union[Tuple[int, int], Tuple[float, float]],
-    time_range: Tuple[np.datetime64, np.datetime64],
+    files_era5: list[Path],
+    files_era5_land: list[Path],
+    latlon: Union[tuple[int, int], tuple[float, float]],
+    time_range: tuple[np.datetime64, np.datetime64],
     timestep: str,
-) -> Dict:
+) -> dict:
     """Extract and convert the required variables from the ERA5 data.
 
     Args:
@@ -106,10 +103,10 @@ def load_era5_data(
 
 
 def get_era5_dataset(
-    files: List[Path],
+    files: list[Path],
     name: Literal["ERA5", "ERA5-land"],
-    latlon: Union[Tuple[int, int], Tuple[float, float]],
-    time_range: Tuple[np.datetime64, np.datetime64],
+    latlon: Union[tuple[int, int], tuple[float, float]],
+    time_range: tuple[np.datetime64, np.datetime64],
     timestep: str,
 ) -> xr.Dataset:
     """Load the ERA5/ERA5-land multifile dataset, and select the location before merge.
@@ -156,8 +153,8 @@ def get_era5_dataset(
 def check_era5_dataset(
     era5data: xr.Dataset,
     name: Literal["ERA5", "ERA5-land"],
-    latlon: Union[Tuple[int, int], Tuple[float, float]],
-    time_range: Tuple[np.datetime64, np.datetime64],
+    latlon: Union[tuple[int, int], tuple[float, float]],
+    time_range: tuple[np.datetime64, np.datetime64],
 ) -> None:
     """Validate the ERA5 or ERA5-land dataset (variables, location & time range).
 
