@@ -72,7 +72,8 @@ def find_image(image: str) -> None:
     images = client.images()
     tags = []
     for img in images:
-        [tags.append(tag) for tag in img["RepoTags"]]
+        for tag in img["RepoTags"]:
+            tags.append(tag)
     if image not in set(tags):
         pull_image(image)
 
