@@ -31,7 +31,7 @@ jobs:
           python3 --version
       - name: Upgrade pip and install dependencies
         run: |
-          python3 -m pip install --upgrade hatch
+          python3 -m pip install --upgrade hatch h5py
       - name: Run unit tests
         run: hatch run test
       - name: Verify that we can build the package
