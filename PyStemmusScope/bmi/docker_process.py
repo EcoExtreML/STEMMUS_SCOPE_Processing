@@ -8,10 +8,8 @@ from PyStemmusScope.bmi.docker_utils import find_image, check_tags, make_docker_
 
 try:
     import docker
-    import docker.errors
 except ImportError:
     docker = None
-    docker.errors = None
 
 
 def wait_for_model(phrase: bytes, socket: Any) -> None:
