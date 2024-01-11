@@ -27,4 +27,4 @@ WORKDIR /
 ENV STEMMUS_SCOPE ./STEMMUS_SCOPE
 
 # Start grpc4bmi server
-CMD run-bmi-server --name "PyStemmusScope.bmi.StemmusScopeBmi" --port 55555 --debug
+CMD run-bmi-server --name "PyStemmusScope.bmi.implementation.StemmusScopeBmi" --port 55555 --debug
