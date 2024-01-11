@@ -6,10 +6,8 @@ from PyStemmusScope.config_io import read_config
 
 try:
     import docker
-    import docker.errors
 except ImportError:
     docker = None
-    docker.errors = None
 
 
 def make_docker_vols_binds(cfg_file: str) -> tuple[list[str], list[str]]:
