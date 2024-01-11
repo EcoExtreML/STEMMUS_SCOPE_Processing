@@ -2,7 +2,8 @@
 import os
 import sys
 from pathlib import Path
-from typing import Literal, Protocol
+from typing import Literal
+from typing import Protocol
 from typing import Union
 import h5py
 import numpy as np
@@ -124,7 +125,7 @@ def set_variable(
     return state
 
 
-def get_run_mode(config: dict) -> str:
+def get_run_mode(config: dict) -> Literal["exe", "docker"]:
     """Get the run mode (docker or EXE) from the config file.
 
     Args:
@@ -150,6 +151,7 @@ def get_run_mode(config: dict) -> str:
 
 class StemmusScopeProcess(Protocol):
     """Protocol for communicating with the model process."""
+
     def __init__(self, cfg_file: str) -> None:
         """Initialize the process class (e.g. create the container)."""
         ...
@@ -171,11 +173,13 @@ class StemmusScopeProcess(Protocol):
         ...
 
 
-def load_process(mode: Literal["exe", "docker"]) -> type[StemmusScopeProcess]:
-    """Load the right STEMMUS_SCOPE process."""
+def start_process(mode: Literal["exe", "docker"], cfg_file: str) -> StemmusScopeProcess:
+    """Start the right STEMMUS_SCOPE process."""
     if mode == "docker":
         try:
-            from PyStemmusScope.bmi.docker_process import StemmusScopeDocker as Process
+            from PyStemmusScope.bmi.docker_process import StemmusScopeDocker
+
+            return StemmusScopeDocker(cfg_file=cfg_file)
         except ImportError as err:
             msg = (
                 "The docker python package is not available."
@@ -183,11 +187,12 @@ def load_process(mode: Literal["exe", "docker"]) -> type[StemmusScopeProcess]:
             )
             raise ImportError(msg) from err
     elif mode == "exe":
-        from PyStemmusScope.bmi.local_process import LocalStemmusScope as Process
+        from PyStemmusScope.bmi.local_process import LocalStemmusScope
+
+        return LocalStemmusScope(cfg_file=cfg_file)
     else:
         msg = "Unknown mode."
         raise ValueError(msg)
-    return Process
 
 
 class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
@@ -199,7 +204,7 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
     state_file: Union[Path, None] = None
 
     _run_mode: Union[str, None] = None
-    _process: Union[type[StemmusScopeProcess], None] = None
+    _process: Union[StemmusScopeProcess, None] = None
 
     def initialize(self, config_file: str) -> None:
         """Perform startup tasks for the model.
@@ -213,7 +218,7 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
         self._run_mode = get_run_mode(self.config)
         self.state_file = Path(self.config["OutputPath"]) / "STEMMUS_SCOPE_state.mat"
 
-        self._process = load_process(self._run_mode)(cfg_file=config_file)
+        self._process = start_process(self._run_mode, config_file)
         self._process.initialize()
 
     def update(self) -> None:
@@ -221,7 +226,12 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
         if self.state is not None:
             self.state = self.state.close()  # Close file to allow matlab to write
 
-        self._process.update()
+        if self._process is not None:
+            self._process.update()
+        else:
+            msg = "The STEMMUS_SCOPE process is not running/connected. Can't update!"
+            raise ValueError(msg)
+
         self.state = load_state(self.config)
 
     def update_until(self, time: float) -> None:
@@ -235,7 +245,11 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
 
     def finalize(self) -> None:
         """Finalize the STEMMUS_SCOPE model."""
-        self._process.finalize()
+        if self._process is not None:
+            self._process.finalize()
+        else:
+            msg = "The STEMMUS_SCOPE process is not running/connected. Can't finalize!"
+            raise ValueError(msg)
 
     def get_component_name(self) -> str:
         """Name of the component.

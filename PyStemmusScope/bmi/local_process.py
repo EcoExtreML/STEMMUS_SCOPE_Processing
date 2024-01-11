@@ -1,9 +1,9 @@
 """The local STEMMUS_SCOPE model process wrapper."""
-from pathlib import Path
+import os
 import subprocess
+from pathlib import Path
 from typing import Union
 from PyStemmusScope.config_io import read_config
-import os
 
 
 def is_alive(process: Union[subprocess.Popen, None]) -> subprocess.Popen:
@@ -42,6 +42,7 @@ def find_exe(config: dict) -> str:
 
 class LocalStemmusScope:
     """Communicate with the local STEMMUS_SCOPE executable file."""
+
     def __init__(self, cfg_file: str) -> None:
         """Initialize the process."""
         self.cfg_file = cfg_file
@@ -60,7 +61,7 @@ class LocalStemmusScope:
         )
 
         wait_for_model(self.matlab_process)
-    
+
     def is_alive(self) -> bool:
         """Return if the process is alive."""
         try:
@@ -74,10 +75,9 @@ class LocalStemmusScope:
         self.matlab_process = is_alive(self.matlab_process)
 
         self.matlab_process.stdin.write(  # type: ignore
-            bytes(f'initialize "{self.cfg_file}"\n', encoding="utf-8")  
+            bytes(f'initialize "{self.cfg_file}"\n', encoding="utf-8")
         )
         wait_for_model(self.matlab_process)
-
 
     def update(self) -> None:
         """Update the model and wait for it to be ready."""
@@ -88,7 +88,6 @@ class LocalStemmusScope:
         self.matlab_process = is_alive(self.matlab_process)
         self.matlab_process.stdin.write(b"update\n")  # type: ignore
         wait_for_model(self.matlab_process)
-
 
     def finalize(self) -> None:
         """Finalize the model."""
