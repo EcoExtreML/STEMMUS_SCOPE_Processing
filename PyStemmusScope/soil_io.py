@@ -1,6 +1,6 @@
 """Module for the soil data IO of PyStemmusScope."""
-from pathlib import Path
 from collections.abc import Iterable
+from pathlib import Path
 import hdf5storage
 import numpy as np
 import xarray as xr

@@ -1,10 +1,11 @@
 """The Docker STEMMUS_SCOPE model process wrapper."""
+import os
+import warnings
+from pathlib import Path
 from time import sleep
 from typing import Any
-import warnings
 from PyStemmusScope.config_io import read_config
-from pathlib import Path
-import os
+
 
 try:
     import docker
@@ -30,7 +31,9 @@ def make_docker_vols_binds(cfg_file: str) -> tuple[list[str], list[str]]:
     if not cfg_dir.is_relative_to(cfg["InputPath"]):
         volumes.append(str(cfg_dir))
         binds.append(f"{str(cfg_dir)}:{str(cfg_dir)}")
-    if (not Path(cfg["InputPath"]).is_relative_to(cfg_dir)) or (Path(cfg["InputPath"]) == cfg_dir):
+    if (not Path(cfg["InputPath"]).is_relative_to(cfg_dir)) or (
+        Path(cfg["InputPath"]) == cfg_dir
+    ):
         volumes.append(cfg["InputPath"])
         binds.append(f"{cfg['InputPath']}:{cfg['InputPath']}")
     if not Path(cfg["OutputPath"]).is_relative_to(cfg_dir):
@@ -80,8 +83,9 @@ def wait_for_model(phrase: bytes, socket: Any) -> None:
 
 class StemmusScopeDocker:
     """Communicate with a STEMMUS_SCOPE Docker container."""
+
     # Default image, can be overridden with config:
-    compatible_tags = ("1.5.0", )
+    compatible_tags = ("1.5.0",)
 
     _process_ready_phrase = b"Select BMI mode:"
     _process_finalized_phrase = b"Finished clean up."
@@ -104,53 +108,50 @@ class StemmusScopeDocker:
             detach=True,
             user=os.getuid(),  # ensure correct user for writing files.
             volumes=vols,
-            host_config=self.client.create_host_config(binds=binds)
+            host_config=self.client.create_host_config(binds=binds),
         )
 
         self.running = False
-    
-    def wait_for_model(self):
+
+    def wait_for_model(self) -> None:
         """Wait for the model to be ready to receive (more) commands."""
         wait_for_model(self._process_ready_phrase, self.socket)
-    
-    def is_alive(self):
+
+    def is_alive(self) -> bool:
         """Return if the process is alive."""
         return self.running
-    
-    def initialize(self):
+
+    def initialize(self) -> None:
         """Initialize the model and wait for it to be ready."""
         if self.is_alive():
             self.client.stop(self.container_id)
 
         self.client.start(self.container_id)
         self.socket = self.client.attach_socket(
-            self.container_id, {'stdin': 1, 'stdout': 1, 'stream':1}
+            self.container_id, {"stdin": 1, "stdout": 1, "stream": 1}
         )
         self.wait_for_model()
         os.write(
             self.socket.fileno(),
-            bytes(f'initialize "{self.cfg_file}"\n', encoding="utf-8")
+            bytes(f'initialize "{self.cfg_file}"\n', encoding="utf-8"),
         )
         self.wait_for_model()
 
         self.running = True
 
-    def update(self):
+    def update(self) -> None:
         """Update the model and wait for it to be ready."""
         if self.is_alive():
-            os.write(
-                self.socket.fileno(),
-                b'update\n'
-            )
+            os.write(self.socket.fileno(), b"update\n")
             self.wait_for_model()
         else:
             msg = "Docker container is not alive. Please restart the model."
             raise ConnectionError(msg)
 
-    def finalize(self):
+    def finalize(self) -> None:
         """Finalize the model."""
         if self.is_alive():
-            os.write(self.socket.fileno(),b'finalize\n')
+            os.write(self.socket.fileno(), b"finalize\n")
             wait_for_model(self._process_finalized_phrase, self.socket)
             sleep(0.5)  # Ensure the container can stop cleanly.
             self.client.stop(self.container_id)
