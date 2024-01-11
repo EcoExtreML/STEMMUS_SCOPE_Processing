@@ -4,12 +4,11 @@ import re
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
-from typing import Tuple
 from typing import Union
 import numpy as np
 
 
-def convert_to_lsm_coordinates(lat: float, lon: float) -> Tuple[int, int]:
+def convert_to_lsm_coordinates(lat: float, lon: float) -> tuple[int, int]:
     """Convert latitude in degrees North to NCAR's LSM coordinate system.
 
     NCAR's LSM coordinates consist of a grid with lat values ranging from 0 -- 360,
@@ -110,11 +109,11 @@ def get_forcing_file(config):
 
 
 # Location format aliases
-LatLonFmt = Tuple[float, float]
-BBoxFmt = Tuple[LatLonFmt, LatLonFmt]
+LatLonFmt = tuple[float, float]
+BBoxFmt = tuple[LatLonFmt, LatLonFmt]
 
 
-def check_location_fmt(loc: str) -> Tuple[Union[str, LatLonFmt, BBoxFmt], str]:
+def check_location_fmt(loc: str) -> tuple[Union[str, LatLonFmt, BBoxFmt], str]:
     """Check the format of the model location.
 
     Three types of format are supported:

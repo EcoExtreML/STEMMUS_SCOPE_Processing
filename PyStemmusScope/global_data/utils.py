@@ -1,6 +1,4 @@
 """Utility funtions for the global data IO."""
-from typing import List
-from typing import Tuple
 from typing import Union
 import numpy as np
 import xarray as xr
@@ -16,7 +14,7 @@ class InvalidLocationError(Exception):
 
 def assert_variables_present(
     dataset: xr.Dataset,
-    variables: List[str],
+    variables: list[str],
 ):
     """Check if the required variables are in the specified dataset."""
     dataset_variables = [str(var) for var in dataset.data_vars]
@@ -112,7 +110,7 @@ def make_lat_lon_strings(
     lat: Union[int, float],
     lon: Union[int, float],
     step: int = 1,
-) -> Tuple[str, str]:
+) -> tuple[str, str]:
     """Turn numeric lat and lon values into strings.
 
     Args:

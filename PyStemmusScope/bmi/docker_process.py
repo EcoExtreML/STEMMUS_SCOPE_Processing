@@ -1,6 +1,6 @@
 """The Docker STEMMUS_SCOPE model process wrapper."""
 from time import sleep
-from typing import Any, List, Tuple
+from typing import Any
 import warnings
 from PyStemmusScope.config_io import read_config
 from pathlib import Path
@@ -12,7 +12,7 @@ except ImportError:
     docker = None
 
 
-def make_docker_vols_binds(cfg_file: str) -> Tuple[List[str], List[str]]:
+def make_docker_vols_binds(cfg_file: str) -> tuple[list[str], list[str]]:
     """Make docker volume mounting configs.
 
     Args:

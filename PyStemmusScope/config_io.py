@@ -7,8 +7,6 @@ import logging
 import shutil
 import time
 from pathlib import Path
-from typing import Dict
-from typing import Tuple
 from typing import Union
 from . import utils
 
@@ -16,7 +14,7 @@ from . import utils
 logger = logging.getLogger(__name__)
 
 
-def read_config(config_file: Union[str, Path]) -> Dict[str, str]:
+def read_config(config_file: Union[str, Path]) -> dict[str, str]:
     """Read config from given config file.
 
     Load paths from config file and save them into dict.
@@ -55,7 +53,7 @@ def validate_config(config: Union[Path, dict]):
     utils.check_time_fmt(cfg["StartTime"], cfg["EndTime"])
 
 
-def create_io_dir(config: Dict) -> Tuple[Path, Path, Path]:
+def create_io_dir(config: dict) -> tuple[Path, Path, Path]:
     """Create input directory and copy required files.
 
     Work flow executor to create work directory and all sub-directories.
@@ -133,7 +131,7 @@ def _copy_data(input_dir: Path, config: dict) -> None:
 def _update_config_file(
     input_dir: Path,
     output_dir: Path,
-    config: Dict,
+    config: dict,
     site_name: str,
     timestamp: str,
 ) -> Path:

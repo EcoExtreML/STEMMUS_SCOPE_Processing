@@ -1,6 +1,5 @@
 """Module for forcing data input and output operations."""
 from pathlib import Path
-from typing import Dict
 import hdf5storage
 import numpy as np
 import xarray as xr
@@ -116,7 +115,7 @@ def read_forcing_data_global(  # noqa:PLR0913 (too many arguments)
     start_time: np.datetime64,
     end_time: np.datetime64,
     timestep: str = "1800S",
-) -> Dict:
+) -> dict:
     """Read forcing data for a certain location, based on global datasets.
 
     Args:

@@ -5,8 +5,6 @@ import os
 import shlex
 import subprocess
 from pathlib import Path
-from typing import Dict
-from typing import List
 from typing import Optional
 from typing import Union
 from . import config_io
@@ -55,7 +53,7 @@ def _check_interpreter(interpreter: Union[None, str]) -> None:
         raise ValueError(msg)
 
 
-def _run_sub_process(args: Union[str, List[str]], cwd: Optional[Path] = None) -> str:
+def _run_sub_process(args: Union[str, list[str]], cwd: Optional[Path] = None) -> str:
     """Run subprocess' Popen, using a list of arguments.
 
     Args:
@@ -231,6 +229,6 @@ class StemmusScope:
         return result
 
     @property
-    def config(self) -> Dict:
+    def config(self) -> dict:
         """Return the configurations for this model."""
         return self._config
