@@ -52,7 +52,7 @@ classifiers = [
 dependencies = [
     "h5py",
     "hdf5storage",
-    "netcdf4<=1.5.8",
+    "netcdf4>=1.6.5",
     "numpy",
     "pandas<2",
     "xarray",
