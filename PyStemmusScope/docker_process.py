@@ -1,5 +1,6 @@
 """The Docker STEMMUS_SCOPE model process wrapper."""
-from typing import List, Tuple
+from time import sleep
+from typing import Any, List, Tuple
 import warnings
 from PyStemmusScope.config_io import read_config
 from pathlib import Path
@@ -64,6 +65,18 @@ def check_tags(image: str, compatible_tags: tuple[str, ...]):
         warnings.warn(UserWarning(msg), stacklevel=1)
 
 
+def wait_for_model(phrase: bytes, socket: Any) -> None:
+    """Wait for the model to be ready to receive (more) commands, or is finalized."""
+    output = b""
+
+    while phrase not in output:
+        data = socket.read(1)
+        if data is None:
+            msg = "Could not read data from socket. Docker container might be dead."
+            raise ConnectionError(msg)
+        else:
+            output += bytes(data)
+
 
 class StemmusScopeDocker:
     """Communicate with a STEMMUS_SCOPE Docker container."""
@@ -71,6 +84,7 @@ class StemmusScopeDocker:
     compatible_tags = ("1.5.0", )
 
     _process_ready_phrase = b"Select BMI mode:"
+    _process_finalized_phrase = b"Finished clean up."
 
     def __init__(self, cfg_file: str):
         """Create the Docker container.."""
@@ -97,15 +111,7 @@ class StemmusScopeDocker:
     
     def wait_for_model(self):
         """Wait for the model to be ready to receive (more) commands."""
-        output = b""
-
-        while self._process_ready_phrase not in output:
-            data = self.socket.read(1)
-            if data is None:
-                msg = "Could not read data from socket. Docker container might be dead."
-                raise ConnectionError(msg)
-            else:
-                output += bytes(data)
+        wait_for_model(self._process_ready_phrase, self.socket)
     
     def is_alive(self):
         """Return if the process is alive."""
@@ -145,5 +151,9 @@ class StemmusScopeDocker:
         """Finalize the model."""
         if self.is_alive():
             os.write(self.socket.fileno(),b'finalize\n')
+            wait_for_model(self._process_finalized_phrase, self.socket)
+            sleep(0.5)  # Ensure the container can stop cleanly.
+            self.client.stop(self.container_id)
+            self.client.remove_container(self.container_id, v=True)
         else:
             pass
