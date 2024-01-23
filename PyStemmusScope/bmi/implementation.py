@@ -149,6 +149,16 @@ def get_run_mode(config: dict) -> Literal["exe", "docker"]:
         raise ValueError(msg)
 
 
+def check_writable(file: Path) -> None:
+    """Check if this process has write access to a file."""
+    if not os.access(file, os.W_OK):
+        msg = (
+            f"The file '{file}' already exists, and this process has no"
+            " write access to it."
+        )
+        raise PermissionError(msg)
+
+
 class StemmusScopeProcess(Protocol):
     """Protocol for communicating with the model process."""
 
@@ -215,8 +225,14 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
         self.config_file = config_file
         self.config = read_config(config_file)
 
-        self._run_mode = get_run_mode(self.config)
+        Path(self.config["OutputPath"]).mkdir(parents=True, exist_ok=True)
         self.state_file = Path(self.config["OutputPath"]) / "STEMMUS_SCOPE_state.mat"
+        if self.state_file.exists():
+            check_writable(self.state_file)
+        else:
+            self.state_file.touch()  # Prevent docker messing up file permission.
+
+        self._run_mode = get_run_mode(self.config)
 
         self._process = start_process(self._run_mode, config_file)
         self._process.initialize()
