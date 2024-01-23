@@ -2,8 +2,10 @@
 import os
 from time import sleep
 from typing import Any
+from PyStemmusScope.bmi.docker_utils import check_tags
+from PyStemmusScope.bmi.docker_utils import find_image
+from PyStemmusScope.bmi.docker_utils import make_docker_vols_binds
 from PyStemmusScope.config_io import read_config
-from PyStemmusScope.bmi.docker_utils import find_image, check_tags, make_docker_vols_binds
 
 
 try:
@@ -51,7 +53,7 @@ class StemmusScopeDocker:
             stdin_open=True,
             tty=True,
             detach=True,
-            user=os.getuid(),  # ensure correct user for writing files.
+            user=f"{os.getuid()}:{os.getgid()}",  # ensure correct user for writing files.
             volumes=vols,
             host_config=self.client.create_host_config(binds=binds),
         )
