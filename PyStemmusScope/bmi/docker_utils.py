@@ -65,7 +65,6 @@ def check_tags(image: str, compatible_tags: tuple[str, ...]):
         warnings.warn(UserWarning(msg), stacklevel=1)
 
 
-
 def find_image(image: str) -> None:
     """See if the desired image is available, and if not, try to pull it."""
     client = docker.APIClient()
