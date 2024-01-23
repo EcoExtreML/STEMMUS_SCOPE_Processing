@@ -214,6 +214,8 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
         """
         self.config_file = config_file
         self.config = read_config(config_file)
+        Path(self.config["OutputPath"]).mkdir(parents=True, exist_ok=True)
+        (Path(self.config["OutputPath"]) / "STEMMUS_SCOPE_state.mat").touch(exist_ok=False)
 
         self._run_mode = get_run_mode(self.config)
         self.state_file = Path(self.config["OutputPath"]) / "STEMMUS_SCOPE_state.mat"
