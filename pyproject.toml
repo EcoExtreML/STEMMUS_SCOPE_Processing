@@ -60,6 +60,7 @@ dependencies = [
     "scipy",  # required for xarray's interpolate
     "dask",  # required for xarray.open_mfdataset lazy loading
     "bmipy",
+    "matplotlib",
 ]
 dynamic = ["version"]
 
