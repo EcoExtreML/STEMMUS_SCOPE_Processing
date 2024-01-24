@@ -14,11 +14,19 @@ except ImportError:
     docker = None
 
 
-def wait_for_model(phrase: bytes, socket: Any) -> None:
+def _wait_for_model(phrase: bytes, socket: Any, client: Any, container_id: Any) -> None:
     """Wait for the model to be ready to receive (more) commands, or is finalized."""
     output = b""
-
+    error_msg = b"Error in "
     while phrase not in output:
+        if error_msg in output:
+            client.stop(container_id)
+            logs = client.logs(container_id).decode("utf-8")
+            raise ValueError(
+                f"Error in container '{container_id['Id']}'. Please inspect logs."
+                "\nDOCKER LOGS:\n" + logs
+            )
+
         data = socket.read(1)
         if data is None:
             msg = "Could not read data from socket. Docker container might be dead."
@@ -62,7 +70,9 @@ class StemmusScopeDocker:
 
     def wait_for_model(self) -> None:
         """Wait for the model to be ready to receive (more) commands."""
-        wait_for_model(self._process_ready_phrase, self.socket)
+        _wait_for_model(
+            self._process_ready_phrase, self.socket, self.client, self.container_id
+        )
 
     def is_alive(self) -> bool:
         """Return if the process is alive."""
@@ -99,7 +109,12 @@ class StemmusScopeDocker:
         """Finalize the model."""
         if self.is_alive():
             os.write(self.socket.fileno(), b"finalize\n")
-            wait_for_model(self._process_finalized_phrase, self.socket)
+            _wait_for_model(
+                self._process_finalized_phrase,
+                self.socket,
+                self.client,
+                self.container_id,
+            )
             sleep(0.5)  # Ensure the container can stop cleanly.
             self.client.stop(self.container_id)
             self.client.remove_container(self.container_id, v=True)

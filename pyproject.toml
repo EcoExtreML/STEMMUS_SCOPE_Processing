@@ -87,7 +87,7 @@ docs = [
 ]
 
 [tool.hatch.envs.default]
-features = ["dev"]
+features = ["dev", "docker"]
 
 [tool.hatch.envs.default.scripts]
 lint = [
