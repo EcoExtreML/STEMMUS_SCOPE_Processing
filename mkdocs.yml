@@ -5,7 +5,9 @@ repo_name: PyStemmusScope
 nav:
   - Getting started: index.md
   - Installation: installation_instructions.md
-  - Notebook page: notebooks/run_model_in_notebook.ipynb
+  - Notebook page:
+    - Run the model with different options: notebooks/run_model_with_different_options.ipynb
+    - Run the model with different dataset: notebooks/run_model_with_different_dataset.ipynb
   - Contributing guide: CONTRIBUTING.md
   - API reference: reference.md
 
