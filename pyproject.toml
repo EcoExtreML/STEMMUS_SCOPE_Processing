@@ -178,7 +178,7 @@ source = ["PyStemmusScope"]
 command_line = "-m pytest"
 
 [tool.coverage.report]
-exclude_lines = [
+exclude_also = [
   "pragma: no cover",
   "@overload",
   "if TYPE_CHECKING:",
