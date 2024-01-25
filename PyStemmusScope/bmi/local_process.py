@@ -1,12 +1,17 @@
 """The local STEMMUS_SCOPE model process wrapper."""
 import os
+import platform
 import subprocess
 from pathlib import Path
+from time import sleep
 from typing import Union
+from PyStemmusScope.bmi.utils import MATLAB_ERROR
+from PyStemmusScope.bmi.utils import PROCESS_READY
+from PyStemmusScope.bmi.utils import MatlabError
 from PyStemmusScope.config_io import read_config
 
 
-def is_alive(process: Union[subprocess.Popen, None]) -> subprocess.Popen:
+def alive_process(process: Union[subprocess.Popen, None]) -> subprocess.Popen:
     """Return process if the process is alive, raise an exception if it is not."""
     if process is None:
         msg = "Model process does not seem to be open."
@@ -17,12 +22,39 @@ def is_alive(process: Union[subprocess.Popen, None]) -> subprocess.Popen:
     return process
 
 
-def wait_for_model(process: subprocess.Popen, phrase=b"Select BMI mode:") -> None:
+def read_stdout(process: subprocess.Popen) -> bytes:
+    """Read from stdout. If the stream ends unexpectedly, an error is raised."""
+    assert process.stdout is not None  # required for type narrowing.
+    read = process.stdout.read(1)
+    if read is None:
+        sleep(5)
+        read = process.stdout.read(1)
+        if read is not None:
+            return bytes(read)
+        msg = "Connection error: could not find expected output or "
+        raise ConnectionError(msg)
+    return bytes(read)
+
+
+def _model_is_ready(process: subprocess.Popen) -> None:
+    return _wait_for_model(PROCESS_READY, process)
+
+
+def _wait_for_model(phrase: bytes, process: subprocess.Popen) -> None:
     """Wait for model to be ready for interaction."""
     output = b""
-    while is_alive(process) and phrase not in output:
-        assert process.stdout is not None  # required for type narrowing.
-        output += bytes(process.stdout.read(1))
+
+    while alive_process(process) and phrase not in output:
+        output += read_stdout(process)
+        if MATLAB_ERROR in output:
+            try:
+                process.terminate()
+            finally:
+                msg = (
+                    "Error encountered in Matlab.\n"
+                    "Please inspect logs in the output directory"
+                )
+                raise MatlabError(msg)
 
 
 def find_exe(config: dict) -> str:
@@ -51,46 +83,73 @@ class LocalStemmusScope:
         exe_file = find_exe(config)
         args = [exe_file, cfg_file, "bmi"]
 
-        os.environ["MATLAB_LOG_DIR"] = str(config["InputPath"])
+        lib_path = os.getenv("LD_LIBRARY_PATH")
+        if lib_path is None:
+            msg = (
+                "Environment variable LD_LIBRARY_PATH not found. "
+                "Refer the Matlab Compiler Runtime documentation"
+            )
+            raise ValueError(msg)
 
-        self.matlab_process = subprocess.Popen(
+        # Ensure output directory exists so log file can be written:
+        Path(config["OutputPath"]).mkdir(parents=True, exist_ok=True)
+        env = {
+            "LD_LIBRARY_PATH": lib_path,
+            "MATLAB_LOG_DIR": str(config["OutputPath"]),
+        }
+
+        self.process = subprocess.Popen(
             args,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             bufsize=0,
+            env=env,
         )
 
-        wait_for_model(self.matlab_process)
+        if platform.system() == "Linux":
+            assert self.process.stdout is not None  # required for type narrowing.
+            # Make the connection non-blocking to allow for a timeout on read.
+            os.set_blocking(self.process.stdout.fileno(), False)
+        else:
+            msg = "Unexpected system. The executable is only compiled for Linux."
+            raise ValueError(msg)
+        _model_is_ready(self.process)
 
     def is_alive(self) -> bool:
         """Return if the process is alive."""
         try:
-            is_alive(self.matlab_process)
+            alive_process(self.process)
             return True
         except ConnectionError:
             return False
 
     def initialize(self) -> None:
         """Initialize the model and wait for it to be ready."""
-        self.matlab_process = is_alive(self.matlab_process)
+        self.process = alive_process(self.process)
 
-        self.matlab_process.stdin.write(  # type: ignore
+        self.process.stdin.write(  # type: ignore
             bytes(f'initialize "{self.cfg_file}"\n', encoding="utf-8")
         )
-        wait_for_model(self.matlab_process)
+        _model_is_ready(self.process)
 
     def update(self) -> None:
         """Update the model and wait for it to be ready."""
-        if self.matlab_process is None:
+        if self.process is None:
             msg = "Run initialize before trying to update the model."
             raise AttributeError(msg)
 
-        self.matlab_process = is_alive(self.matlab_process)
-        self.matlab_process.stdin.write(b"update\n")  # type: ignore
-        wait_for_model(self.matlab_process)
+        self.process = alive_process(self.process)
+        self.process.stdin.write(b"update\n")  # type: ignore
+        _model_is_ready(self.process)
 
     def finalize(self) -> None:
         """Finalize the model."""
-        self.matlab_process = is_alive(self.matlab_process)
-        self.matlab_process.stdin.write(b"finalize\n")  # type: ignore
-        wait_for_model(self.matlab_process, phrase=b"Finished clean up.")
+        self.process = alive_process(self.process)
+        self.process.stdin.write(b"finalize\n")  # type: ignore
+        sleep(10)
+        if self.process.poll() != 0:
+            try:
+                self.process.terminate()
+            finally:
+                msg = f"Model terminated with return code {self.process.poll()}"
+                raise ValueError(msg)
