@@ -8,7 +8,9 @@ from PyStemmusScope import config_io
 from PyStemmusScope import forcing_io
 from PyStemmusScope import soil_io
 from PyStemmusScope.bmi.implementation import StemmusScopeBmi
+from PyStemmusScope.bmi.docker_utils import find_image
 from . import data_folder
+import platform
 
 
 SCOPE_INPUTDATA_v2_1 = "https://github.com/Christiaanvandertol/SCOPE/raw/2.1/input/"
@@ -20,12 +22,20 @@ SCOPE_INPUTDATA_v1_7 = (
 def docker_available():
     try:
         docker.APIClient()
+        
+        # Github Actions windows runners couldn't pull the image:
+        if platform.system() == "Windows":
+            find_image("ghcr.io/ecoextreml/stemmus_scope:1.5.0")
+
         return True
     except docker.errors.DockerException as err:
         if "Error while fetching server API version" in str(err):
             return False
         else:
             raise err  # Unknown error.
+    except docker.errors.ImageNotFound:
+        return False
+        
 
 
 cfg_file = data_folder / "config_file_docker.txt"
