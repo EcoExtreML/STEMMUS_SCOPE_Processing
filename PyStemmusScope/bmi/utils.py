@@ -2,10 +2,22 @@
 import numpy as np
 
 
+# Phrases defined in the Matlab code to check for:
+PROCESS_READY = b"Select BMI mode:"
+PROCESS_FINALIZED = b"Finished clean up."
+MATLAB_ERROR = b"Error in "
+
+
 INAPPLICABLE_GRID_METHOD_MSG = (
     "This grid method is not implmented for the STEMMUS_SCOPE BMI because the model is"
     "\non a rectilinear grid."
 )
+
+
+class MatlabError(Exception):
+    """Matlab code encountered an error."""
+
+    pass
 
 
 class InapplicableBmiMethods:
