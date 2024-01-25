@@ -11,7 +11,7 @@ from PyStemmusScope.bmi.utils import MatlabError
 from PyStemmusScope.config_io import read_config
 
 
-def alive_process(process: Union[subprocess.Popen, None]) -> subprocess.Popen:
+def alive_process(process: Union[subprocess.Popen, None]) -> subprocess.Popen:  # pragma: no cover
     """Return process if the process is alive, raise an exception if it is not."""
     if process is None:
         msg = "Model process does not seem to be open."
@@ -22,7 +22,7 @@ def alive_process(process: Union[subprocess.Popen, None]) -> subprocess.Popen:
     return process
 
 
-def read_stdout(process: subprocess.Popen) -> bytes:
+def read_stdout(process: subprocess.Popen) -> bytes:  # pragma: no cover
     """Read from stdout. If the stream ends unexpectedly, an error is raised."""
     assert process.stdout is not None  # required for type narrowing.
     read = process.stdout.read(1)
@@ -36,11 +36,11 @@ def read_stdout(process: subprocess.Popen) -> bytes:
     return bytes(read)
 
 
-def _model_is_ready(process: subprocess.Popen) -> None:
+def _model_is_ready(process: subprocess.Popen) -> None:  # pragma: no cover
     return _wait_for_model(PROCESS_READY, process)
 
 
-def _wait_for_model(phrase: bytes, process: subprocess.Popen) -> None:
+def _wait_for_model(phrase: bytes, process: subprocess.Popen) -> None:  # pragma: no cover
     """Wait for model to be ready for interaction."""
     output = b""
 
@@ -72,7 +72,7 @@ def find_exe(config: dict) -> str:
     return exe_file
 
 
-class LocalStemmusScope:
+class LocalStemmusScope:  # pragma: no cover
     """Communicate with the local STEMMUS_SCOPE executable file."""
 
     def __init__(self, cfg_file: str) -> None:
