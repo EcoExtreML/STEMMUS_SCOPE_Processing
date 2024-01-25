@@ -8,7 +8,7 @@ from PyStemmusScope import config_io
 from PyStemmusScope import forcing_io
 from PyStemmusScope import soil_io
 from PyStemmusScope.bmi.implementation import StemmusScopeBmi
-from PyStemmusScope.bmi.docker_utils import find_image
+from PyStemmusScope.bmi.docker_utils import pull_image
 from . import data_folder
 import platform
 
@@ -25,7 +25,7 @@ def docker_available():
         
         # Github Actions windows runners couldn't pull the image:
         if platform.system() == "Windows":
-            find_image("ghcr.io/ecoextreml/stemmus_scope:1.5.0")
+            pull_image("ghcr.io/ecoextreml/stemmus_scope:1.5.0")
 
         return True
     except docker.errors.DockerException as err:
