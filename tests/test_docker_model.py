@@ -31,11 +31,10 @@ def docker_available():
     except docker.errors.DockerException as err:
         if "Error while fetching server API version" in str(err):
             return False
+        if "404 Client Error" in str(err):  # Can't find image
+            return False
         else:
-            raise err  # Unknown error.
-    except docker.errors.ImageNotFound:
-        return False
-        
+            raise err  # Unknown error.        
 
 
 cfg_file = data_folder / "config_file_docker.txt"
