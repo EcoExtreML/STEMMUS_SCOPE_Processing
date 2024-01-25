@@ -22,7 +22,7 @@ def docker_available():
         docker.APIClient()
         return True
     except docker.errors.DockerException as err:
-        if "Error while fetching server API version" in err.value:
+        if "Error while fetching server API version" in str(err):
             return False
         else:
             raise err  # Unknown error.
