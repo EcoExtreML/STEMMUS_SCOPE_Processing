@@ -1,16 +1,17 @@
+import platform
 from distutils.dir_util import copy_tree
 from pathlib import Path
 import docker
 import docker.errors
+import numpy as np
 import pytest
 import requests
 from PyStemmusScope import config_io
 from PyStemmusScope import forcing_io
 from PyStemmusScope import soil_io
-from PyStemmusScope.bmi.implementation import StemmusScopeBmi
 from PyStemmusScope.bmi.docker_utils import pull_image
+from PyStemmusScope.bmi.implementation import StemmusScopeBmi
 from . import data_folder
-import platform
 
 
 SCOPE_INPUTDATA_v2_1 = "https://github.com/Christiaanvandertol/SCOPE/raw/2.1/input/"
@@ -22,7 +23,7 @@ SCOPE_INPUTDATA_v1_7 = (
 def docker_available():
     try:
         docker.APIClient()
-        
+
         # Github Actions windows runners couldn't pull the image:
         if platform.system() == "Windows":
             pull_image("ghcr.io/ecoextreml/stemmus_scope:1.5.0")
@@ -34,7 +35,7 @@ def docker_available():
         if "404 Client Error" in str(err):  # Can't find image
             return False
         else:
-            raise err  # Unknown error.        
+            raise err  # Unknown error.
 
 
 cfg_file = data_folder / "config_file_docker.txt"
@@ -100,6 +101,46 @@ def prepare_data_config(tmpdir_factory, prep_input_data) -> Path:
 @pytest.mark.skipif(not docker_available(), reason="Docker not available")
 def test_initialize(prepare_data_config):
     model = StemmusScopeBmi()
+
+    assert model.get_component_name() == "STEMMUS_SCOPE"
+    with pytest.raises(ValueError, match="STEMMUS_SCOPE process is not running"):
+        model.update()
+
     model.initialize(str(prepare_data_config))
+
+    assert isinstance(model.get_input_item_count(), int)
+    assert isinstance(model.get_output_item_count(), int)
+    assert "soil_temperature" in model.get_input_var_names()
+    assert "respiration" in model.get_output_var_names()
+
+    assert model.get_var_grid("respiration") == 0
+    assert model.get_var_grid("soil_temperature") == 1
+
+    assert model.get_var_type("soil_temperature") == "float64"
+
+    # model.get_grid_size needs to have .update() run.
     model.update()
+
+    dest = np.zeros(model.get_grid_size(0))
+    np.testing.assert_almost_equal(model.get_grid_x(0, x=dest), np.array([-107.80752563]))
+    np.testing.assert_almost_equal(model.get_grid_y(0, y=dest), np.array([37.93380356]))
+
+    with pytest.raises(ValueError, match="has no dimension `z`"):
+        model.get_grid_z(0, z=dest)
+
+    model.update()
+
+    dest = np.zeros(1)
+    model.get_value("respiration", dest)
+    assert dest[0] != 0.
+
+    dest = np.zeros(1)
+    model.set_value_at_indices(
+        "soil_temperature",
+        inds=np.array([0]),
+        src=np.array([0.]),
+    )
+    model.get_value_at_indices("soil_temperature", dest, inds=np.array([0]))
+    assert dest[0] == 0.
+
     model.finalize()
