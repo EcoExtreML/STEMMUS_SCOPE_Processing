@@ -17,14 +17,15 @@ SCOPE_INPUTDATA_v1_7 = (
 )
 
 
-try:
-    docker.APIClient()
-    docker_available = True
-except docker.errors.DockerException as err:
-    if "Error while fetching server API version" in err.value:
-        docker_available = False
-    else:
-        raise err  # Unknown error.
+def docker_available():
+    try:
+        docker.APIClient()
+        return True
+    except docker.errors.DockerException as err:
+        if "Error while fetching server API version" in err.value:
+            return False
+        else:
+            raise err  # Unknown error.
 
 
 cfg_file = data_folder / "config_file_docker.txt"
@@ -87,7 +88,7 @@ def prepare_data_config(tmpdir_factory, prep_input_data) -> Path:
     return config_dir
 
 
-@pytest.mark.skipif(not docker_available, reason="Docker not available")
+@pytest.mark.skipif(not docker_available(), reason="Docker not available")
 def test_initialize(prepare_data_config):
     model = StemmusScopeBmi()
     model.initialize(str(prepare_data_config))
