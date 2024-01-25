@@ -534,7 +534,7 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
             )
             return z
         else:
-            raise ValueError()
+            raise ValueError(f"Grid {grid} has no dimension `z`.")
 
     def get_grid_shape(self, grid: int, shape: np.ndarray) -> np.ndarray:
         """Get dimensions of the computational grid."""
