@@ -1,6 +1,5 @@
 """BMI wrapper for the STEMMUS_SCOPE model."""
 import os
-import sys
 from pathlib import Path
 from typing import Literal
 from typing import Protocol
