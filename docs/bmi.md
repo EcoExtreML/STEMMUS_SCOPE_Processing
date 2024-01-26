@@ -43,7 +43,7 @@ Alternatively, if the environmental variable `STEMMUS_SCOPE` is configured, the 
 
 ## Using the BMI
 
-A [notebook demonstration the use of the Basic Model Interface](BMI_demo.ipynb) is available.
+A [notebook demonstration the use of the Basic Model Interface](../notebooks/BMI_demo/) is available.
 For more information on using BMI, see the [CSDMS website](https://csdms.colorado.edu/wiki/BMI).
 
 If you need access to other model variables that are not yet available in the BMI, please raise an issue on the [STEMMUS_SCOPE repository](https://github.com/EcoExtreML/STEMMUS_SCOPE/issues), or leave a comment if an issue is open already.
