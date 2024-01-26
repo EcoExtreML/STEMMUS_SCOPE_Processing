@@ -6,6 +6,9 @@ nav:
   - Getting started: index.md
   - Installation: installation_instructions.md
   - Notebook page: notebooks/run_model_in_notebook.ipynb
+  - BMI:
+    "BMI instructions": bmi.md
+    "BMI demonstration": notebooks/BMI_demo.ipynb
   - Contributing guide: CONTRIBUTING.md
   - API reference: reference.md
 
