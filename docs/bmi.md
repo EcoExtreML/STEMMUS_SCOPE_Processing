@@ -43,10 +43,19 @@ Alternatively, if the environmental variable `STEMMUS_SCOPE` is configured, the 
 
 ## Using the BMI
 
-A [notebook demonstration the use of the Basic Model Interface](../notebooks/BMI_demo/) is available.
+A [notebook demonstration the use of the Basic Model Interface](notebooks/BMI_demo.ipynb) is available.
 For more information on using BMI, see the [CSDMS website](https://csdms.colorado.edu/wiki/BMI).
 
 If you need access to other model variables that are not yet available in the BMI, please raise an issue on the [STEMMUS_SCOPE repository](https://github.com/EcoExtreML/STEMMUS_SCOPE/issues), or leave a comment if an issue is open already.
+
+## grpc4bmi
+
+A [Docker image is available](https://ghcr.io/ecoextreml/stemmus_scope-gprc4bmi) in which the model as well as the Python BMI have been wrapped in a container.
+This allows communication with a STEMMUS_SCOPE BMI through [gprc4bmi](https://grpc4bmi.readthedocs.io/en/latest/).
+
+Doing so avoids the needs to install PyStemmusScope yourself, only Docker/apptainer and a python environment with gprc4bmi are required.
+
+A demonstration is available [here](notebooks/gprc4bmi_demo.ipynb)
 
 ## Developer instructions
 
