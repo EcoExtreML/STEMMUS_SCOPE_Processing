@@ -50,12 +50,12 @@ If you need access to other model variables that are not yet available in the BM
 
 ## grpc4bmi
 
-A [Docker image is available](https://ghcr.io/ecoextreml/stemmus_scope-gprc4bmi) in which the model as well as the Python BMI have been wrapped in a container.
-This allows communication with a STEMMUS_SCOPE BMI through [gprc4bmi](https://grpc4bmi.readthedocs.io/en/latest/).
+A [Docker image is available](https://ghcr.io/ecoextreml/stemmus_scope-grpc4bmi) in which the model as well as the Python BMI have been wrapped in a container.
+This allows communication with a STEMMUS_SCOPE BMI through [grpc4bmi](https://grpc4bmi.readthedocs.io/en/latest/).
 
-Doing so avoids the needs to install PyStemmusScope yourself, only Docker/apptainer and a python environment with gprc4bmi are required.
+Doing so avoids the needs to install PyStemmusScope yourself, only Docker/apptainer and a python environment with grpc4bmi are required.
 
-A demonstration is available [here](notebooks/gprc4bmi_demo.ipynb)
+A demonstration is available [here](notebooks/grpc4bmi_demo.ipynb)
 
 ## Developer instructions
 

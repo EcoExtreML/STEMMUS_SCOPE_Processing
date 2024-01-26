@@ -9,7 +9,7 @@ nav:
   - BMI:
     - "BMI instructions": bmi.md
     - "BMI demonstration": notebooks/BMI_demo.ipynb
-    - "grpc4bmi demonstration": notebooks/gprc4bmi_demo.ipynb
+    - "grpc4bmi demonstration": notebooks/grpc4bmi_demo.ipynb
   - Contributing guide: CONTRIBUTING.md
   - API reference: reference.md
 
