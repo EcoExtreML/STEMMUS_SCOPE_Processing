@@ -72,7 +72,7 @@ dev = [
     "bump2version",
     "hatch",
     "ruff",
-    "black",
+    "black==23.12.1",  # pin until switching to ruff formatter
     "isort",
     "mypy",
     "pytest",
