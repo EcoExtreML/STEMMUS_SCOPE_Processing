@@ -360,7 +360,7 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
         """Return the current time step of the model."""
         if self.state is None:
             raise ValueError(NO_STATE_MSG)
-        return float(self.state["KT"][0])
+        return float(self.state["TimeStep"][0][0])
 
     ### GETTERS AND SETTERS ###
     def get_value(self, name: str, dest: np.ndarray) -> np.ndarray:
@@ -542,8 +542,8 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
             msg = f"Unknown grid identifier '{grid}'"
             raise ValueError(msg)
 
-        self.get_grid_x(grid, shape[-1])  # Last element is x
-        self.get_grid_y(grid, shape[-2])  # Semi-last element is y
+        shape[-1] = 1  # Last element is x
+        shape[-2] = 1  # Semi-last element is y
         if grid == 1:
-            self.get_grid_z(grid, shape[-3])  # First element is z
+            shape[-3] = self.get_grid_size(grid)  # First element is z
         return shape
