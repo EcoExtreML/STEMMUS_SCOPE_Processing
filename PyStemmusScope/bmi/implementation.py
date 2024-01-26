@@ -47,16 +47,6 @@ NO_CONFIG_MSG = (
 )
 
 
-def ipython_info():
-    """Get ipython info: if the code is being run from notebook or terminal."""
-    ip = False
-    if "ipykernel" in sys.modules:
-        ip = "notebook"
-    elif "IPython" in sys.modules:
-        ip = "terminal"
-    return ip
-
-
 def load_state(config: dict) -> h5py.File:
     """Load the STEMMUS_SCOPE model state.
 
@@ -85,7 +75,7 @@ def get_variable(state: h5py.File, varname: str) -> np.ndarray:
         if varname in MODEL_VARNAMES:
             msg = "Varname is missing in get_variable! Contact devs."
         else:
-            msg = "Uknown variable name"
+            msg = "Unknown variable name"
         raise ValueError(msg)
 
 
@@ -117,7 +107,7 @@ def set_variable(
     else:
         if varname in MODEL_OUTPUT_VARNAMES and varname not in MODEL_INPUT_VARNAMES:
             msg = "This variable is a model output variable only. You cannot set it."
-        if varname in MODEL_VARNAMES:
+        elif varname in MODEL_VARNAMES:
             msg = "Varname is missing in set_variable! Contact devs."
         else:
             msg = "Uknown variable name"

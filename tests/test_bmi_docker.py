@@ -1,6 +1,7 @@
 import platform
 from distutils.dir_util import copy_tree
 from pathlib import Path
+from unittest.mock import patch
 import docker
 import docker.errors
 import numpy as np
@@ -218,6 +219,7 @@ class TestInitializedModel:
         initialized_model.update()
 
 
+@pytest.mark.skipif(not docker_available(), reason="Docker not available")
 class TestUpdatedModel:
     # Many of these should be available after init
     def test_get_current_time(self, updated_model):
@@ -258,6 +260,32 @@ class TestUpdatedModel:
         dest = np.zeros(1)
         updated_model.get_value("respiration", dest)
         assert dest[0] != 0.0
+
+    def test_set_output_var(self, updated_model):
+        src = np.zeros(1)
+        with pytest.raises(ValueError, match="output variable"):
+            updated_model.set_value("respiration", src)
+
+    def test_get_wrong_value(self, updated_model):
+        dest = np.zeros(1)
+        with pytest.raises(ValueError, match="Unknown variable"):
+            updated_model.get_value("nonsense_variable", dest)
+
+    def test_dev_error_variables(self, updated_model):
+        dest = np.zeros(1)
+        with patch("PyStemmusScope.bmi.implementation.MODEL_VARNAMES", ("NONSENSE",)):
+            with pytest.raises(ValueError, match="Contact devs"):
+                updated_model.get_value("NONSENSE", dest)
+
+    def test_set_value(self, updated_model):
+        gridsize = updated_model.get_grid_size(
+            updated_model.get_var_grid("soil_temperature")
+        )
+        src = np.zeros(gridsize) + 10.0
+        dest = np.zeros(gridsize)
+        updated_model.set_value("soil_temperature", src)
+        updated_model.get_value("soil_temperature", dest)
+        np.testing.assert_array_equal(src, dest)
 
     def test_set_value_inds(self, updated_model):
         dest = np.zeros(1)
