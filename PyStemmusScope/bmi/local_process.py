@@ -11,7 +11,9 @@ from PyStemmusScope.bmi.utils import MatlabError
 from PyStemmusScope.config_io import read_config
 
 
-def alive_process(process: Union[subprocess.Popen, None]) -> subprocess.Popen:  # pragma: no cover
+def alive_process(
+    process: Union[subprocess.Popen, None]
+) -> subprocess.Popen:  # pragma: no cover
     """Return process if the process is alive, raise an exception if it is not."""
     if process is None:
         msg = "Model process does not seem to be open."
@@ -40,7 +42,9 @@ def _model_is_ready(process: subprocess.Popen) -> None:  # pragma: no cover
     return _wait_for_model(PROCESS_READY, process)
 
 
-def _wait_for_model(phrase: bytes, process: subprocess.Popen) -> None:  # pragma: no cover
+def _wait_for_model(
+    phrase: bytes, process: subprocess.Popen
+) -> None:  # pragma: no cover
     """Wait for model to be ready for interaction."""
     output = b""
 
