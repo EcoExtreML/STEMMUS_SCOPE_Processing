@@ -28,13 +28,16 @@ def read_stdout(process: subprocess.Popen) -> bytes:  # pragma: no cover
     """Read from stdout. If the stream ends unexpectedly, an error is raised."""
     assert process.stdout is not None  # required for type narrowing.
     read = process.stdout.read(1)
-    if read is None:
-        sleep(5)
+
+    retries = 0
+    retry_time = 0.1
+    while read is None:
+        sleep(retry_time)
         read = process.stdout.read(1)
-        if read is not None:
-            return bytes(read)
-        msg = "Connection error: could not find expected output or "
-        raise ConnectionError(msg)
+        retries += 1
+        if retries > int(60 / retry_time):
+            msg = "Connection error: could not find expected output or "
+            raise ConnectionError(msg)
     return bytes(read)
 
 
