@@ -132,7 +132,7 @@ def read_forcing_data_global(  # noqa:PLR0913 (too many arguments)
         Dictionary containing the forcing data.
     """
     # see https://docs.dask.org/en/latest/array-slicing.html#efficiency
-    with dask.config.set(**{"array.slicing.split_large_chunks": True}):   # type: ignore
+    with dask.config.set(**{"array.slicing.split_large_chunks": True}):  # type: ignore
         return global_data.collect_datasets(
             global_data_dir=global_data_dir,
             latlon=(lat, lon),
