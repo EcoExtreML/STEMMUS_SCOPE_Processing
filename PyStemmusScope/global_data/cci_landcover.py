@@ -1,11 +1,14 @@
 """Module for loading and validating the ESA CCI land cover dataset."""
 from pathlib import Path
 from typing import Union
+import dask
 import numpy as np
 import pandas as pd
 import xarray as xr
 from PyStemmusScope.global_data import utils
 
+# see https://docs.dask.org/en/latest/array-slicing.html#efficiency
+dask.config.set(**{'array.slicing.split_large_chunks': True})
 
 RESOLUTION_CCI = 1 / 360  # Resolution of the dataset in degrees
 FILEPATH_LANDCOVER_TABLE = Path(__file__).parent / "assets" / "lccs_to_igbp_table.csv"

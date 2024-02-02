@@ -2,11 +2,14 @@
 from pathlib import Path
 from typing import Literal
 from typing import Union
+import dask
 import numpy as np
 import PyStemmusScope.variable_conversion as vc
 import xarray as xr
 from PyStemmusScope.global_data import utils
 
+# see https://docs.dask.org/en/latest/array-slicing.html#efficiency
+dask.config.set(**{'array.slicing.split_large_chunks': True})
 
 ERA5_VARIABLES = ["u10", "v10", "mtpr", "sp", "ssrd", "strd"]
 ERA5LAND_VARIABLES = ["t2m", "d2m"]
