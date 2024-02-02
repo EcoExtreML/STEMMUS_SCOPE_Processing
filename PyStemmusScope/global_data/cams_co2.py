@@ -63,7 +63,7 @@ def extract_cams_data(
     Returns:
         DataArray containing the CO2 concentration.
     """
-    ds = xr.open_mfdataset(files_cams, chunks='auto')
+    ds = xr.open_mfdataset(files_cams, chunks="auto")
 
     check_cams_dataset(cams_data=ds, latlon=latlon, time_range=time_range)
 

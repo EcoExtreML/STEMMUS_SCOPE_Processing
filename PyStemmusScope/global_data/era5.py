@@ -127,7 +127,7 @@ def get_era5_dataset(
     """
     tol = RESOLUTION_ERA5 if name == "ERA5" else RESOLUTION_ERA5LAND
 
-    ds = xr.open_mfdataset(files, chunks='auto')
+    ds = xr.open_mfdataset(files, chunks="auto")
 
     check_era5_dataset(ds, name, latlon, time_range)
 
