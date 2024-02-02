@@ -2,13 +2,9 @@
 import gzip
 from pathlib import Path
 from typing import Union
-import dask
 import xarray as xr
 from PyStemmusScope.global_data import utils
 
-
-# see https://docs.dask.org/en/latest/array-slicing.html#efficiency
-dask.config.set(**{"array.slicing.split_large_chunks": True})  # type: ignore
 
 MAX_DISTANCE = 0.01  # Maximum lat/lon distance to be considered nearby.
 
