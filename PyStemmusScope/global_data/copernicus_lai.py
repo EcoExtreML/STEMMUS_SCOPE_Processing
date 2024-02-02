@@ -60,7 +60,7 @@ def extract_lai_data(
     Returns:
         DataArray containing the LAI of the specified site for the given time range.
     """
-    ds = xr.open_mfdataset(files_lai)
+    ds = xr.open_mfdataset(files_lai, chunks='auto')
 
     check_lai_dataset(ds, latlon, time_range)
 

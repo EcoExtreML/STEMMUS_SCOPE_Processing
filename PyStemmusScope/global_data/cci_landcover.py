@@ -62,7 +62,7 @@ def extract_landcover_data(
     Returns:
         Dictionary containing IGBP and LCCS land cover classes.
     """
-    cci_dataset = xr.open_mfdataset(files_cci)
+    cci_dataset = xr.open_mfdataset(files_cci, chunks='auto')
 
     check_cci_dataset(cci_dataset, latlon, time_range)  # Assert spatial/temporal bounds
 
