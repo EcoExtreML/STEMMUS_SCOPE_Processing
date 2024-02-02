@@ -1,5 +1,6 @@
 """Module for forcing data input and output operations."""
 from pathlib import Path
+import dask
 import hdf5storage
 import numpy as np
 import xarray as xr
@@ -114,7 +115,7 @@ def read_forcing_data_global(  # noqa:PLR0913 (too many arguments)
     lon: float,
     start_time: np.datetime64,
     end_time: np.datetime64,
-    timestep: str = "1800S",
+    timestep: str = "1800s",
 ) -> dict:
     """Read forcing data for a certain location, based on global datasets.
 
@@ -130,12 +131,14 @@ def read_forcing_data_global(  # noqa:PLR0913 (too many arguments)
     Returns:
         Dictionary containing the forcing data.
     """
-    return global_data.collect_datasets(
-        global_data_dir=global_data_dir,
-        latlon=(lat, lon),
-        time_range=(start_time, end_time),
-        timestep=timestep,
-    )
+    # see https://docs.dask.org/en/latest/array-slicing.html#efficiency
+    with dask.config.set(**{"array.slicing.split_large_chunks": True}):  # type: ignore
+        return global_data.collect_datasets(
+            global_data_dir=global_data_dir,
+            latlon=(lat, lon),
+            time_range=(start_time, end_time),
+            timestep=timestep,
+        )
 
 
 def write_dat_files(data: dict, input_dir: Path):

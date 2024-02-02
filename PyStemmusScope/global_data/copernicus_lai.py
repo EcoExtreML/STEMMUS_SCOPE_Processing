@@ -22,7 +22,7 @@ def retrieve_lai_data(
         latlon: Latitude and longitude of the site.
         time_range: Start and end time of the model run.
         timestep: Desired timestep of the model, this is derived from the forcing data.
-            In a pandas-timedelta compatible format. For example: "1800S"
+            In a pandas-timedelta compatible format. For example: "1800s"
 
     Returns:
         DataArray containing the LAI of the specified site for the given time range.
@@ -55,12 +55,12 @@ def extract_lai_data(
         latlon: Latitude and longitude of the site.
         time_range: Start and end time of the model run.
         timestep: Desired timestep of the model, this is derived from the forcing data.
-            In a pandas-timedelta compatible format. For example: "1800S"
+            In a pandas-timedelta compatible format. For example: "1800s"
 
     Returns:
         DataArray containing the LAI of the specified site for the given time range.
     """
-    ds = xr.open_mfdataset(files_lai)
+    ds = xr.open_mfdataset(files_lai, chunks="auto")
 
     check_lai_dataset(ds, latlon, time_range)
 

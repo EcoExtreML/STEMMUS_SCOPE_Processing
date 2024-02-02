@@ -22,7 +22,7 @@ def retrieve_co2_data(
         latlon: Latitude and longitude of the site.
         time_range: Start and end time of the model run.
         timestep: Desired timestep of the model, this is derived from the forcing data.
-            In a pandas-timedelta compatible format. For example: "1800S"
+            In a pandas-timedelta compatible format. For example: "1800s"
 
     Returns:
         DataArray containing the CO2 at the specified site for the given time range.
@@ -55,12 +55,12 @@ def extract_cams_data(
         latlon: Latitude and longitude of the site.
         time_range: Start and end time of the model run.
         timestep: Desired timestep of the model, this is derived from the forcing data.
-            In a pandas-timedelta compatible format. For example: "1800S"
+            In a pandas-timedelta compatible format. For example: "1800s"
 
     Returns:
         DataArray containing the CO2 concentration.
     """
-    ds = xr.open_mfdataset(files_cams)
+    ds = xr.open_mfdataset(files_cams, chunks="auto")
 
     check_cams_dataset(cams_data=ds, latlon=latlon, time_range=time_range)
 
