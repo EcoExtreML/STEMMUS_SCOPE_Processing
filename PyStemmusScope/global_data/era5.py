@@ -10,7 +10,7 @@ from PyStemmusScope.global_data import utils
 
 
 # see https://docs.dask.org/en/latest/array-slicing.html#efficiency
-dask.config.set(**{'array.slicing.split_large_chunks': True}) # type: ignore
+dask.config.set(**{"array.slicing.split_large_chunks": True})  # type: ignore
 
 ERA5_VARIABLES = ["u10", "v10", "mtpr", "sp", "ssrd", "strd"]
 ERA5LAND_VARIABLES = ["t2m", "d2m"]
