@@ -114,7 +114,7 @@ def read_forcing_data_global(  # noqa:PLR0913 (too many arguments)
     lon: float,
     start_time: np.datetime64,
     end_time: np.datetime64,
-    timestep: str = "1800S",
+    timestep: str = "1800s",
 ) -> dict:
     """Read forcing data for a certain location, based on global datasets.
 

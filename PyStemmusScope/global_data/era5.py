@@ -27,7 +27,7 @@ def retrieve_era5_data(
         latlon: Latitude and longitude of the site.
         time_range: Start and end time of the model run.
         timestep: Desired timestep of the model, this is derived from the forcing data.
-            In a pandas-timedelta compatible format. For example: "1800S"
+            In a pandas-timedelta compatible format. For example: "1800s"
 
     Returns:
         Dictionary containing the variables extracted from ERA5.
@@ -68,7 +68,7 @@ def load_era5_data(
         latlon: Latitude and longitude of the site.
         time_range: Start and end time of the model run.
         timestep: Desired timestep of the model, this is derived from the forcing data.
-            In a pandas-timedelta compatible format. For example: "1800S"
+            In a pandas-timedelta compatible format. For example: "1800s"
 
     Returns:
         Dictionary containing the variables extracted from ERA5.
@@ -117,7 +117,7 @@ def get_era5_dataset(
         name: Either "ERA5" or "ERA5-land".
         time_range: Start and end time of the model run.
         timestep: Desired timestep of the model, this is derived from the forcing data.
-            In a pandas-timedelta compatible format. For example: "1800S"
+            In a pandas-timedelta compatible format. For example: "1800s"
 
     Returns:
         The ERA5 or ERA5-land dataset.
