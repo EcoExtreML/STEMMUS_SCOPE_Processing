@@ -1,9 +1,6 @@
 """Module for the soil data IO of PyStemmusScope."""
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Dict
-from typing import Iterable
-from typing import List
-from typing import Tuple
 import hdf5storage
 import numpy as np
 import xarray as xr
@@ -34,7 +31,7 @@ def _open_multifile_datasets(
     Returns:
         Dataset containing the merged data for a single location in space.
     """
-    datasets: List[xr.Dataset] = []
+    datasets: list[xr.Dataset] = []
     for file in paths:
         ds = xr.open_dataset(file)
         #  Drop attributes to avoid combine conflicts
@@ -44,8 +41,8 @@ def _open_multifile_datasets(
 
 
 def _read_lambda_coef(
-    lambda_directory: Path, lat: float, lon: float, depth_indices: List[int]
-) -> Dict:
+    lambda_directory: Path, lat: float, lon: float, depth_indices: list[int]
+) -> dict:
     """Read the lambda coefficient files and return the data in a dict.
 
     Args:
@@ -73,8 +70,8 @@ def _read_lambda_coef(
 
 
 def _read_soil_composition(
-    soil_data_path: Path, lat: float, lon: float, depth_indices: List[int]
-) -> Dict:
+    soil_data_path: Path, lat: float, lon: float, depth_indices: list[int]
+) -> dict:
     """Read the soil composition files and return them in a dict.
 
     Args:
@@ -116,8 +113,8 @@ def _read_soil_composition(
 
 
 def _read_hydraulic_parameters(
-    soil_data_path: Path, lat: float, lon: float, depths: List[int]
-) -> Dict:
+    soil_data_path: Path, lat: float, lon: float, depths: list[int]
+) -> dict:
     """Read the soil hydraulic parameters from the Schaap dataset and return a dict.
 
     Args:
@@ -168,7 +165,7 @@ def _read_hydraulic_parameters(
     }
 
 
-def _read_surface_data(soil_data_path: Path, lat: float, lon: float) -> Dict:
+def _read_surface_data(soil_data_path: Path, lat: float, lon: float) -> dict:
     """Read the fmax variable from the surface dataset and return it in a dict.
 
     Args:
@@ -188,7 +185,7 @@ def _read_surface_data(soil_data_path: Path, lat: float, lon: float) -> Dict:
     return {"fmax": fmax}
 
 
-def _collect_soil_data(soil_data_path: Path, lat: float, lon: float) -> Dict:
+def _collect_soil_data(soil_data_path: Path, lat: float, lon: float) -> dict:
     """Call and merge all individual data collectors into a single write-ready dict.
 
     Args:
@@ -214,7 +211,7 @@ def _collect_soil_data(soil_data_path: Path, lat: float, lon: float) -> Dict:
     return matfiledata
 
 
-def _retrieve_latlon(file: Path) -> Tuple[float, float]:
+def _retrieve_latlon(file: Path) -> tuple[float, float]:
     """Retrieve the latitude and longitude coordinates from the dataset file.
 
     Args:
@@ -230,7 +227,7 @@ def _retrieve_latlon(file: Path) -> Tuple[float, float]:
     return lat, lon
 
 
-def prepare_soil_data(config: Dict) -> None:
+def prepare_soil_data(config: dict) -> None:
     """Prepare the soil input data for the STEMMUS_SCOPE model.
 
     The data for the input location is parsed, and written to a file that can be easily
@@ -265,7 +262,7 @@ def prepare_soil_data(config: Dict) -> None:
     utils.remove_dates_from_header(Path(config["InputPath"]) / "soil_parameters.mat")
 
 
-def prepare_soil_init(config: Dict) -> None:
+def prepare_soil_init(config: dict) -> None:
     """Prepare the soil inital conditions data for the STEMMUS_SCOPE model.
 
     The data for the input location is parsed, and written to a file that can be easily
@@ -337,7 +334,7 @@ def _extract_soil_initial_variables(soil_init_ds: xr.Dataset):
 def _read_soil_initial_conditions_plumber2(
     soil_init_path: Path,
     sitename: str,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     ds = xr.open_mfdataset(str(soil_init_path / f"{sitename}*.nc"))
     ds = ds.squeeze()  # Remove lat, lon, time dims.
     ds.compute()
@@ -350,7 +347,7 @@ def _read_soil_initial_conditions_global(
     lat: float,
     lon: float,
     start_time: np.datetime64,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """Read soil initial conditions from era5-land data.
 
     Args:

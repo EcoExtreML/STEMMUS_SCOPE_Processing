@@ -23,7 +23,7 @@ name = "PyStemmusScope"
 description = "Python modules for running the STEMMUS-SCOPE model."
 readme = "README.md"
 license = "Apache-2.0"
-requires-python = ">=3.8, <3.11"
+requires-python = ">=3.9, <3.12"
 authors = [
   {email = "f.alidoost@esciencecenter.nl"},
   {name = "Sarah Alidoost, Bart Schilperoort, Yang Liu"}
@@ -45,32 +45,39 @@ classifiers = [
   "Operating System :: OS Independent",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
 ]
 dependencies = [
+    "h5py",
     "hdf5storage",
-    "netcdf4<=1.5.8",
+    "netcdf4>=1.6.5",
     "numpy",
     "pandas<2",
     "xarray",
     "rioxarray",  # required for interacting with .tiff files
     "scipy",  # required for xarray's interpolate
     "dask",  # required for xarray.open_mfdataset lazy loading
+    "bmipy",
+    "matplotlib",
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
+docker = [
+    "docker",
+]
 dev = [
     "bump2version",
     "hatch",
     "ruff",
-    "black",
+    "black==23.12.1",  # pin until switching to ruff formatter
     "isort",
     "mypy",
     "pytest",
     "pytest-cov",
+    "types-requests",  # type stubs
 ]
 docs = [
     "mkdocs",
@@ -81,7 +88,7 @@ docs = [
 ]
 
 [tool.hatch.envs.default]
-features = ["dev"]
+features = ["dev", "docker"]
 
 [tool.hatch.envs.default.scripts]
 lint = [
@@ -108,10 +115,11 @@ testpaths = ["tests"]
 
 [tool.mypy]
 ignore_missing_imports = true
+python_version = "3.9"
 
 [tool.black]
 line-length = 88
-target-version = ['py38', 'py39', 'py310']
+target-version = ['py39', 'py310', 'py311']
 include = '\.pyi?$'
 
 [tool.ruff]
@@ -136,15 +144,13 @@ extend-select = [
 ignore = [
   "E501",  # Line length: fails on many docstrings (needs fixing).
   "PLR2004",  # magic value used in comparsion (i.e. `if ndays == 28: month_is_feb`).
+  "B009",  # getattr is useful to not mess with typing.
 ]
-# Allow autofix for all enabled rules (when `--fix`) is provided.
-fixable = ["A", "B", "C90", "D", "E", "F", "TID"]
-unfixable = []
 line-length = 88
 exclude = ["docs", "build"]
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
-target-version = "py38"
+target-version = "py39"
 
 [tool.ruff.per-file-ignores]
 "tests/**" = ["D"]
@@ -172,7 +178,7 @@ source = ["PyStemmusScope"]
 command_line = "-m pytest"
 
 [tool.coverage.report]
-exclude_lines = [
+exclude_also = [
   "pragma: no cover",
   "@overload",
   "if TYPE_CHECKING:",

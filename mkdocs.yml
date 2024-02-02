@@ -7,7 +7,13 @@ nav:
   - Installation: installation_instructions.md
   - Run the model:
       - Run the model with different options: notebooks/run_model_with_different_options.ipynb
-      - Run the model with different dataset: notebooks/run_model_with_different_dataset.ipynb
+      - Run the model with different dataset using executable file: notebooks/run_model_with_different_dataset.ipynb
+      - Run the model with different dataset on CRIB: notebooks/run_model_with_different_dataset_on_CRIB.ipynb
+
+  - BMI:
+    - "BMI instructions": bmi.md
+    - "BMI demonstration": notebooks/BMI_demo.ipynb
+    - "grpc4bmi demonstration": notebooks/grpc4bmi_demo.ipynb
   - Contributing guide: CONTRIBUTING.md
   - API reference: reference.md
 

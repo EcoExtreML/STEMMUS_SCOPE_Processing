@@ -1,8 +1,5 @@
 """Module for loading and validating the ESA CCI land cover dataset."""
 from pathlib import Path
-from typing import Dict
-from typing import List
-from typing import Tuple
 from typing import Union
 import numpy as np
 import pandas as pd
@@ -16,10 +13,10 @@ FILEPATH_LANDCOVER_TABLE = Path(__file__).parent / "assets" / "lccs_to_igbp_tabl
 
 def retrieve_landcover_data(
     global_data_dir: Path,
-    latlon: Union[Tuple[int, int], Tuple[float, float]],
-    time_range: Tuple[np.datetime64, np.datetime64],
+    latlon: Union[tuple[int, int], tuple[float, float]],
+    time_range: tuple[np.datetime64, np.datetime64],
     timestep: str,
-) -> Dict[str, np.ndarray]:
+) -> dict[str, np.ndarray]:
     """Get the land cover data from the CCI netCDF files.
 
     Args:
@@ -48,11 +45,11 @@ def retrieve_landcover_data(
 
 
 def extract_landcover_data(
-    files_cci: List[Path],
-    latlon: Union[Tuple[int, int], Tuple[float, float]],
-    time_range: Tuple[np.datetime64, np.datetime64],
+    files_cci: list[Path],
+    latlon: Union[tuple[int, int], tuple[float, float]],
+    time_range: tuple[np.datetime64, np.datetime64],
     timestep: str,
-) -> Dict[str, np.ndarray]:
+) -> dict[str, np.ndarray]:
     """Extract the land cover data from the CCI netCDF files.
 
     Args:
@@ -105,13 +102,13 @@ def extract_landcover_data(
     }
 
 
-def get_lccs_to_igbp_table() -> Dict[int, str]:
+def get_lccs_to_igbp_table() -> dict[int, str]:
     """Read the land cover translation table, and turn it into a lookup dictionary."""
     df = pd.read_csv(FILEPATH_LANDCOVER_TABLE, index_col="lccs_class")
     return df.to_dict()["IGBP_STEMMUS_SCOPE"]
 
 
-def get_landcover_table(cci_dataset: xr.Dataset) -> Dict[int, str]:
+def get_landcover_table(cci_dataset: xr.Dataset) -> dict[int, str]:
     """Get the lookup table to convert the flag values to a land cover name.
 
     The lookup table for the land cover classes is contained in the netCDF file, under
@@ -131,8 +128,8 @@ def get_landcover_table(cci_dataset: xr.Dataset) -> Dict[int, str]:
 
 def check_cci_dataset(
     cci_dataset: xr.Dataset,
-    latlon: Union[Tuple[int, int], Tuple[float, float]],
-    time_range: Tuple[np.datetime64, np.datetime64],
+    latlon: Union[tuple[int, int], tuple[float, float]],
+    time_range: tuple[np.datetime64, np.datetime64],
 ) -> None:
     """Validate the cci dataset for spatial and temporal bounds."""
     # Assert spatial bounds

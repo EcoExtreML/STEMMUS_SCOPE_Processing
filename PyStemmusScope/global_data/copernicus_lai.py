@@ -1,7 +1,5 @@
 """Module for loading and validating the Copernicus LAI dataset."""
 from pathlib import Path
-from typing import List
-from typing import Tuple
 from typing import Union
 import numpy as np
 import xarray as xr
@@ -13,8 +11,8 @@ RESOLUTION_LAI = 1 / 112  # Resolution of the LAI dataset in degrees
 
 def retrieve_lai_data(
     global_data_dir: Path,
-    latlon: Union[Tuple[int, int], Tuple[float, float]],
-    time_range: Tuple[np.datetime64, np.datetime64],
+    latlon: Union[tuple[int, int], tuple[float, float]],
+    time_range: tuple[np.datetime64, np.datetime64],
     timestep: str,
 ) -> np.ndarray:
     """Check for availability and retrieve the Copernicus LAI data.
@@ -45,9 +43,9 @@ def retrieve_lai_data(
 
 
 def extract_lai_data(
-    files_lai: List[Path],
-    latlon: Union[Tuple[int, int], Tuple[float, float]],
-    time_range: Tuple[np.datetime64, np.datetime64],
+    files_lai: list[Path],
+    latlon: Union[tuple[int, int], tuple[float, float]],
+    time_range: tuple[np.datetime64, np.datetime64],
     timestep: str,
 ) -> np.ndarray:
     """Generate LAI values, until a dataset is chosen.
@@ -95,8 +93,8 @@ def extract_lai_data(
 
 def check_lai_dataset(
     lai_data: xr.Dataset,
-    latlon: Union[Tuple[int, int], Tuple[float, float]],
-    time_range: Tuple[np.datetime64, np.datetime64],
+    latlon: Union[tuple[int, int], tuple[float, float]],
+    time_range: tuple[np.datetime64, np.datetime64],
 ) -> None:
     """Validate the LAI dataset (variables name, location & time range).
 

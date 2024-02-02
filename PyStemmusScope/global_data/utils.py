@@ -1,6 +1,4 @@
 """Utility funtions for the global data IO."""
-from typing import List
-from typing import Tuple
 from typing import Union
 import numpy as np
 import xarray as xr
@@ -16,7 +14,7 @@ class InvalidLocationError(Exception):
 
 def assert_variables_present(
     dataset: xr.Dataset,
-    variables: List[str],
+    variables: list[str],
 ):
     """Check if the required variables are in the specified dataset."""
     dataset_variables = [str(var) for var in dataset.data_vars]
@@ -70,10 +68,10 @@ def assert_time_within_bounds(
         raise MissingDataError(
             "\nThe available data cannot cover the specified start and end time.\n"
             f"    Specified model time range:\n"
-            f"        {np.datetime_as_string(start_time, unit='m')}"
-            f" - {np.datetime_as_string(end_time, unit='m')}\n"
-            f"    Data start: {np.datetime_as_string(data[time_dim].min(), unit='m')}\n"
-            f"    Data end: {np.datetime_as_string(data[time_dim].max(), unit='m')}"
+            f"        {np.datetime_as_string(start_time, unit='m')}"  # type: ignore
+            f" - {np.datetime_as_string(end_time, unit='m')}\n"  # type: ignore
+            f"    Data start: {np.datetime_as_string(data[time_dim].min(), unit='m')}\n"  # type: ignore
+            f"    Data end: {np.datetime_as_string(data[time_dim].max(), unit='m')}"  # type: ignore
         )
 
 
@@ -112,7 +110,7 @@ def make_lat_lon_strings(
     lat: Union[int, float],
     lon: Union[int, float],
     step: int = 1,
-) -> Tuple[str, str]:
+) -> tuple[str, str]:
     """Turn numeric lat and lon values into strings.
 
     Args:
