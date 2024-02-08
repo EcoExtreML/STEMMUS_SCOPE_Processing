@@ -23,7 +23,7 @@ installed there. See [Install PyStemmusScope](#install-pystemmusscope).
 
 ## On your own machine
 
-Choose how do you want to run the model, see [Run the model](notebooks/run_model_with_different_options.ipynb).
+Choose how do you want to run the model, see [Run the model](notebooks/run_model_on_different_infra.ipynb).
 
 ## Install PyStemmusScope
 
@@ -59,7 +59,7 @@ jupyter lab
 
 JupyterLab will open automatically in your browser. Now, you can run the
 notebook
-[run_model_with_different_options.ipynb](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/docs/notebooks/run_model_with_different_options.ipynb).
+[run_model_on_different_infra.ipynb](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/docs/notebooks/run_model_on_different_infra.ipynb).
 
 ## Install MATLAB Runtime
 
