@@ -4,13 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.4.0] - 2024-02-08
 
 ### Added:
 
-### Removed:
+- BMI implementation for STEMMUS_SCOPE [#89](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/89)
+- Add grpc4bmi support [#89](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/89)
+- Add wind speed masking to preprocessing module [#88](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/88)
 
 ### Changed:
+
+- Update documentation on how to run the model [#93](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/93)
+- Improve the memory usage of reading data in preprocessing module [#95](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/95)
 
 
 ## [0.3.0] - 2023-06-21
@@ -61,3 +66,4 @@ The first release of PyStemmusScope. Compatible with STEMMUS_SCOPE 1.1.11.
 [0.2.0]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/releases/tag/v0.2.0
 [0.2.1]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/releases/tag/v0.2.1
 [0.3.0]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/releases/tag/v0.3.0
+[0.4.0]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/releases/tag/v0.4.0

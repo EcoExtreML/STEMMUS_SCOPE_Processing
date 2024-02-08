@@ -26,8 +26,10 @@ The model source code, executable file and utility files are available in the [S
 
 The input datasets are available on Snellius and CRIB. First, make sure you have
 right access to the repository and data. Then, see the notebook
-[run_model_in_notebook.ipynb](https://pystemmusscope.readthedocs.io/en/latest/notebooks/run_model_in_notebook/)
-which provides different options to run the model.
+[run_model_on_different_infra.ipynb](./docs/notebooks/run_model_on_different_infra.ipynb)
+which provides different ways to run the model depending on your system and
+[run_model_with_different_dataset.ipynb](./docs/notebooks/run_model_with_different_dataset.ipynb)
+on how to use different datasets e.g. site or global data.
 
 More information on the setup and installation, including for own machine, is available
 in the [documentation](https://pystemmusscope.readthedocs.io/).
