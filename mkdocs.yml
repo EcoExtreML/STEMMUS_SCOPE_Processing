@@ -6,7 +6,7 @@ nav:
   - Getting started: index.md
   - Installation: installation_instructions.md
   - Run the model:
-      - Different ways to run the model: notebooks/run_model_with_different_options.ipynb
+      - Different ways to run the model: notebooks/run_model_on_different_infra.ipynb
       - Site and global datasets with the executable file: notebooks/run_model_with_different_dataset.ipynb
       - Site and global datasets on CRIB: notebooks/run_model_with_different_dataset_on_CRIB.ipynb
 
