@@ -1,5 +1,6 @@
 """BMI wrapper for the STEMMUS_SCOPE model."""
 import os
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 from typing import Protocol
@@ -11,28 +12,47 @@ from PyStemmusScope.bmi.utils import InapplicableBmiMethods
 from PyStemmusScope.config_io import read_config
 
 
-MODEL_INPUT_VARNAMES: tuple[str, ...] = ("soil_temperature",)
+@dataclass
+class BmiVariable:
+    """Holds all info to inform the BMI implementation."""
 
-MODEL_OUTPUT_VARNAMES: tuple[str, ...] = (
-    "soil_temperature",
-    "respiration",
+    name: str
+    dtype: str
+    input: bool
+    output: bool
+    units: str
+    grid: int
+
+
+VARIABLES: tuple[BmiVariable, ...] = (
+    #           name                dtype      input ouput units grid
+    # Soil vars:
+    BmiVariable("soil_temperature", "float64", True, True, "degC", 1),
+    BmiVariable("soil_moisture", "float64", True, True, "m3 m-3", 1),
+    # atmospheric vars:
+    BmiVariable("respiration", "float64", False, True, "?", 0),
+    # groundwater vars:
+    BmiVariable("groundwater_coupling_enabled", "bool", True, True, "-", 0),
+    BmiVariable("groundwater_head_bottom_layer", "float64", True, True, "m", 0),
+    BmiVariable("groundwater_bottom_layer_index", "int64", False, True, "-", 0),
+    BmiVariable("groundwater_soil_layer_thickness", "float64", False, True, "?", 0),
 )
 
-MODEL_VARNAMES: tuple[str, ...] = tuple(
-    set(MODEL_INPUT_VARNAMES + MODEL_OUTPUT_VARNAMES)
+MODEL_INPUT_VARNAMES: tuple[str, ...] = tuple(
+    var.name for var in VARIABLES if var.input
 )
 
-VARNAME_UNITS: dict[str, str] = {"respiration": "unknown", "soil_temperature": "degC"}
+MODEL_OUTPUT_VARNAMES: tuple[str, ...] = tuple(
+    var.name for var in VARIABLES if var.output
+)
 
-VARNAME_DTYPE: dict[str, str] = {
-    "respiration": "float64",
-    "soil_temperature": "float64",
-}
+MODEL_VARNAMES: tuple[str, ...] = tuple(var.name for var in VARIABLES)
 
-VARNAME_GRID: dict[str, int] = {
-    "respiration": 0,
-    "soil_temperature": 1,
-}
+VARNAME_UNITS: dict[str, str] = {var.name: var.units for var in VARIABLES}
+
+VARNAME_DTYPE: dict[str, str] = {var.name: var.dtype for var in VARIABLES}
+
+VARNAME_GRID: dict[str, int] = {var.name: var.grid for var in VARIABLES}
 
 NO_STATE_MSG = (
     "The model state is not available. Please run `.update()` before requesting "
@@ -59,7 +79,7 @@ def load_state(config: dict) -> h5py.File:
     return h5py.File(matfile, mode="a")
 
 
-def get_variable(state: h5py.File, varname: str) -> np.ndarray:
+def get_variable(state: h5py.File, varname: str) -> np.ndarray:  # noqa: PLR0911
     """Get a variable from the model state.
 
     Args:
@@ -70,6 +90,18 @@ def get_variable(state: h5py.File, varname: str) -> np.ndarray:
         return state["fluxes"]["Resp"][0]
     elif varname == "soil_temperature":
         return state["TT"][0, :-1]
+    elif varname == "soil_moisture":
+        return state["SoilVariables"]["Theta_U"][0]
+
+    # groundwater coupling variables:
+    elif varname == "groundwater_coupling_enabled":
+        return state["GroundwaterSettings"]["GroundwaterCoupling"][0].astype(bool)
+    elif varname == "groundwater_head_bottom_layer":
+        return state["GroundwaterSettings"]["headBotmLayer"][0]
+    elif varname == "groundwater_bottom_layer_index":
+        return state["GroundwaterSettings"]["indexBotmLayer"][0]
+    elif varname == "groundwater_soil_layer_thickness":
+        return state["GroundwaterSettings"]["soilLayerThickness"][0]
     else:
         if varname in MODEL_VARNAMES:
             msg = "Varname is missing in get_variable! Contact devs."
@@ -103,6 +135,16 @@ def set_variable(
 
     if varname == "soil_temperature":
         state["TT"][0, :-1] = vals
+    elif varname == "soil_moisture":
+        state["SoilVariables"]["Theta_U"][0] = vals
+    # groundwater coupling variables:
+    elif varname == "groundwater_coupling_enabled":
+        state["GroundwaterSettings"]["GroundwaterCoupling"][0] = vals.astype("float")
+    elif varname == "groundwater_head_bottom_layer":
+        state["GroundwaterSettings"]["headBotmLayer"][0] = vals
+    elif varname == "groundwater_bottom_layer_index":
+        state["GroundwaterSettings"]["indexBotmLayer"][0] = vals
+
     else:
         if varname in MODEL_OUTPUT_VARNAMES and varname not in MODEL_INPUT_VARNAMES:
             msg = "This variable is a model output variable only. You cannot set it."
