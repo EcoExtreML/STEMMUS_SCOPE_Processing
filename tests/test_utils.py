@@ -180,3 +180,16 @@ class TestGetForcingFile:
         config["Location"] = "((19.5,125.5), (20.5,130.0))"
         with pytest.raises(NotImplementedError):
             utils.get_forcing_file(config_file)
+
+
+
+def test_interpolate_groundwater_head():
+    groundwater_head_init = 1.0
+    groundwater_head_final = 2.0
+    time_init = 1.0
+    time_current = 1.5
+    time_delta = 0.5
+    times = [time_init, time_init + time_delta]
+    groundwater_heads = [groundwater_head_init, groundwater_head_final]
+    interpolated_head = utils.interpolate_groundwater_head(groundwater_heads, times, time_current)
+    assert interpolated_head == 2.0

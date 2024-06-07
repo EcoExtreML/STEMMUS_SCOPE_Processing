@@ -214,3 +214,60 @@ def remove_dates_from_header(file: Path):
     # Overwrite the old file
     with file.open(mode="wb") as f:
         f.write(sanitized_data)
+
+
+def interpolate_groundwater_head(groundwater_heads: np.array, times: np.array, time_current: float):
+    """Interpolate groundwater head.
+
+    Args:
+        groundwater_heads: np.array of [groundwater_head_init, ... and groundwater_head_final]
+        times: np.array of [time_init, ... and time_final]
+        time_current: Current time to interpolate the groundwater head
+
+    Returns:
+        Interpolated groundwater head
+    """
+    # check if the current time is within the time range
+    if time_current < times[0] or time_current > times[-1]:
+        raise ValueError("Current time is out of the time range.")
+
+    # check if times is monotonic
+    if not np.all(np.diff(times) > 0):
+        raise ValueError("Times must be monotonically increasing.")
+
+    # check if the length of times and groundwater_heads are the same
+    if len(times) != len(groundwater_heads):
+        raise ValueError("Length of times and groundwater_heads must be the same.")
+
+    # check if groundwater_heads is monotonic
+    if not np.all(np.diff(groundwater_heads) >= 0):
+        raise ValueError("Groundwater heads must be monotonically increasing.")
+
+    return np.interp(time_current, times, groundwater_heads)
+
+
+def find_groundwater_head_index(groundwater_table, soil_layer_thickness, number_soil_layers):
+    """Find the index of the soil layer where the groundwater table is located.
+
+    Args:
+        groundwater_table: Groundwater table
+        soil_layer_thickness: Thickness of the soil layers
+        number_soil_layers: Number of soil layers
+
+    Returns:
+        Index of the soil layer where the groundwater table is located.
+    """
+    #TODO: check the implementation
+    index_bottom_layer = number_soil_layers
+    found_index = False
+
+    while not found_index and i < (number_soil_layers - 1):
+        index = (soil_layer_thickness[i] + soil_layer_thickness[i+1]) / 2
+        index_bottom_layer = i if groundwater_table < index else i+1
+
+        if groundwater_table >= soil_layer_thickness[i] and groundwater_table < soil_layer_thickness[i+1]:
+            found_index = True
+            index_bottom_layer += 3  # Add a comment explaining why + 3
+
+        i += 1
+    return min(index_bottom_layer, number_soil_layers)
