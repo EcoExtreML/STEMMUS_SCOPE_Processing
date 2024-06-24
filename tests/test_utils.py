@@ -182,7 +182,6 @@ class TestGetForcingFile:
             utils.get_forcing_file(config_file)
 
 
-
 def test_interpolate_groundwater_head():
     groundwater_head_init = 1.0
     groundwater_head_final = 2.0

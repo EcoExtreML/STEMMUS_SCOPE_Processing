@@ -231,16 +231,8 @@ def interpolate_groundwater_head(groundwater_heads: np.array, times: np.array, t
     if time_current < times[0] or time_current > times[-1]:
         raise ValueError("Current time is out of the time range.")
 
-    # check if times is monotonic
-    if not np.all(np.diff(times) > 0):
-        raise ValueError("Times must be monotonically increasing.")
-
     # check if the length of times and groundwater_heads are the same
     if len(times) != len(groundwater_heads):
         raise ValueError("Length of times and groundwater_heads must be the same.")
-
-    # check if groundwater_heads is monotonic
-    if not np.all(np.diff(groundwater_heads) >= 0):
-        raise ValueError("Groundwater heads must be monotonically increasing.")
 
     return np.interp(time_current, times, groundwater_heads)
