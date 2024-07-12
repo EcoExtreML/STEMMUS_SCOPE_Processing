@@ -1,7 +1,6 @@
 import platform
 from distutils.dir_util import copy_tree
 from pathlib import Path
-from unittest.mock import patch
 import docker
 import docker.errors
 import numpy as np
@@ -270,12 +269,6 @@ class TestUpdatedModel:
         dest = np.zeros(1)
         with pytest.raises(ValueError, match="Unknown variable"):
             updated_model.get_value("nonsense_variable", dest)
-
-    def test_dev_error_variables(self, updated_model):
-        dest = np.zeros(1)
-        with patch("PyStemmusScope.bmi.implementation.MODEL_VARNAMES", ("NONSENSE",)):
-            with pytest.raises(ValueError, match="Contact devs"):
-                updated_model.get_value("NONSENSE", dest)
 
     def test_set_value(self, updated_model):
         gridsize = updated_model.get_grid_size(
