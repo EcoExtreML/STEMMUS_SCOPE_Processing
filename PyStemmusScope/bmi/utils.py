@@ -1,4 +1,6 @@
 """Utilities for the STEMMUS_SCOPE Basic Model Interface."""
+from typing import Any
+from typing import Union
 import numpy as np
 
 
@@ -64,3 +66,18 @@ class InapplicableBmiMethods:
     ) -> np.ndarray:
         """Get the number of nodes for each face."""
         raise NotImplementedError(INAPPLICABLE_GRID_METHOD_MSG)
+
+
+def nested_set(dic: dict, keys: Union[list, tuple], value: Any) -> None:
+    """Set a value in a nested dictionary programatically.
+
+    E.g.: dict[keys[0]][keys[1]] = value
+
+    Args:
+        dic: Dictionary to be modified.
+        keys: Iterable of keys that are used to find the right value.
+        value: The new value.
+    """
+    for key in keys[:-1]:
+        dic = dic.setdefault(key, {})
+    dic[keys[-1]] = value
