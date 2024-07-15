@@ -9,7 +9,7 @@ import numpy as np
 from bmipy.bmi import Bmi
 from PyStemmusScope.bmi.utils import InapplicableBmiMethods
 from PyStemmusScope.bmi.utils import nested_set
-from PyStemmusScope.bmi.variable_reference import VARIABLES
+from PyStemmusScope.bmi.variable_reference import VARIABLES, BmiVariable
 from PyStemmusScope.config_io import read_config
 
 
@@ -21,6 +21,8 @@ MODEL_OUTPUT_VARNAMES: tuple[str, ...] = tuple(
     var.name for var in VARIABLES if var.output
 )
 
+MODEL_VARS: dict[str, BmiVariable] = {var.name: var for var in VARIABLES}
+
 MODEL_VARNAMES: tuple[str, ...] = tuple(var.name for var in VARIABLES)
 
 VARNAME_UNITS: dict[str, str] = {var.name: var.units for var in VARIABLES}
@@ -29,7 +31,7 @@ VARNAME_DTYPE: dict[str, str] = {var.name: var.dtype for var in VARIABLES}
 
 VARNAME_GRID: dict[str, int] = {var.name: var.grid for var in VARIABLES}
 
-VARNAME_LOC: dict[str, list[str]] = {var.name: var.loc for var in VARIABLES}
+VARNAME_LOC: dict[str, list[str]] = {var.name: var.keys for var in VARIABLES}
 
 NO_STATE_MSG = (
     "The model state is not available. Please run `.update()` before requesting "
@@ -78,12 +80,10 @@ def get_variable(
     for _loc in VARNAME_LOC[varname]:
         _s = _s.get(_loc)
 
-    if VARNAME_GRID[varname] == 0:
+    if MODEL_VARS[varname].all_timesteps:
+        return _s[0].astype(VARNAME_DTYPE[varname])[[int(state["KT"][0])]]
+    else:
         return _s[0].astype(VARNAME_DTYPE[varname])
-
-    # something's gone wrong:
-    msg = "Varname is missing in get_variable! Contact devs."
-    raise ValueError(msg)
 
 
 def set_variable(

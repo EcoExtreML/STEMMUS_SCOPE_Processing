@@ -83,7 +83,7 @@ class StemmusScopeDocker:
     """Communicate with a STEMMUS_SCOPE Docker container."""
 
     # Default image, can be overridden with config:
-    compatible_tags = ("1.5.0",)
+    compatible_tags = ("1.6.0",)
 
     _process_ready_phrase = b"Select BMI mode:"
     _process_finalized_phrase = b"Finished clean up."

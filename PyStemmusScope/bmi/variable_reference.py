@@ -12,7 +12,8 @@ class BmiVariable:
     output: bool
     units: str
     grid: int
-    loc: list[str]
+    keys: list[str]
+    all_timesteps: bool = False
 
 
 VARIABLES: tuple[BmiVariable, ...] = (
@@ -24,7 +25,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=True,
         units="cm s-1",
         grid=0,
-        loc=["fluxes", "Resp"],
+        keys=["fluxes", "Resp"],
     ),
     BmiVariable(
         name="evaporation_total",
@@ -33,7 +34,8 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=True,
         units="cm s-1",
         grid=0,
-        loc=["EVAP"],
+        keys=["EVAP"],
+        all_timesteps=True,
     ),
     # soil vars:
     BmiVariable(
@@ -43,7 +45,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=True,
         units="degC",
         grid=1,
-        loc=["TT"],
+        keys=["TT"],
     ),
     BmiVariable(
         name="soil_moisture",
@@ -52,7 +54,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=True,
         units="m3 m-3",
         grid=1,
-        loc=["SoilVariables", "Theta_U"],
+        keys=["SoilVariables", "Theta_U"],
     ),
     BmiVariable(
         name="soil_root_water_uptake",
@@ -61,7 +63,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=True,
         units="cm s-1",
         grid=0,
-        loc=["RWUs"],
+        keys=["RWUs"],
     ),
     # surface runoff
     BmiVariable(
@@ -71,7 +73,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=True,
         units="cm s-1",
         grid=0,
-        loc=["RS"],
+        keys=["RS"],
     ),
     BmiVariable(
         name="surface_runoff_hortonian",
@@ -80,7 +82,8 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=True,
         units="cm s-1",
         grid=0,
-        loc=["ForcingData", "R_Dunn"],
+        keys=["ForcingData", "R_Dunn"],
+        all_timesteps=True,
     ),
     BmiVariable(
         name="surface_runoff_dunnian",
@@ -89,7 +92,8 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=True,
         units="cm s-1",
         grid=0,
-        loc=["ForcingData", "R_Hort"],
+        keys=["ForcingData", "R_Hort"],
+        all_timesteps=True,
     ),
     # groundwater vars (STEMMUS_SCOPE)
     BmiVariable(
@@ -99,7 +103,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=True,
         units="cm s-1",
         grid=0,
-        loc=["RWUg"],
+        keys=["RWUg"],
     ),
     BmiVariable(
         name="groundwater_recharge",
@@ -108,7 +112,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=True,
         units="cm s-1",
         grid=0,
-        loc=["gwfluxes", "recharge"],
+        keys=["gwfluxes", "recharge"],
     ),
     # groundwater (coupling) vars
     BmiVariable(
@@ -118,7 +122,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=False,
         units="-",
         grid=0,
-        loc=["GroundwaterSettings", "GroundwaterCoupling"],
+        keys=["GroundwaterSettings", "GroundwaterCoupling"],
     ),
     BmiVariable(
         name="groundwater_head_bottom_layer",
@@ -127,7 +131,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=False,
         units="cm",
         grid=0,
-        loc=["GroundwaterSettings", "headBotmLayer"],
+        keys=["GroundwaterSettings", "headBotmLayer"],
     ),
     BmiVariable(
         name="groundwater_temperature",
@@ -136,7 +140,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=False,
         units="degC",
         grid=0,
-        loc=["GroundwaterSettings", "tempBotm"],
+        keys=["GroundwaterSettings", "tempBotm"],
     ),
     BmiVariable(
         name="groundwater_elevation_top_aquifer",
@@ -145,6 +149,6 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=False,
         units="cm",
         grid=0,
-        loc=["GroundwaterSettings", "toplevel"],
+        keys=["GroundwaterSettings", "topLevel"],
     ),
 )
