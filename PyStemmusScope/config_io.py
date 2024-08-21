@@ -126,7 +126,9 @@ def _copy_data(input_dir: Path, config: dict) -> None:
 
     # copy input_data.xlsx and input_soilLayThick.csv
     shutil.copy(str(config["input_data"]), str(input_dir))
-    shutil.copy(str(input_dir / "input_soilLayThick.csv"), str(input_dir))
+    soilLay_file = Path(str(config["input_data"]).replace("input_data.xlsx", "input_soilLayThick.csv"))
+    if soilLay_file.exists():
+        shutil.copy(soilLay_file, str(input_dir))
 
 def _update_config_file(
     input_dir: Path,
