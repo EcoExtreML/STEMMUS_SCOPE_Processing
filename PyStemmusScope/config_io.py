@@ -124,9 +124,9 @@ def _copy_data(input_dir: Path, config: dict) -> None:
             str(config[folder]), str(input_dir / folder), dirs_exist_ok=True
         )
 
-    # copy input_data.xlsx
+    # copy input_data.xlsx and input_soilLayThick.csv
     shutil.copy(str(config["input_data"]), str(input_dir))
-
+    shutil.copy(str(input_dir / input_soilLayThick.csv]), str(input_dir))
 
 def _update_config_file(
     input_dir: Path,
