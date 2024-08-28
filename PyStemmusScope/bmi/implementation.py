@@ -9,7 +9,8 @@ import numpy as np
 from bmipy.bmi import Bmi
 from PyStemmusScope.bmi.utils import InapplicableBmiMethods
 from PyStemmusScope.bmi.utils import nested_set
-from PyStemmusScope.bmi.variable_reference import VARIABLES, BmiVariable
+from PyStemmusScope.bmi.variable_reference import VARIABLES
+from PyStemmusScope.bmi.variable_reference import BmiVariable
 from PyStemmusScope.config_io import read_config
 
 

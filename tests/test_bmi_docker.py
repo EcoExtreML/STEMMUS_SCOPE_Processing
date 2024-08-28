@@ -10,6 +10,7 @@ from PyStemmusScope import config_io
 from PyStemmusScope import forcing_io
 from PyStemmusScope import soil_io
 from PyStemmusScope.bmi.docker_utils import pull_image
+from PyStemmusScope.bmi.implementation import MODEL_VARNAMES
 from PyStemmusScope.bmi.implementation import StemmusScopeBmi
 from . import data_folder
 
@@ -39,13 +40,14 @@ INVALID_METHODS = (
 # fmt: on
 
 
-def docker_available():
+def docker_available(cfg_file):
     try:
         docker.APIClient()
 
+        config = config_io.read_config(cfg_file)
         # Github Actions windows runners couldn't pull the image:
         if platform.system() == "Windows":
-            pull_image("ghcr.io/ecoextreml/stemmus_scope:1.5.0")
+            pull_image(config["DockerImage"])
 
         return True
     except docker.errors.DockerException as err:
@@ -144,7 +146,7 @@ def updated_model(uninitialized_model, prepare_data_config):
     model.finalize()
 
 
-@pytest.mark.skipif(not docker_available(), reason="Docker not available")
+@pytest.mark.skipif(not docker_available(cfg_file), reason="Docker not available")
 class TestUninitialized:
     def test_component_name(self, uninitialized_model):
         assert uninitialized_model.get_component_name() == "STEMMUS_SCOPE"
@@ -168,7 +170,7 @@ class TestUninitialized:
         uninitialized_model.initialize(str(prepare_data_config))
 
 
-@pytest.mark.skipif(not docker_available(), reason="Docker not available")
+@pytest.mark.skipif(not docker_available(cfg_file), reason="Docker not available")
 class TestInitializedModel:
     def test_input_item(self, initialized_model):
         assert isinstance(initialized_model.get_input_item_count(), int)
@@ -218,7 +220,7 @@ class TestInitializedModel:
         initialized_model.update()
 
 
-@pytest.mark.skipif(not docker_available(), reason="Docker not available")
+@pytest.mark.skipif(not docker_available(cfg_file), reason="Docker not available")
 class TestUpdatedModel:
     # Many of these should be available after init
     def test_get_current_time(self, updated_model):
@@ -295,3 +297,11 @@ class TestUpdatedModel:
 
     def test_get_var_nbytes(self, updated_model):
         assert updated_model.get_var_nbytes("soil_temperature") == 8 * 55
+
+    @pytest.mark.parametrize("varname", MODEL_VARNAMES)
+    def test_get_vars(self, updated_model: StemmusScopeBmi, varname):
+        dest = np.zeros(
+            shape=updated_model.get_grid_size(updated_model.get_var_grid(varname)),
+            dtype=updated_model.get_var_type(varname),
+        )
+        updated_model.get_value(varname, dest)
