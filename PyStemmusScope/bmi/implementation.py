@@ -415,6 +415,9 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
         """
         if self.state is None:
             raise ValueError(NO_STATE_MSG)
+        if src.size != self.get_grid_size(self.get_var_grid(name)):
+            msg = f"Size of `src` and variable '{name}' grid size are not equal!"
+            raise ValueError(msg)
         self.state = set_variable(self.state, name, src)
 
     def set_value_at_indices(
@@ -433,6 +436,9 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
         """
         if self.state is None:
             raise ValueError(NO_STATE_MSG)
+        if inds.size != src.size:
+            msg = "Sizes of `inds` and `src` are not equal!"
+            raise ValueError(msg)
         self.state = set_variable(self.state, name, src, inds)
 
     ### GRID INFO ###
