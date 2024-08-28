@@ -282,6 +282,14 @@ class TestUpdatedModel:
         updated_model.get_value("soil_temperature", dest)
         np.testing.assert_array_equal(src, dest)
 
+    def test_wrong_set_value(self, updated_model):
+        gridsize = updated_model.get_grid_size(
+            updated_model.get_var_grid("soil_temperature")
+        )
+        src = np.zeros(gridsize + 1) + 10.0
+        with pytest.raises(ValueError, match="not equal"):
+            updated_model.set_value("soil_temperature", src)
+
     def test_set_value_inds(self, updated_model):
         dest = np.zeros(1)
         updated_model.set_value_at_indices(
@@ -291,6 +299,14 @@ class TestUpdatedModel:
         )
         updated_model.get_value_at_indices("soil_temperature", dest, inds=np.array([0]))
         assert dest[0] == 0.0
+
+    def test_wrong_set_value_inds(self, updated_model):
+        with pytest.raises(ValueError, match="not equal"):
+            updated_model.set_value_at_indices(
+                "soil_temperature",
+                inds=np.array([0, 1]),
+                src=np.array([0.0]),
+            )
 
     def test_itemsize(self, updated_model):
         assert updated_model.get_var_itemsize("soil_temperature") == 8  # ==64 bits
