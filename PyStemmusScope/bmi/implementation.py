@@ -8,31 +8,31 @@ import h5py
 import numpy as np
 from bmipy.bmi import Bmi
 from PyStemmusScope.bmi.utils import InapplicableBmiMethods
+from PyStemmusScope.bmi.utils import nested_set
+from PyStemmusScope.bmi.variable_reference import VARIABLES
+from PyStemmusScope.bmi.variable_reference import BmiVariable
 from PyStemmusScope.config_io import read_config
 
 
-MODEL_INPUT_VARNAMES: tuple[str, ...] = ("soil_temperature",)
-
-MODEL_OUTPUT_VARNAMES: tuple[str, ...] = (
-    "soil_temperature",
-    "respiration",
+MODEL_INPUT_VARNAMES: tuple[str, ...] = tuple(
+    var.name for var in VARIABLES if var.input
 )
 
-MODEL_VARNAMES: tuple[str, ...] = tuple(
-    set(MODEL_INPUT_VARNAMES + MODEL_OUTPUT_VARNAMES)
+MODEL_OUTPUT_VARNAMES: tuple[str, ...] = tuple(
+    var.name for var in VARIABLES if var.output
 )
 
-VARNAME_UNITS: dict[str, str] = {"respiration": "unknown", "soil_temperature": "degC"}
+MODEL_VARS: dict[str, BmiVariable] = {var.name: var for var in VARIABLES}
 
-VARNAME_DTYPE: dict[str, str] = {
-    "respiration": "float64",
-    "soil_temperature": "float64",
-}
+MODEL_VARNAMES: tuple[str, ...] = tuple(var.name for var in VARIABLES)
 
-VARNAME_GRID: dict[str, int] = {
-    "respiration": 0,
-    "soil_temperature": 1,
-}
+VARNAME_UNITS: dict[str, str] = {var.name: var.units for var in VARIABLES}
+
+VARNAME_DTYPE: dict[str, str] = {var.name: var.dtype for var in VARIABLES}
+
+VARNAME_GRID: dict[str, int] = {var.name: var.grid for var in VARIABLES}
+
+VARNAME_LOC: dict[str, list[str]] = {var.name: var.keys for var in VARIABLES}
 
 NO_STATE_MSG = (
     "The model state is not available. Please run `.update()` before requesting "
@@ -59,23 +59,32 @@ def load_state(config: dict) -> h5py.File:
     return h5py.File(matfile, mode="a")
 
 
-def get_variable(state: h5py.File, varname: str) -> np.ndarray:
+def get_variable(
+    state: h5py.File, varname: str
+) -> np.ndarray:  # noqa: PLR0911 PLR0912 C901
     """Get a variable from the model state.
 
     Args:
         state: STEMMUS_SCOPE model state
         varname: Variable name
     """
-    if varname == "respiration":
-        return state["fluxes"]["Resp"][0]
+    if varname not in MODEL_VARNAMES:
+        msg = "Unknown variable name"
+        raise ValueError(msg)
+
+    # deviating implemetation:
     elif varname == "soil_temperature":
         return state["TT"][0, :-1]
+
+    # default implementation:
+    _s = state
+    for _loc in VARNAME_LOC[varname]:
+        _s = _s.get(_loc)
+
+    if MODEL_VARS[varname].all_timesteps:
+        return _s[0].astype(VARNAME_DTYPE[varname])[[int(state["KT"][0])]]
     else:
-        if varname in MODEL_VARNAMES:
-            msg = "Varname is missing in get_variable! Contact devs."
-        else:
-            msg = "Unknown variable name"
-        raise ValueError(msg)
+        return _s[0].astype(VARNAME_DTYPE[varname])
 
 
 def set_variable(
@@ -101,16 +110,21 @@ def set_variable(
     else:
         vals = value
 
+    if varname in MODEL_OUTPUT_VARNAMES and varname not in MODEL_INPUT_VARNAMES:
+        msg = "This variable is a model output variable only. You cannot set it."
+        raise ValueError(msg)
+    elif varname not in MODEL_INPUT_VARNAMES:
+        msg = "Uknown variable name"
+        raise ValueError(msg)
+
+    # deviating implementations:
     if varname == "soil_temperature":
         state["TT"][0, :-1] = vals
+    elif varname == "groundwater_coupling_enabled":
+        state["GroundwaterSettings"]["GroundwaterCoupling"][0] = vals.astype("float")
+    # default:
     else:
-        if varname in MODEL_OUTPUT_VARNAMES and varname not in MODEL_INPUT_VARNAMES:
-            msg = "This variable is a model output variable only. You cannot set it."
-        elif varname in MODEL_VARNAMES:
-            msg = "Varname is missing in set_variable! Contact devs."
-        else:
-            msg = "Uknown variable name"
-        raise ValueError(msg)
+        nested_set(state, VARNAME_LOC[varname] + [0], vals)
     return state
 
 
@@ -401,6 +415,9 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
         """
         if self.state is None:
             raise ValueError(NO_STATE_MSG)
+        if src.size != self.get_grid_size(self.get_var_grid(name)):
+            msg = f"Size of `src` and variable '{name}' grid size are not equal!"
+            raise ValueError(msg)
         self.state = set_variable(self.state, name, src)
 
     def set_value_at_indices(
@@ -419,6 +436,9 @@ class StemmusScopeBmi(InapplicableBmiMethods, Bmi):
         """
         if self.state is None:
             raise ValueError(NO_STATE_MSG)
+        if inds.size != src.size:
+            msg = "Sizes of `inds` and `src` are not equal!"
+            raise ValueError(msg)
         self.state = set_variable(self.state, name, src, inds)
 
     ### GRID INFO ###
