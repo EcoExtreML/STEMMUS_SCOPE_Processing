@@ -114,18 +114,6 @@ VARIABLES: tuple[BmiVariable, ...] = (
         grid=0,
         keys=["gwfluxes", "recharge"],
     ),
-<<<<<<< HEAD
-    BmiVariable(
-        name="groundwater_recharge_temperature",
-        dtype="float64",
-        input=False,
-        output=True,
-        units="degC",
-        grid=0,
-        keys=["gwfluxes", "rechargeTemp"],
-    ),    
-=======
->>>>>>> main
     # groundwater (coupling) vars
     BmiVariable(
         name="groundwater_coupling_enabled",
