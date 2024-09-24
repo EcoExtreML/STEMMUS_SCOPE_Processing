@@ -114,18 +114,15 @@ VARIABLES: tuple[BmiVariable, ...] = (
         grid=0,
         keys=["gwfluxes", "recharge"],
     ),
-<<<<<<< HEAD
     BmiVariable(
-        name="groundwater_recharge_temperature",
-        dtype="float64",
+        name="groundwater_recharge_index",
+        dtype="int64",
         input=False,
         output=True,
-        units="degC",
+        units="-",
         grid=0,
-        keys=["gwfluxes", "rechargeTemp"],
+        keys=["gwfluxes", "indxRchrg"],
     ),    
-=======
->>>>>>> main
     # groundwater (coupling) vars
     BmiVariable(
         name="groundwater_coupling_enabled",
@@ -163,4 +160,31 @@ VARIABLES: tuple[BmiVariable, ...] = (
         grid=0,
         keys=["GroundwaterSettings", "topLevel"],
     ),
+    BmiVariable(
+        name="groundwater_depth",
+        dtype="float64",
+        input=True,
+        output=False,
+        units="cm",
+        grid=0,
+        keys=["GroundwaterSettings", "gw_Dep"],
+    ),
+    BmiVariable(
+        name="groundwater_index_bottom_layer",
+        dtype="int64",
+        input=False,
+        output=True,
+        units="-",
+        grid=0,
+        keys=["GroundwaterSettings", "indxBotmLayer"],
+    ),
+    BmiVariable(
+        name="groundwater_index_bottom_layer_reversed",
+        dtype="int64",
+        input=False,
+        output=True,
+        units="-",
+        grid=0,
+        keys=["GroundwaterSettings", "indxBotmLayer_R"],
+    ),            
 )
