@@ -19,10 +19,10 @@ To use the Docker image, use the `DockerImage` setting in the configuration file
 ```sh
 WorkDir=/home/username/tmp/stemmus_scope
 ...
-DockerImage=ghcr.io/ecoextreml/stemmus_scope:1.6.0
+DockerImage=ghcr.io/ecoextreml/stemmus_scope:1.6.1
 ```
 
-It is best to add the version tag here too (`:1.6.0`), this way the BMI will warn you if the version might be incompatible.
+It is best to add the version tag here too (`:1.6.1`), this way the BMI will warn you if the version might be incompatible.
 
 Note that the `docker` package for python is required here. Install this with `pip install PyStemmusScope[docker]`.
 Additionally, [Docker](https://docs.docker.com/get-docker/) itself has to be installed.
@@ -52,7 +52,7 @@ If you need access to other model variables that are not yet available in the BM
 
 A [Docker image is available](https://ghcr.io/ecoextreml/stemmus_scope-grpc4bmi) in which the model as well as the Python BMI have been wrapped in a container. The Docker image is created using the Docker file [here](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/blob/main/Dockerfile) and allows communication with a STEMMUS_SCOPE BMI through [grpc4bmi](https://grpc4bmi.readthedocs.io/en/latest/).
 
-Doing so avoids the needs to install PyStemmusScope yourself, only Docker/apptainer and a python environment with grpc4bmi are required. Please note you should not specify `DockerImage` or `ExeFilePath` in the config file if you are using the grpc4bmi interface. 
+Doing so avoids the needs to install PyStemmusScope yourself, only Docker/apptainer and a python environment with grpc4bmi are required. Please note you should not specify `DockerImage` or `ExeFilePath` in the config file if you are using the grpc4bmi interface.
 
 A demonstration is available [here](notebooks/grpc4bmi_demo.ipynb)
 
