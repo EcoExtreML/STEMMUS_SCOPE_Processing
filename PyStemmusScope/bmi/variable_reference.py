@@ -114,6 +114,15 @@ VARIABLES: tuple[BmiVariable, ...] = (
         grid=0,
         keys=["gwfluxes", "recharge"],
     ),
+    BmiVariable(
+        name="groundwater_recharge_index",
+        dtype="int64",
+        input=False,
+        output=True,
+        units="-",
+        grid=0,
+        keys=["gwfluxes", "indxRchrg"],
+    ),
     # groundwater (coupling) vars
     BmiVariable(
         name="groundwater_coupling_enabled",

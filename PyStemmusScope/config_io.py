@@ -126,6 +126,16 @@ def _copy_data(input_dir: Path, config: dict) -> None:
 
     # copy input_data.xlsx
     shutil.copy(str(config["input_data"]), str(input_dir))
+    # copy soil_layers_thickness, this is optional
+    if "soil_layers_thickness" in config:
+        if Path(config["soil_layers_thickness"]).is_file():
+            shutil.copy(str(config["soil_layers_thickness"]), str(input_dir))
+        else:
+            raise FileNotFoundError(
+                "The key `soil_layers_thickness` is provided in the config file, "
+                f"but file {config['soil_layers_thickness']} not found. "
+                "Remove the key from the config file or provide the file."
+            )
 
 
 def _update_config_file(

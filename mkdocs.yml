@@ -14,6 +14,7 @@ nav:
     - "BMI instructions": bmi.md
     - "BMI demonstration": notebooks/BMI_demo.ipynb
     - "grpc4bmi demonstration": notebooks/grpc4bmi_demo.ipynb
+    - "example: coupling modflow and stemmus_scope": notebooks/bmi_MODFLOW_coupling.ipynb
   - Contributing guide: CONTRIBUTING.md
   - API reference: reference.md
 
