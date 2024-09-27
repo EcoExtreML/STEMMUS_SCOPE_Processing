@@ -41,3 +41,14 @@ class TestConfigIO:
         assert Path(input_dir).is_dir()
         assert Path(output_dir).is_dir()
         assert Path(config_path).exists()
+
+    def test_without_soil_layers_thickness(self, dummy_config):
+        dummy_config["soil_layers_thickness"] = ""
+        with pytest.raises(FileNotFoundError):
+            config_io.create_io_dir(dummy_config)
+
+    def test_with_soil_layers_thickness(self, dummy_config):
+        dummy_config["soil_layers_thickness"] = dummy_config["input_data"]
+        input_dir, _, _ = config_io.create_io_dir(dummy_config)
+
+        assert (Path(input_dir) / "dummy_data.xlsx").exists()
