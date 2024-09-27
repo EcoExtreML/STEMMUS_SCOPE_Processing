@@ -137,6 +137,7 @@ def _copy_data(input_dir: Path, config: dict) -> None:
                 "Remove the key from the config file or provide the file."
             )
 
+
 def _update_config_file(
     input_dir: Path,
     output_dir: Path,

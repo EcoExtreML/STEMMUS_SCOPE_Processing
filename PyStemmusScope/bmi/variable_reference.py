@@ -122,7 +122,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         units="-",
         grid=0,
         keys=["gwfluxes", "indxRchrg"],
-    ),    
+    ),
     # groundwater (coupling) vars
     BmiVariable(
         name="groundwater_coupling_enabled",
@@ -159,5 +159,5 @@ VARIABLES: tuple[BmiVariable, ...] = (
         units="cm",
         grid=0,
         keys=["GroundwaterSettings", "topLevel"],
-    ),           
+    ),
 )
