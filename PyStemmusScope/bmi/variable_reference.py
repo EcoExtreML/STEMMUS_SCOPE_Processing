@@ -95,6 +95,26 @@ VARIABLES: tuple[BmiVariable, ...] = (
         keys=["ForcingData", "R_Hort"],
         all_timesteps=True,
     ),
+    BmiVariable(
+        name="precipitation",
+        dtype="float64",
+        input=True,
+        output=False,
+        units="cm s-1",
+        grid=0,
+        keys=["ForcingData", "Precip_msr"],
+        all_timesteps=True,
+    ),
+    BmiVariable(
+        name="applied_infiltration",
+        dtype="float64",
+        input=False,
+        output=True,
+        units="cm s-1",
+        grid=0,
+        keys=["ForcingData", "applied_inf"],
+        all_timesteps=True,
+    ),
     # groundwater vars (STEMMUS_SCOPE)
     BmiVariable(
         name="groundwater_root_water_uptake",
