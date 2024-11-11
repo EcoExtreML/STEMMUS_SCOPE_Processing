@@ -45,7 +45,6 @@ VARIABLES: tuple[BmiVariable, ...] = (
         units="cm s-1",
         grid=0,
         keys=["Trap"],
-        all_timesteps=True,
     ),
     # soil vars:
     BmiVariable(
