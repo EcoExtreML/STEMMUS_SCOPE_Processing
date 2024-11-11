@@ -37,6 +37,16 @@ VARIABLES: tuple[BmiVariable, ...] = (
         keys=["EVAP"],
         all_timesteps=True,
     ),
+        BmiVariable(
+        name="transpiration_total",
+        dtype="float64",
+        input=False,
+        output=True,
+        units="cm s-1",
+        grid=0,
+        keys=["Trap"],
+        all_timesteps=True,
+    ),
     # soil vars:
     BmiVariable(
         name="soil_temperature",
