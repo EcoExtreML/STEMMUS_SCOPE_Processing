@@ -152,6 +152,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         units="-",
         grid=0,
         keys=["gwfluxes", "indxRchrg"],
+        all_timesteps=True,
     ),
     # groundwater (coupling) vars
     BmiVariable(
