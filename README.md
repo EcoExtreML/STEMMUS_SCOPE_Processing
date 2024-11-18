@@ -32,4 +32,4 @@ which provides different ways to run the model depending on your system and
 on how to use different datasets e.g. site or global data.
 
 More information on the setup and installation, including for own machine, is available
-in the [documentation](https://pystemmusscope.readthedocs.io/).
+in the [documentation](https://pystemmusscope.readthedocs.io/en/latest/).
