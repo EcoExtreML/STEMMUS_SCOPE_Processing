@@ -35,7 +35,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         units="cm s-1",
         grid=0,
         keys=["EVAP"],
-        # all_timesteps=True,
+        all_timesteps=True,
     ),
         BmiVariable(
         name="transpiration_total",
