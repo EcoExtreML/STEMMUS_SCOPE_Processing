@@ -45,7 +45,6 @@ VARIABLES: tuple[BmiVariable, ...] = (
         units="cm s-1",
         grid=0,
         keys=["Trap"],
-        all_timesteps=True,
     ),
     # soil vars:
     BmiVariable(
@@ -123,6 +122,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         units="cm s-1",
         grid=0,
         keys=["ForcingData", "applied_inf"],
+        all_timesteps=True,
     ),
     # groundwater vars (STEMMUS_SCOPE)
     BmiVariable(
