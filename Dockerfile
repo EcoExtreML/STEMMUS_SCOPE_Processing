@@ -1,7 +1,7 @@
 FROM ghcr.io/ecoextreml/stemmus_scope:1.6.1
 
 LABEL maintainer="Bart Schilperoort <b.schilperoort@esciencecenter.nl>"
-LABEL org.opencontainers.image.source = "https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing"
+LABEL org.opencontainers.image.source="https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing"
 
 # Requirements for building Python 3.10
 RUN apt-get update && apt-get -y upgrade
@@ -26,8 +26,8 @@ RUN pip3.10 install grpc4bmi==0.5.0
 
 # # Set the STEMMUS_SCOPE environmental variable, so the BMI can find the executable
 WORKDIR /
-ENV STEMMUS_SCOPE /STEMMUS_SCOPE
+ENV STEMMUS_SCOPE=/STEMMUS_SCOPE
 
 EXPOSE 55555
 # Start grpc4bmi server
-CMD run-bmi-server --name "PyStemmusScope.bmi.implementation.StemmusScopeBmi" --port 55555 --debug
+CMD ["run-bmi-server", "--name", "PyStemmusScope.bmi.implementation.StemmusScopeBmi", "--port", "55555", "--debug"]
