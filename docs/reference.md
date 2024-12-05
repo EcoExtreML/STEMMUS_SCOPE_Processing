@@ -1,8 +1,6 @@
-Here you find the code reference for the two main components users of `PyStemmusScope`
-might need. First is the StemmusScope model class. Second is the `save` module, with
-which you can save the STEMMUS_SCOPE model output to a netCDF file.
+Here you find the code reference for the main components of `PyStemmusScope`.
 
-## **PyStemmusScope**:
+## **Run the model**:
 
 ::: PyStemmusScope.stemmus_scope.StemmusScope
     options:
@@ -10,10 +8,17 @@ which you can save the STEMMUS_SCOPE model output to a netCDF file.
       show_source: true
       heading_level: 3
 
-
-## **PyStemmusScope.save**:
+## **To netcdf**:
 
 ::: PyStemmusScope.save
+    options:
+      show_root_heading: true
+      show_source: true
+      heading_level: 3
+
+## **BMI interface**:
+
+::: PyStemmusScope.bmi.implementation.StemmusScopeBmi
     options:
       show_root_heading: true
       show_source: true

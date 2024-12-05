@@ -2,28 +2,35 @@
 
 # Getting started
 
-This is the documentation for the python package `PyStemmusScope`, which allows for for
-running the STEMMUS-SCOPE model.
-
-
-The model source code, executable file and utility files are available in the
-<!-- markdown-link-check-disable-next-line -->
+This is the documentation for the python package `PyStemmusScope`, which allows
+for preparing data and running the STEMMUS-SCOPE model. The model source code
 [STEMMUS_SCOPE repository](https://github.com/EcoExtreML/STEMMUS_SCOPE).
 
-The input datasets are available on Snellius and CRIB. First, make sure you have
-right access to the repository and data.
+## Requirements
+
+To run the model, check the
+[requirements](https://ecoextreml.github.io/STEMMUS_SCOPE/getting_started/).
+
+## Configuration file
+
+The configuration file is a text file that sets the paths required by the model.
+Check [**required** information and
+templates](https://ecoextreml.github.io/STEMMUS_SCOPE/getting_started/#configuration-file).
+In addition to required information, there are optional parameters that can be
+set in the configuration file:
+
+- `soil_layers_thickness`: a path to a csv file containing soil layers thickness
+  information, see
+  [exmaple](https://github.com/EcoExtreML/STEMMUS_SCOPE/blob/main/example_data/input_soilLayThick.csv).
+- `ExeFilePath`: a path to the STEMMUS-SCOPE executable file, if BMI interface
+  is used.
+- `DockerImage`: a path to the Docker image, if BMI interface and docker are
+  used.
 
 ## Running the model
 
-1. Using executable file: As a user, you don't need to have a MATLAB license to
-run the STEMMUS-SCOPE model. If `PyStemmusScope` and `MATLAB Runtime` are
-installed on a Unix-like system (e.g. your own machine, Snellius or WSL), you
-can run STEMMUS_SCOPE using the executable file.
-2. Using Matlab: If `PyStemmusScope` and `Matlab` are installed, you can run
-STEMMUS_SCOPE from the source code, for example on Snellius or CRIB.
-3. Using Octave: If `PyStemmusScope` and latest `Octave` including required
-packages are installed, you can run STEMMUS_SCOPE from its source code, for
-example on CRIB or your own machine.
+If you want to run the model using `PyStemmusScope`, follow the instructions in
+the `installation` and `Run the model` documentation.
 
-See section [Installation Instructions](installation_instructions.md) for required packages.
-
+If you want to add changes to the package `PyStemmusScope`, follow `Contributing
+guide` documnetation.
