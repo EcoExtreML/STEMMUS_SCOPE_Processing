@@ -7,8 +7,9 @@ Here you find the code reference for the main components of `PyStemmusScope`.
       show_root_heading: false
       show_source: true
       heading_level: 3
+      members_order: source
 
-## **To netcdf**:
+## **Post processing**:
 
 ::: PyStemmusScope.save
     options:
@@ -18,8 +19,9 @@ Here you find the code reference for the main components of `PyStemmusScope`.
 
 ## **BMI interface**:
 
-::: PyStemmusScope.bmi.implementation.StemmusScopeBmi
+::: PyStemmusScope.bmi.StemmusScopeBmi
     options:
       show_root_heading: true
       show_source: true
       heading_level: 3
+      members_order: source
