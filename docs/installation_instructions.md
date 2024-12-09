@@ -6,6 +6,9 @@ source code [STEMMUS_SCOPE
 repository](https://github.com/EcoExtreML/STEMMUS_SCOPE). For model-specific
 instructions, check the `Getting started` page.
 
+Note that the latest version of `PyStemmusScope` is compatible with latest
+version of `STEMMUS-SCOPE` model.
+
 ## Install PyStemmusScope
 
 To install the package, you need to have Python ">=3.9, <3.12" installed.
@@ -22,6 +25,12 @@ Open a jupyter notebook and run the code below in a cell:
 
 ```python
 !pip install pystemmusscope
+```
+
+On CRIB, you can use the following command to install the package:
+
+```sh
+python3 -m pip install --user pystemmusscope
 ```
 
 ## Install jupyterlab

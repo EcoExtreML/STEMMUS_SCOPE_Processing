@@ -11,6 +11,11 @@ for preparing data and running the STEMMUS-SCOPE model. The model source code
 To run the model, check the
 [requirements](https://ecoextreml.github.io/STEMMUS_SCOPE/getting_started/).
 
+### Global data
+
+See [this documentation](./downloading_global_data.md) on which, where and how
+we download the "global" input data for the model.
+
 ## Configuration file
 
 The configuration file is a text file that sets the paths required by the model.
