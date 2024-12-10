@@ -11,10 +11,10 @@ nav:
       - Site and global datasets on CRIB: notebooks/run_model_with_different_dataset_on_CRIB.ipynb
 
   - BMI:
-    - "BMI instructions": bmi.md
-    - "BMI demonstration": notebooks/BMI_demo.ipynb
-    - "grpc4bmi demonstration": notebooks/grpc4bmi_demo.ipynb
-    - "example: coupling modflow and stemmus_scope": notebooks/bmi_MODFLOW_coupling.ipynb
+    - BMI instructions: bmi.md
+    - BMI demonstration: notebooks/BMI_demo.ipynb
+    - grpc4bmi demonstration: notebooks/grpc4bmi_demo.ipynb
+    - example-coupling modflow and stemmus_scope: notebooks/bmi_MODFLOW_coupling.ipynb
   - Contributing guide: CONTRIBUTING.md
   - API reference: reference.md
 

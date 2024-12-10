@@ -103,6 +103,7 @@ class LocalStemmusScope:  # pragma: no cover
         env = {
             "LD_LIBRARY_PATH": lib_path,
             "MATLAB_LOG_DIR": str(config["OutputPath"]),
+            "MCR_CACHE_ROOT": str(os.getenv("MCR_CACHE_ROOT")),
         }
 
         self.process = subprocess.Popen(
