@@ -18,18 +18,11 @@
 [![cffconvert](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/cffconvert.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/cffconvert.yml)
 [![markdown-link-check](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/markdown-link-check.yml/badge.svg)](https://github.com/EcoExtreML/stemmus_scope_processing/actions/workflows/markdown-link-check.yml) -->
 
-This repository includes the python package `PyStemmusScope` for running the
-STEMMUS-SCOPE model.
+This repository includes the python package `PyStemmusScope` for preparing data
+nd running the STEMMUS-SCOPE model.
 
 <!-- markdown-link-check-disable-next-line -->
 The model source code, executable file and utility files are available in the [STEMMUS_SCOPE repository](https://github.com/EcoExtreML/STEMMUS_SCOPE).
-
-The input datasets are available on Snellius and CRIB. First, make sure you have
-right access to the repository and data. Then, see the notebook
-[run_model_on_different_infra.ipynb](./docs/notebooks/run_model_on_different_infra.ipynb)
-which provides different ways to run the model depending on your system and
-[run_model_with_different_dataset.ipynb](./docs/notebooks/run_model_with_different_dataset.ipynb)
-on how to use different datasets e.g. site or global data.
 
 More information on the setup and installation, including for own machine, is available
 in the [documentation](https://pystemmusscope.readthedocs.io/).
