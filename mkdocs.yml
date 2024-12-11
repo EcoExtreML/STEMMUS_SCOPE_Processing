@@ -3,7 +3,8 @@ repo_url: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing
 repo_name: PyStemmusScope
 
 nav:
-  - Getting started: index.md
+  - Introduction: intro.md
+  - Getting started: getting_started.md.md
   - Installation: installation_instructions.md
   - Run the model:
       - Different ways to run the model: notebooks/run_model_on_different_infra.ipynb
