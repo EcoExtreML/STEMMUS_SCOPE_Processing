@@ -1,4 +1,4 @@
-FROM ghcr.io/ecoextreml/stemmus_scope:1.6.1
+FROM ghcr.io/ecoextreml/stemmus_scope:1.6.2
 
 LABEL maintainer="Bart Schilperoort <b.schilperoort@esciencecenter.nl>"
 LABEL org.opencontainers.image.source = "https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing"
