@@ -48,7 +48,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         all_timesteps=True,
     ),
     BmiVariable(
-        name="evaporation_total",
+        name="soil_evaporation",
         dtype="float64",
         input=False,
         output=True,
@@ -57,7 +57,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         keys=["Evap"],
     ),
     BmiVariable(
-        name="transpiration_total",
+        name="transpiration",
         dtype="float64",
         input=False,
         output=True,
