@@ -27,7 +27,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         grid=0,
         keys=["fluxes", "Resp"],
     ),
-        BmiVariable(
+    BmiVariable(
         name="precipitation",
         dtype="float64",
         input=True,
@@ -56,7 +56,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         grid=0,
         keys=["Evap"],
     ),
-        BmiVariable(
+    BmiVariable(
         name="transpiration_total",
         dtype="float64",
         input=False,

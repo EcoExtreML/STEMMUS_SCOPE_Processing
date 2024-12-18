@@ -87,7 +87,7 @@ class LocalStemmusScope:  # pragma: no cover
         self.cfg_file = cfg_file
         config = read_config(cfg_file)
         self.sleep_duration = int(config.get("SleepDuration", 10))
-        
+
         exe_file = find_exe(config)
         args = [exe_file, cfg_file, "bmi"]
 
