@@ -86,6 +86,7 @@ class LocalStemmusScope:  # pragma: no cover
         """Initialize the process."""
         self.cfg_file = cfg_file
         config = read_config(cfg_file)
+        self.sleep_duration = int(config.get("SleepDuration", 10))
 
         exe_file = find_exe(config)
         args = [exe_file, cfg_file, "bmi"]
@@ -153,7 +154,7 @@ class LocalStemmusScope:  # pragma: no cover
         """Finalize the model."""
         self.process = alive_process(self.process)
         self.process.stdin.write(b"finalize\n")  # type: ignore
-        sleep(10)
+        sleep(self.sleep_duration)
         if self.process.poll() != 0:
             try:
                 self.process.terminate()
