@@ -21,10 +21,10 @@ To use the Docker image, use the `DockerImage` setting in the configuration file
 ```sh
 WorkDir=/home/username/tmp/stemmus_scope
 ...
-DockerImage=ghcr.io/ecoextreml/stemmus_scope:1.6.1
+DockerImage=ghcr.io/ecoextreml/stemmus_scope:1.6.2
 ```
 
-It is best to add the version tag here too (`:1.6.1`), this way the BMI will warn you if the version might be incompatible.
+It is best to add the version tag here too (`:1.6.2`), this way the BMI will warn you if the version might be incompatible.
 
 Note that the `docker` package for python is required here. Install this with `pip install PyStemmusScope[docker]`.
 Additionally, [Docker](https://docs.docker.com/get-docker/) itself has to be installed.
