@@ -1,6 +1,4 @@
-<img align="right" width="200" alt="Logo" src="ecoextreml_logo.png">
-
-# Getting started
+#
 
 This is the documentation for the python package `PyStemmusScope`, which allows
 for preparing data and running the STEMMUS-SCOPE model. The model source code
@@ -31,6 +29,8 @@ set in the configuration file:
   is used.
 - `DockerImage`: a path to the Docker image, if BMI interface and docker are
   used.
+- `SleepDuration`: a time in seconds to wait before checking if the model has
+  finished running in BMI. Default is 10 seconds.
 
 ## Running the model
 
