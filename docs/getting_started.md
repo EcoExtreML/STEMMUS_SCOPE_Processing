@@ -35,7 +35,5 @@ set in the configuration file:
 ## Running the model
 
 If you want to run the model using `PyStemmusScope`, follow the instructions in
-the `installation` and `Run the model` documentation.
-
-If you want to add changes to the package `PyStemmusScope`, follow `Contributing
-guide` documnetation.
+the `installation` and `Run the model` documentation. If you want to add changes
+to the package `PyStemmusScope`, follow `Contributing guide` documnetation.
