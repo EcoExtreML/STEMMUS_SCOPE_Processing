@@ -4,7 +4,7 @@ repo_name: PyStemmusScope
 
 nav:
   - Introduction: intro.md
-  - Getting started: getting_started.md.md
+  - Getting started: getting_started.md
   - Installation: installation_instructions.md
   - Run the model:
       - Different ways to run the model: notebooks/run_model_on_different_infra.ipynb
