@@ -12,7 +12,7 @@ jobs:
 
   markdown-link-check:
     name: Check markdown links
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04 # there is an issue with ubuntu-latest and linkspector
     steps:
     - uses: actions/checkout@v4
     - uses: umbrelladocs/action-linkspector@v1
