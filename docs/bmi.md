@@ -7,7 +7,7 @@ Basic Model Interface. For the model, we generated Matlab Compiler Runtime
 executable file (only available for x86 Linux). This requires installation of
 MCR. The other option is to use the Dockerized version of the executable,
 available on
-[ghcr.io/ecoextreml/stemmus_scope](ghcr.io/ecoextreml/stemmus_scope). For more
+[https://ghcr.io/ecoextreml/stemmus_scope](https://ghcr.io/ecoextreml/stemmus_scope). For more
 information on each method, see the sections below.
 
 ## Installation and setup

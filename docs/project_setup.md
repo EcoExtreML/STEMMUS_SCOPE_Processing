@@ -7,27 +7,13 @@ text when the development of the software package takes off.
 For a quick reference on software development, we refer to [the software guide
 checklist](https://guide.esciencecenter.nl/#/best_practices/checklist).
 
-## Python versions
-
-This repository is set up with Python versions:
-
-- 3.9
-- 3.10
-- 3.11
-
-Add or remove Python versions based on project requirements. See [the
-guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python) for more information about Python
-versions.
-
 ## Package management and dependencies
 
-You can use either pip or conda for installing dependencies and package management. This repository does not force you
-to use one or the other, as project requirements differ. For advice on what to use, please check [the relevant section
-of the
+You can use either pip or conda for installing dependencies (see
+`pyproject.toml`) and package management. This repository does not force you to
+use one or the other, as project requirements differ. For advice on what to use,
+please check [the relevant section of the
 guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python?id=dependencies-and-package-management).
-
-- Runtime dependencies should be added to `setup.cfg` in the `install_requires` list under `[options]`.
-- Development dependencies should be added to `setup.cfg` in one of the lists under `[options.extras_require]`.
 
 ## Packaging/One command install
 
@@ -43,33 +29,18 @@ help you decide which tool to use for packaging.
 - The testing framework used is [PyTest](https://pytest.org)
   - [PyTest introduction](https://pythontest.com/pytest-book/)
   - PyTest is listed as a development dependency
-  - This is configured in `setup.cfg`
+  - This is configured in `pyproject.toml`
 - The project uses GitHub action workflows to automatically run tests on GitHub infrastructure against multiple Python versions
   - Workflows can be found in [`.github/workflows`](../.github/workflows/)
 - [Relevant section in the guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python?id=testing)
 
 ## Documentation
 
-- Documentation should be put in the [`docs/`](../docs) directory. The contents have been generated using `sphinx-quickstart` (Sphinx version 1.6.5).
-- We recommend writing the documentation using Restructured Text (reST) and Google style docstrings.
-  - [Restructured Text (reST) and Sphinx CheatSheet](https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html)
-  - [Google style docstring examples](http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html).
-- The documentation is set up with the ReadTheDocs Sphinx theme.
-  - Check out its [configuration options](https://sphinx-rtd-theme.readthedocs.io/en/latest/).
-- [AutoAPI](https://sphinx-autoapi.readthedocs.io/) is used to generate documentation for the package Python objects.
-- `.readthedocs.yaml` is the ReadTheDocs configuration file. When ReadTheDocs is building the documentation this package and its development dependencies are installed so the API reference can be rendered.
-- [Relevant section in the guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python?id=writingdocumentation)
+- Documentation should be put in the `docs/` directory.
 
 ## Coding style conventions and code quality
 
-- [Relevant section in the NLeSC guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python?id=coding-style-conventions) and [README.dev.md](README.dev.md).
-
-## Continuous code quality
-
-[Sonarcloud](https://sonarcloud.io/) is used to perform quality analysis and code coverage report
-
-- `sonar-project.properties` is the SonarCloud [configuration](https://docs.sonarqube.org/latest/analysis/analysis-parameters/) file
-- `.github/workflows/sonarcloud.yml` is the GitHub action workflow which performs the SonarCloud analysis
+- [Relevant section in the NLeSC guide](https://guide.esciencecenter.nl/#/best_practices/language_guides/python?id=coding-style-conventions).
 
 ## Package version number
 

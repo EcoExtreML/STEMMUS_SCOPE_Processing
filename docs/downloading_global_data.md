@@ -46,8 +46,9 @@ A simple example for the parsing of the data is in
 
 ## DEM data from Copernicus
 
-A word doc for instructions is available
-[here](https://spacedata.copernicus.eu/documents/20123/121286/Copernicus+DEM+Open+HTTPS+Access.pdf/36c9adad-8488-f463-af43-573e68b7f481?t=1669283200177). A simple example for the parsing of the data is in
+DEM data is provided by Copernicus, see
+[here](https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM).
+A simple example for the parsing of the data is in
 `global_data/data_analysis_notebooks/parse_dem.ipynb`.
 
 ## LAI from Climate Data Store (CDS)
@@ -58,4 +59,4 @@ data is in `global_data/data_analysis_notebooks/parse_LAI.py`.
 
 ## Land cover from Climate Data Store (CDS)
 
-Land cover data is available at [https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-land-cover?tab=overview](https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-land-cover?tab=overview).
+Land cover data is available at [https://cds.climate.copernicus.eu/datasets/satellite-land-cover](https://cds.climate.copernicus.eu/datasets/satellite-land-cover).

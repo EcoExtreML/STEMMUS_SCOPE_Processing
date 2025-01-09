@@ -1,3 +1,8 @@
+dirs:
+  - ./docs
+excludedDirs:
+  - ./docs/notebooks
+  - ./docs/overrides
 ignorePatterns:
   - pattern: "^http://localhost"
   - pattern: "^https://doi.org/<replace-with-created-DOI>"
@@ -6,5 +11,4 @@ ignorePatterns:
   - pattern: "^https://test.pypi.org"
   - pattern: "^https://bestpractices.coreinfrastructure.org/projects/<replace-with-created-project-identifier>"
   - pattern: "^https://readthedocs.org/dashboard/import.*"
-
 useGitIgnore: true
