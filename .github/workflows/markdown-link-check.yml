@@ -15,6 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: gaurav-nelson/github-action-markdown-link-check@v1
+    - uses: umbrelladocs/action-linkspector@v1
       with:
-        config-file: '.mlc-config.json'
+        config-file: '.linkspector.yml'
