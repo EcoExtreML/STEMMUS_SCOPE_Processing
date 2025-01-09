@@ -3,7 +3,8 @@ repo_url: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing
 repo_name: PyStemmusScope
 
 nav:
-  - Getting started: index.md
+  - Introduction: index.md
+  - Getting started: getting_started.md
   - Installation: installation_instructions.md
   - Run the model:
       - Different ways to run the model: notebooks/run_model_on_different_infra.ipynb
@@ -11,10 +12,10 @@ nav:
       - Site and global datasets on CRIB: notebooks/run_model_with_different_dataset_on_CRIB.ipynb
 
   - BMI:
-    - "BMI instructions": bmi.md
-    - "BMI demonstration": notebooks/BMI_demo.ipynb
-    - "grpc4bmi demonstration": notebooks/grpc4bmi_demo.ipynb
-    - "example: coupling modflow and stemmus_scope": notebooks/bmi_MODFLOW_coupling.ipynb
+    - BMI instructions: bmi.md
+    - BMI demonstration: notebooks/BMI_demo.ipynb
+    - grpc4bmi demonstration: notebooks/grpc4bmi_demo.ipynb
+    - example-coupling modflow and stemmus_scope: notebooks/bmi_MODFLOW_coupling.ipynb
   - Contributing guide: CONTRIBUTING.md
   - API reference: reference.md
 
