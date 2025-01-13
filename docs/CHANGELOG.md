@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-01-14
+
+### Added:
+
+- Ground water coupling in BMI in
+  [#101](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/101)
+- A notebook to demonstrate how to run the model coupling with stemmus_scope and
+  modflow in
+  [#101](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/101)
+- Optional key `soil_layers_thickness` to the config in
+  [#104](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/104)
+- Optional key `SleepDuration` to the config and bmi implementation in
+  [#116](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/116)
+- GitHib action to create a docker container in [#118](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/118)
+
+### Changed:
+
+- BMI variables in [#116](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/116)
+- Dockerfile in [#117](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/117)
+- `MCR_CACHE_ROOT` added to the `local_process.py` in [#117](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/117) to fix MATLAB RunTime error, see [#110](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/issues/110)
+- Documentation is updated in [#117](https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/pull/117)
+
+
 ## [0.4.0] - 2024-02-08
 
 ### Added:
@@ -67,3 +90,4 @@ The first release of PyStemmusScope. Compatible with STEMMUS_SCOPE 1.1.11.
 [0.2.1]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/releases/tag/v0.2.1
 [0.3.0]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/releases/tag/v0.3.0
 [0.4.0]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/releases/tag/v0.4.0
+[0.5.0]: https://github.com/EcoExtreML/STEMMUS_SCOPE_Processing/releases/tag/v0.5.0
