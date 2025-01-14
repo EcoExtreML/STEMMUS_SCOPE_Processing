@@ -13,7 +13,5 @@ Please add a description of the changes proposed in the pull request.
 - [ ] Add tests.
 - [ ] Add changes to the [changelog file](./docs/CHANGELOG.md) under section `Unreleased`.
 - [ ] If your changes are about BMI, make sure that your changes are compatible
-  with [the latest version of
-  STEMMUS_SCOPE](https://github.com/EcoExtreML/STEMMUS_SCOPE/releases) and [its
-  of docker
-  image](https://github.com/orgs/EcoExtreML/packages?repo_name=STEMMUS_SCOPE).
+  with [the latest version of STEMMUS_SCOPE](https://github.com/EcoExtreML/STEMMUS_SCOPE/releases)
+  and [its docker image](https://github.com/orgs/EcoExtreML/packages?repo_name=STEMMUS_SCOPE).

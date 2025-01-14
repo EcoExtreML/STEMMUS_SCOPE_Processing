@@ -18,9 +18,19 @@ authors:
     family-names: Liu
     given-names: Yang
     orcid: "https://orcid.org/0000-0002-1966-8460"
-date-released: 2022-11-24
+  -
+    affiliation: "Univesrity of Twente"
+    family-names: Daoud
+    given-names: Mostafa Gomaa
+    orcid: "https://orcid.org/0000-0001-5112-1708"
+  -
+    affiliation: "Univesrity of Twente"
+    family-names: Zeng
+    given-names: Yijian
+    orcid: "https://orcid.org/0000-0002-2166-5314"
+date-released: 2025-01-14
 doi: <insert your DOI here>
-version: "0.4.0"
+version: "0.5.0"
 repository-code: "https://github.com/EcoExtreML/stemmus_scope_processing"
 keywords:
   - STEMMUS SCOPE Processing
