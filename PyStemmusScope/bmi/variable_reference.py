@@ -33,7 +33,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         input=True,
         output=False,
         units="cm s-1",
-        grid=0,
+        grid=1,
         keys=["ForcingData", "Precip_msr"],
         all_timesteps=True,
     ),
