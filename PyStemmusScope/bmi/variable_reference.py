@@ -30,8 +30,8 @@ VARIABLES: tuple[BmiVariable, ...] = (
     BmiVariable(
         name="precipitation",
         dtype="float64",
-        input=True,
-        output=False,
+        input=False,#True,
+        output=True,#False,
         units="cm s-1",
         grid=0,
         keys=["ForcingData", "Precip_msr"],
