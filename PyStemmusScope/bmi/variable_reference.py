@@ -100,9 +100,9 @@ VARIABLES: tuple[BmiVariable, ...] = (
         input=False,
         output=True,
         units="cm s-1",
-        grid=1,
+        grid=0,
         keys=["RS"],
-        all_timesteps=True,
+        #all_timesteps=True,
     ),
     BmiVariable(
         name="surface_runoff_hortonian",
