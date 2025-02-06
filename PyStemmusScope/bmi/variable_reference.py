@@ -35,7 +35,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         units="cm s-1",
         grid=0,
         keys=["ForcingData", "Precip_msr"],
-        all_timesteps=True,
+        #all_timesteps=True,
     ),
     #BmiVariable(
     #    name="applied_infiltration",
