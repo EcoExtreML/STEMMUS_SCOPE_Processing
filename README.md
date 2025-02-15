@@ -25,4 +25,4 @@ nd running the STEMMUS-SCOPE model.
 The model source code, executable file and utility files are available in the [STEMMUS_SCOPE repository](https://github.com/EcoExtreML/STEMMUS_SCOPE).
 
 More information on the setup and installation, including for own machine, is available
-in the [documentation](https://pystemmusscope.readthedocs.io/).
+in the [documentation](https://pystemmusscope.readthedocs.io/en/latest/).
