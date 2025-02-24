@@ -70,7 +70,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=True,
         units="cm s-1",
         grid=0,
-        keys=["ForcingData", "applied_inf"],
+        keys=["ForcingData", "infiltration"],
     ),
     BmiVariable(
         name="soil_evaporation",
@@ -174,6 +174,24 @@ VARIABLES: tuple[BmiVariable, ...] = (
         grid=0,
         keys=["gwfluxes", "indxRchrg"],
     ),
+    BmiVariable(
+        name="energy_flux_top",
+        dtype="float64",
+        input=False,
+        output=True,
+        units="w s-1",
+        grid=0,
+        keys=["gwfluxes", "energyfluxTop"],
+    ),
+    BmiVariable(
+        name="energy_flux_bottom",
+        dtype="float64",
+        input=False,
+        output=True,
+        units="w s-1",
+        grid=0,
+        keys=["gwfluxes", "energyfluxBotm"],
+    ),    
     # groundwater (coupling) vars
     BmiVariable(
         name="groundwater_coupling_enabled",
