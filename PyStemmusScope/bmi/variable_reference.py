@@ -70,7 +70,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=True,
         units="cm s-1",
         grid=0,
-        keys=["ForcingData", "infiltration"],
+        keys=["ForcingData", "applied_infiltration"],
     ),
     BmiVariable(
         name="soil_evaporation",
