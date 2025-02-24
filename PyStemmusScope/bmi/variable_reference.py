@@ -175,22 +175,22 @@ VARIABLES: tuple[BmiVariable, ...] = (
         keys=["gwfluxes", "indxRchrg"],
     ),
     BmiVariable(
-        name="energy_flux_top",
+        name="energy_top_flux",
         dtype="float64",
         input=False,
         output=True,
         units="w s-1",
         grid=0,
-        keys=["gwfluxes", "energyfluxTop"],
+        keys=["gwfluxes", "energyTopflux"],
     ),
     BmiVariable(
-        name="energy_flux_bottom",
+        name="energy_bottom_flux",
         dtype="float64",
         input=False,
         output=True,
         units="w s-1",
         grid=0,
-        keys=["gwfluxes", "energyfluxBotm"],
+        keys=["gwfluxes", "energyBotmflux"],
     ),    
     # groundwater (coupling) vars
     BmiVariable(
