@@ -64,7 +64,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         keys=["ForcingData", "Precip_snowAccum"],
     ),
     BmiVariable(
-        name="applied_infiltration",
+        name="infiltration",
         dtype="float64",
         input=False,
         output=True,
@@ -126,7 +126,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=True,
         units="cm s-1",
         grid=0,
-        keys=["ForcingData", "RS"],
+        keys=["ForcingData", "runoff"],
     ),
     BmiVariable(
         name="surface_runoff_hortonian",
@@ -135,7 +135,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=True,
         units="cm s-1",
         grid=0,
-        keys=["ForcingData", "R_Hort"],
+        keys=["ForcingData", "runoffHort"],
     ),
     BmiVariable(
         name="surface_runoff_dunnian",
@@ -144,7 +144,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=True,
         units="cm s-1",
         grid=0,
-        keys=["ForcingData", "R_Dunn"],
+        keys=["ForcingData", "runoffDunn"],
     ),
     # groundwater vars (STEMMUS_SCOPE)
     BmiVariable(
