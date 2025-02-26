@@ -64,13 +64,13 @@ VARIABLES: tuple[BmiVariable, ...] = (
         keys=["ForcingData", "Precip_snowAccum"],
     ),
     BmiVariable(
-        name="infiltration",
+        name="effective_precipitation",
         dtype="float64",
         input=False,
         output=True,
         units="cm s-1",
         grid=0,
-        keys=["ForcingData", "infiltration"],
+        keys=["ForcingData", "effectivePrecip"],
     ),
     BmiVariable(
         name="soil_evaporation",
