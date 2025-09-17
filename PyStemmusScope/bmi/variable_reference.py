@@ -34,7 +34,7 @@ VARIABLES: tuple[BmiVariable, ...] = (
         output=False,
         units="cm s-1",
         grid=0,
-        keys=["ForcingData", "Precip"],
+        keys=["ForcingData", "Precip_totalLiquid"],
     ),
     BmiVariable(
         name="precipitation_liquid",
@@ -62,6 +62,15 @@ VARIABLES: tuple[BmiVariable, ...] = (
         units="cm s-1",
         grid=0,
         keys=["ForcingData", "Precip_snowAccum"],
+    ),
+    BmiVariable(
+        name="precipitation_snowmelt",
+        dtype="float64",
+        input=False,
+        output=True,
+        units="cm s-1",
+        grid=0,
+        keys=["ForcingData", "Precip_snowmelt"],
     ),
     BmiVariable(
         name="effective_precipitation",
